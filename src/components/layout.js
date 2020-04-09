@@ -25,10 +25,10 @@ const data = useStaticQuery(
       css={css`
         margin: 0 auto;
         max-width: 1140px;
-        padding: ${rhythm(1.5)};
+        padding: ${rhythm(2)};
         padding-top: ${rhythm(1.5)};
       `}>
-      <header style={{ marginBottom: `1.5rem`,  position: `sticky` }}>
+      <header style={{ marginBottom: `1.5rem` }}>
         <Link to={'/'}>
           <h3 style={{ display: `inline-block` }}>
             {data.site.siteMetadata.title}
