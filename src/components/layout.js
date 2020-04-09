@@ -1,7 +1,6 @@
 import React from "react"
 import { css } from "@emotion/core"
 import { useStaticQuery, Link, graphql } from "gatsby"
-
 import { rhythm } from "../utils/typography"
 
 const ListLink = props => (
@@ -25,10 +24,10 @@ const data = useStaticQuery(
       css={css`
         margin: 0 auto;
         max-width: 1140px;
-        padding: ${rhythm(2)};
+        padding: 0 ${rhythm(2)};
         padding-top: ${rhythm(1.5)};
       `}>
-      <header style={{ marginBottom: `1.5rem` }}>
+      <header style={{ marginBottom: `1.5rem`, paddingBottom: rhythm(1.5) }}>
         <Link to={'/'}>
           <h3 style={{ display: `inline-block` }}>
             {data.site.siteMetadata.title}

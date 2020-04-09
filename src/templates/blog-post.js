@@ -1,6 +1,8 @@
 import React from "react"
 import Layout from "../components/layout"
+import { css } from "@emotion/core"
 import { graphql } from "gatsby"
+import { rhythm } from "../utils/typography"
 
 export default ({ data }) => {
   const post = data.allWordpressPost.edges[0].node

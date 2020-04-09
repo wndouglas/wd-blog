@@ -8,7 +8,7 @@ export default ({ data }) => {
   return (
     <Layout>
       <SEO title="home" />
-      <h1>Latest posts</h1>
+      <h1> Latest posts</h1>
       {data.allWordpressPost.edges.map(({ node }) => (
         <div key={node.slug}>
           <Link to={node.slug}>
