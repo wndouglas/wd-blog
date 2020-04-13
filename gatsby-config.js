@@ -17,10 +17,6 @@ module.exports = {
         useACF: true,
       },
     },
-    /**
-     * The following plugins aren't required for gatsby-source-wordpress,
-     * but we need them so the default starter we installed above will keep working.
-     **/
     `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-source-filesystem`,
@@ -36,10 +32,6 @@ module.exports = {
         path: `${__dirname}/content/posts`,
       },
     },
-    `gatsby-transformer-sharp`,
-    `gatsby-transformer-remark`,
-    `gatsby-plugin-sharp`,
-    `gatsby-plugin-emotion`,
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
@@ -58,5 +50,10 @@ module.exports = {
         pathToConfigModule: `src/utils/typography`,
       },
     },
+    `gatsby-transformer-sharp`,
+    `gatsby-transformer-remark`,
+    `gatsby-plugin-sharp`,
+    `gatsby-plugin-emotion`,
+    `gatsby-plugin-styled-components`,
   ],
 }

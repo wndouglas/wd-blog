@@ -2,6 +2,8 @@ import React from "react"
 import { css } from "@emotion/core"
 import { useStaticQuery, Link, graphql } from "gatsby"
 import { rhythm } from "../utils/typography"
+import Navbar from "./navbar/navbar"
+import Footer from "./footer"
 
 const ListLink = props => (
   <li style={{ display: `inline-block`, marginRight: rhythm(0.75) }}>
@@ -15,11 +17,13 @@ const data = useStaticQuery(
     query {
       site {
         siteMetadata {
-          title
+          author
         }
       }
     }`)
   return (
+    <>
+    <Navbar />
     <div
       css={css`
         margin: 0 auto;
@@ -27,19 +31,9 @@ const data = useStaticQuery(
         padding: 0 ${rhythm(2)};
         padding-top: ${rhythm(1.5)};
       `}>
-      <header style={{ marginBottom: `1.5rem`, paddingBottom: rhythm(1.5) }}>
-        <Link to={'/'}>
-          <h3 style={{ display: `inline-block` }}>
-            {data.site.siteMetadata.title}
-          </h3>
-        </Link>
-        <ul style={{ listStyle: `none`, float: `right` }}>
-          <ListLink to="/">Home</ListLink>
-          <ListLink to="/about/">About</ListLink>
-          <ListLink to="/posts/">Posts</ListLink>
-        </ul>
-      </header>
+      
       {children}
     </div>
+    </>
   )
 }
