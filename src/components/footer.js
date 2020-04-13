@@ -1,7 +1,7 @@
 import { rhythm } from "../utils/typography"
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useStaticQuery } from "gatsby"
+import { useStaticQuery, graphql } from "gatsby"
 
 const Footer = () => {
   const data = useStaticQuery(
