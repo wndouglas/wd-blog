@@ -44,8 +44,8 @@ export default () => {
   return (
     <>
       <NavItem to="/">Home</NavItem>
-      <NavItem to="/about/">About</NavItem>
       <NavItem to="/posts">Posts</NavItem>
+      <NavItem to="/about/">About</NavItem>
       <NavItem to="/404">Contact</NavItem>
     </>
     )
