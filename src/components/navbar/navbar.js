@@ -13,7 +13,7 @@ const Navigation = styled.nav`
   text-transform: uppercase;
   border-bottom: 2px solid #33333320;
   margin: ${rhythm(1.5)} auto;
-  padding: 0 ${rhythm(0)};
+  padding: 0 ${rhythm(1)};
   z-index: 2;
   align-self: center;
 
@@ -99,7 +99,9 @@ export default () => {
         navbarOpen={navbarOpen}
         onClick={() => setNavbarOpen(!navbarOpen)}
         >
-          {navbarOpen ? <Hamburger open/> : <Hamburger />}
+          <div style={{ float: `right`, position: `absolute` }}>
+            {navbarOpen ? <Hamburger open/> : <Hamburger />}
+          </div>
         </Toggle>
         {navbarOpen ? (
         <Navbox>
