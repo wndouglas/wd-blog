@@ -1,16 +1,44 @@
 import { rhythm } from "../utils/typography"
-import styled from "styled-components"
+import React from 'react'
+import PropTypes from 'prop-types'
+import { useStaticQuery } from "gatsby"
 
-const Footer = styled.footer`
-height: ${rhythm(0.5)};
-background-color: #fff;
-position: static;
-bottom: 0;
-justify-content: space-between;
-margin: 0 auto;
-padding: 0 ${rhythm(1)};
-z-index: 2;
-align-self: center;
-`
+const Footer = () => {
+  const data = useStaticQuery(
+    graphql`
+      query {
+        site {
+          siteMetadata {
+            author
+          }
+        }
+    }`)
+
+  return (
+  <footer
+    style={{
+      position: 'static',
+      bottom: 0,
+      left: 0,
+      zIndex: 2,
+      width: `100vw`,
+      height: rhythm(1.75),
+      maxHeight: rhythm(1.75),
+      padding: `${rhythm(0.5)} ${rhythm(1)}`,
+      textAlign: `left`,
+      borderTop: `2px solid #33333320`,
+    }}>
+    © {data.site.siteMetadata.author}, {new Date().getFullYear()}.
+  </footer>
+  )
+}
+
+Footer.propTypes = {
+  siteTitle: PropTypes.string,
+}
+
+Footer.defaultProps = {
+  siteTitle: ``,
+}
 
 export default Footer
