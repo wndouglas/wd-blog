@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
     title: `Alpha Beta Rho`,
-    description: `Thoughts and Musings of a Quantitative Professional.`,
+    description: `Thoughts and Ideas from a Quantitative Professional.`,
     author: `Will Douglas`,
   },
   plugins: [

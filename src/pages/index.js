@@ -8,7 +8,7 @@ import { rhythm } from "../utils//typography"
 export default ({ data }) => {
   return (
     <Layout>
-      <SEO title="home" />
+      <SEO title="Alpha Beta Rho - Home" />
       <h1 style={{ paddingBottom:`${rhythm(0.5)}` }}> Latest posts</h1>
       {data.allWordpressPost.edges.map(({ node }) => (
         <div key={node.slug}>
