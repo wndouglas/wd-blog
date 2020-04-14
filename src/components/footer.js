@@ -1,9 +1,20 @@
 import { rhythm } from "../utils/typography"
 import React from 'react'
-import PropTypes from 'prop-types'
+import styled from "styled-components"
 import { useStaticQuery, graphql } from "gatsby"
 
-const Footer = () => {
+const Footer = styled.footer`
+width: 100vw;
+height: ${rhythm(1)};
+padding-top: ${rhythm(0.2)};
+padding-left: ${rhythm(0.5)};
+-webkit-box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
+-moz-box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
+box-shadow: 0 -4px 6px -5px #222;
+font-size: 75%;
+`
+
+export default () => {
   const data = useStaticQuery(
     graphql`
       query {
@@ -15,30 +26,8 @@ const Footer = () => {
     }`)
 
   return (
-  <footer
-    style={{
-      position: 'static',
-      bottom: 0,
-      left: 0,
-      zIndex: 2,
-      width: `100vw`,
-      height: rhythm(1.75),
-      maxHeight: rhythm(1.75),
-      padding: `${rhythm(0.5)} ${rhythm(1)}`,
-      textAlign: `left`,
-      borderTop: `2px solid #33333320`,
-    }}>
+  <Footer>
     © {data.site.siteMetadata.author}, {new Date().getFullYear()}.
-  </footer>
+  </Footer>
   )
 }
-
-Footer.propTypes = {
-  siteTitle: PropTypes.string,
-}
-
-Footer.defaultProps = {
-  siteTitle: ``,
-}
-
-export default Footer

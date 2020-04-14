@@ -7,10 +7,12 @@ import { rhythm } from "../../utils/typography"
 const NavbarContainer = styled.header`
   height: ${rhythm(2)};
   background-color: white;
-  border-bottom: 2px solid #33333320;
+  -webkit-box-shadow: 0 4px 6px -5px #222;
+  -moz-box-shadow: 0 4px 6px -5px #222;
+  box-shadow: 0 4px 6px -5px #222;
   position: fixed;
   width: 100%;
-  padding: ${rhythm(1.5)} ${rhythm(1)};
+  padding: ${rhythm(1)} ${rhythm(1)};
   z-index: 2;
 `
 
@@ -51,7 +53,7 @@ const Navbox = styled.nav`
     padding-top: 10vh;
     background-color: #fff;
     transition: all 0.3s ease-in;
-    top: 10vh;
+    top: 5vh;
     left: ${props => (props.open ? "-100%" : "0")};
   }
 `

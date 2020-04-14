@@ -10,9 +10,10 @@ export default ({ children }) => (
   <div
     css={css`
       margin: 0 auto;
-      max-width: 1140px;
-      min-height: 90vh;
-      padding: ${rhythm(4.5)} ${rhythm(2)} ${rhythm(2)} ${rhythm(2)};
+      max-width: 1000px;
+      min-height: 98vh;
+      padding: ${rhythm(3.5)} ${rhythm(2)} ${rhythm(2)} ${rhythm(2)};
+      font-size: 80%;
     `}>
     {children}
   </div>
