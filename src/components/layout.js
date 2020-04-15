@@ -16,7 +16,7 @@ export default ({ children }) => (
     margin: 0 auto;
     max-width: 1000px;
     min-height: 200vh;
-    padding: ${rhythm(3.5)} ${rhythm(2)} ${rhythm(2)} ${rhythm(2)};
+    padding: ${rhythm(3.5)} ${rhythm(1)} ${rhythm(2)} ${rhythm(1)};
     font-size: 90%;`}>
         {children}
     </div>
