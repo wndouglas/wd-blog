@@ -13,10 +13,11 @@ const DecoratedLink = ({ slug, children }) => (
               display: inline-block;
               transition: all 400ms ease-in;
               position: relative;
+              bottom: -${rhythm(1/2)};
               
               :after {
                 position: absolute;
-                bottom: 0;
+                bottom: -1px;
                 left: 0;
                 right: 0;
                 width: 0%;

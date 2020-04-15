@@ -36,6 +36,7 @@ const Toggle = styled.nav`
   justify-content: flex-end;
   @media (max-width: 650px) {
     display: flex;
+    padding-right: ${rhythm(1/2)};
   }
 `
 
