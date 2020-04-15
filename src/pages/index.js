@@ -13,7 +13,6 @@ const DecoratedLink = ({ slug, children }) => (
               display: inline-block;
               transition: all 400ms ease-in;
               position: relative;
-              bottom: -${rhythm(1/2)};
               
               :after {
                 position: absolute;
@@ -43,6 +42,7 @@ export default ({ data }) => {
     <Layout>
       <SEO title="Home"/>
       <h1 style={{ paddingBottom:`${rhythm(0.5)}` }}> Latest posts</h1>
+      <br/>
       {data.allWordpressPost.edges.map(({ node }) => (
         <div key={node.slug}>
           <DecoratedLink slug={node.slug}>
