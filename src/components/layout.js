@@ -3,7 +3,6 @@ import { css } from "@emotion/core"
 import { rhythm } from "../utils/typography"
 import Header from "./header/header"
 import Footer from "./footer"
-import BackgroundImage from "./backgroundImage"
 
 export default ({ children }) => (
   <>
