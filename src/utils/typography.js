@@ -1,7 +1,7 @@
 import Typography from "typography"
 import KirkhamTheme from "typography-theme-kirkham"
-KirkhamTheme.baseFontSize = '18px' // was 20px.
 
+KirkhamTheme.headerFontFamily = ['Roboto']
 const typography = new Typography(KirkhamTheme)
 
 export default typography
