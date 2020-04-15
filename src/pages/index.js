@@ -42,7 +42,7 @@ export default ({ data }) => {
     <Layout>
       <SEO title="Home"/>
       <h1 style={{ paddingBottom:`${rhythm(0.5)}` }}> Latest posts</h1>
-      <br/>
+      <hr/>
       {data.allWordpressPost.edges.map(({ node }) => (
         <div key={node.slug}>
           <DecoratedLink slug={node.slug}>
