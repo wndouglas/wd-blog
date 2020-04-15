@@ -1,44 +1,59 @@
+import { graphql, useStaticQuery } from 'gatsby'
 import React from 'react'
-import { graphql, StaticQuery } from 'gatsby'
 import styled from 'styled-components'
 
 import BackgroundImage from 'gatsby-background-image'
 
-const BackgroundSection = ({ className }) => (
-  <StaticQuery
-    query={graphql`
+const MultiBackground = ({ className, children }) => {
+  const { desktop } = useStaticQuery(
+    graphql`
       query {
-        allImageSharp {
-            nodes {
-              fluid(quality: 100, maxWidth: 1920) {
-                ...GatsbyImageSharpFluid_withWebp
-              }
+        desktop: file(relativePath: { eq: "london1.jpg" }) {
+          childImageSharp {
+            fluid(quality: 100) {
+              ...GatsbyImageSharpFluid_withWebp
             }
           }
+        }
       }
-    `}
-    render={data => {
-      // Set ImageData.
-      const imageData = data.allImageSharp.nodes.fluid
-      return (
-        <BackgroundImage
-          Tag="section"
-          className={className}
-          fluid={imageData}
-          backgroundColor={`#040e18`}
-        >
-          <h2>gatsby-background-image</h2>
-        </BackgroundImage>
-      )
-    }}
-  />
-)
+    `
+  )
 
-const StyledBackgroundSection = styled(BackgroundSection)`
-  width: 100%;
-  background-position: bottom center;
-  background-repeat: repeat-y;
-  background-size: cover;
+  // Watch out for CSS's stacking order, especially when styling the individual
+  // positions! The lowermost image comes last!
+  // `linear-gradient(rgba(220, 15, 15, 0.73), rgba(4, 243, 67, 0.73))`,
+  const backgroundFluidImageStack = [
+    desktop.childImageSharp.fluid
+  ]
+
+  return (
+    <BackgroundImage
+      Tag={`section`}
+      id={`test`}
+      className={className}
+      fluid={backgroundFluidImageStack}
+    >
+      <StyledInnerWrapper>
+        {children}
+      </StyledInnerWrapper>
+    </BackgroundImage>
+  )
+}
+
+const StyledInnerWrapper = styled.div`
+width: 100%;
+height: 100vh;
+display: flex;
+overflow: hidden;
 `
 
-export default StyledBackgroundSection
+const StyledMultiBackground = styled(MultiBackground)`
+width: 100%;
+height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+  background-color: linear-gradient(to top, rgba(25, 84, 123, 0.01), rgba(255, 216, 155, 0.15));
+`
+
+export default StyledMultiBackground

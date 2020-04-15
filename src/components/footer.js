@@ -12,6 +12,7 @@ padding-left: ${rhythm(0.5)};
 -moz-box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
 box-shadow: 0 -4px 6px -5px #222;
 font-size: 75%;
+background-color: rgb(255, 244, 224);
 `
 
 export default () => {
@@ -27,7 +28,7 @@ export default () => {
 
   return (
   <Footer>
-    © {data.site.siteMetadata.author}, {new Date().getFullYear()}.
+    © {new Date().getFullYear()} {data.site.siteMetadata.author}, All Rights Reserved.
   </Footer>
   )
 }

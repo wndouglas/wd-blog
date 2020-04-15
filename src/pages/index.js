@@ -13,7 +13,7 @@ export default ({ data }) => {
       {data.allWordpressPost.edges.map(({ node }) => (
         <div key={node.slug}>
           <Link to={node.slug}>
-            <h2>{node.title}</h2>
+            <h2 style={{ }}>{node.title}</h2>
           </Link>
           <div dangerouslySetInnerHTML={{ __html: node.excerpt }} />
         </div>
