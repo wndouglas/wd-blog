@@ -54,7 +54,7 @@ const Navbox = styled.nav`
     padding-top: 10vh;
     background-color: rgb(255, 244, 224);
     transition: all 0.3s ease-in;
-    top: 4vh;
+    top: 52px;
     left: ${props => (props.open ? "-100%" : "0")};
   }
 `

@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from "gatsby"
 import styled from "styled-components"
+import { rhythm } from "../../utils/typography"
 
 const NavItem = styled(Link)`
   dispay: inline-block; 
@@ -8,7 +9,7 @@ const NavItem = styled(Link)`
   text-decoration: none;
   box-shadow: none;
   white-space: nowrap;
-  margin: 10px 1vw;
+  margin: ${rhythm(0.3)} 1vw;
   transition: all 200ms ease-in;
   position: relative;
   top: -20px;
@@ -35,7 +36,7 @@ const NavItem = styled(Link)`
   }
 
   @media (max-width: 650px) {
-    padding: 20px 0;
+    padding: 10px 0;
     font-size: 1.5rem;
     z-index: 6;
   }

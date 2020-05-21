@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form'
 import { Row, Col, Button } from 'react-bootstrap'
 
 export default () => (
-    <div style={{ width: "65%", marginLeft: "auto", marginRight: "auto" }}>
+    <div style={{ width: "100%", marginLeft: "auto", marginRight: "auto" }}>
     <Form method="post" action="/success" data-netlify="true" data-netlify-honeypot="bot-field" name="contact">
         <input type="hidden" name="form-name" value="contact" />
         <Form.Group controlId="formGroupName">

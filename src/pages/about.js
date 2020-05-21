@@ -15,7 +15,7 @@ export const AboutPage = ({ data }) => {
   <Layout>
     <SEO title="About" />
     <Container align='center'>
-        <Col xs={4} md={4}>
+        <Col xs={6} md={4}>
           <Img fluid={data.image.childImageSharp.fluid} style={{ borderRadius: '50%', border: '1px solid #ddd' }}/>
         </Col>
     </Container>
