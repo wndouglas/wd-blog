@@ -5,7 +5,6 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { css } from "@emotion/core"
 
-
 const DecoratedLink = ({ slug, children }) => (
   <Link to={slug}>
             <h2 css={css`

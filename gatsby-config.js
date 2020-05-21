@@ -57,16 +57,12 @@ module.exports = {
         pathToConfigModule: `src/utils/typography`,
       },
     },
-    module.exports = {
-      plugins: [
-        {
-          resolve: `gatsby-plugin-google-analytics`,
-          options: {
-            // replace "UA-XXXXXXXXX-X" with your own Tracking ID
-            trackingId: "UA-167342958-1",
-          },
-        },
-      ],
+    {
+      resolve: `gatsby-plugin-google-analytics`,
+      options: {
+        // replace "UA-XXXXXXXXX-X" with your own Tracking ID
+        trackingId: "UA-167342958-1",
+      },
     },
     `gatsby-transformer-sharp`,
     `gatsby-transformer-remark`,
