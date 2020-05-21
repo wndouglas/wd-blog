@@ -3,7 +3,8 @@ import Form from 'react-bootstrap/Form'
 import { Row, Col, Button } from 'react-bootstrap'
 
 export default () => (
-    <form method="post" action="#" data-netlify="true" data-netlify-honeypot="bot-field" name="contact">
+    <Form method="post" action="#" data-netlify="true" data-netlify-honeypot="bot-field" name="contact">
+        <input type="hidden" name="form-name" value="contact" />
         <Form.Group controlId="formGroupName">
             <Form.Label>Name</Form.Label>
             <Form.Control type="name" placeholder="Enter name" required/>
@@ -21,5 +22,5 @@ export default () => (
              <Button type="submit">Sign in</Button>
             </Col>
         </Form.Group>
-    </form>
+    </Form>
 )
