@@ -3,7 +3,6 @@ import { Link, graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import { rhythm } from "../utils//typography"
 import { css } from "@emotion/core"
 
 
@@ -41,8 +40,9 @@ export default ({ data }) => {
   return (
     <Layout>
       <SEO title="Home"/>
-      <h1 style={{ paddingBottom:`${rhythm(0.5)}` }}> Latest posts</h1>
+      <h1> Latest posts</h1>
       <hr/>
+      <br/>
       {data.allWordpressPost.edges.map(({ node }) => (
         <div key={node.slug}>
           <DecoratedLink slug={node.slug}>

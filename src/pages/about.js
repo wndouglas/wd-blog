@@ -1,6 +1,7 @@
 import React from "react"
-import { Link, graphql } from "gatsby"
+import { graphql } from "gatsby"
 import { MDXRenderer } from "gatsby-plugin-mdx"
+import ContactForm from "../components/form"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -12,7 +13,7 @@ export const AboutPage = ({ data }) => {
     <SEO title="About" />
     <h1>About</h1>
     <MDXRenderer>{post.body}</MDXRenderer>
-    <Link to="/">Go home</Link>
+    <ContactForm/>
   </Layout>
   )
 }

@@ -9,7 +9,6 @@ const AboutPage = () => (
     <SEO title="Contact" />
     <h1>Contact</h1>
     <p>This page contains contact details.</p>
-    <Link to="/">Go home</Link>
   </Layout>
 )
 

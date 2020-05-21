@@ -6,7 +6,7 @@ import { rhythm } from "../../utils/typography"
 const LogoWrap = styled.div`
   flex: 1 0 auto;
   justify-content: flex-start;
-  margin: -${rhythm(3/8)} 0;
+  margin: -${rhythm(0.5)} 0;
   padding-left: ${rhythm(0.5)};
 
   @media (max-width: 768px) and (orientation: landscape) {

@@ -3,9 +3,10 @@ import { Link } from "gatsby"
 import styled from "styled-components"
 
 const NavItem = styled(Link)`
-  text-decoration: none;
+  dispay: inline-block; 
   color: #111;
-  dispay: inline-block;
+  text-decoration: none;
+  box-shadow: none;
   white-space: nowrap;
   margin: 10px 1vw;
   transition: all 200ms ease-in;
@@ -27,6 +28,7 @@ const NavItem = styled(Link)`
 
   :hover {
     color: rgb(159,57,43);
+    text-decoration: none;
     ::after {
       width: 100%;
     }

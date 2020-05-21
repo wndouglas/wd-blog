@@ -9,7 +9,6 @@ const PostsPage = () => (
     <SEO title="Posts" />
     <h1>Posts</h1>
     <p>Here is a page containing all of the posts.</p>
-    <Link to="/">Go home</Link>
   </Layout>
 )
 
