@@ -6,7 +6,7 @@ import { rhythm } from "../../utils/typography"
 
 const NavbarContainer = styled.header`
   height: ${rhythm(2)};
-  background-color: rgb(255, 244, 224);
+  background-color: rgb(233,221,209);
   -webkit-box-shadow: 0 4px 6px -5px #222;
   -moz-box-shadow: 0 4px 6px -5px #222;
   box-shadow: 0 4px 6px -5px #222;

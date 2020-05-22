@@ -20,6 +20,8 @@ export const AboutPage = ({ data }) => {
         </Col>
     </Container>
     <h1>About</h1>
+    <hr/>
+    <br/>
     <MDXRenderer>{post.body}</MDXRenderer>
     <ContactForm/>
   </Layout>

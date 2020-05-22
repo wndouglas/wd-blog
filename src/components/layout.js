@@ -9,9 +9,7 @@ export default ({ children }) => (
   <>
   <Header />
   <div css={css`
-  background: rgba(255, 216, 155, 0.2);  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to top, rgba(25, 84, 123, 0.05), rgba(255, 216, 155, 0.2));  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to top, rgba(25, 84, 123, 0.05), rgba(255, 216, 155, 0.2)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */  
+  background: linear-gradient(135deg, rgb(242,235,228) 0%, rgb(228,213,199) 90%); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */  
   `}>
     <div css={css`
     margin: 0 auto;
