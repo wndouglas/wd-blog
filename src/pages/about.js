@@ -9,6 +9,8 @@ import Img from "gatsby-image"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 
+const shortCodes = { ContactForm }
+
 export const AboutPage = ({ data }) => {
   const post = data.markdown.edges[0].node
   return (
@@ -22,8 +24,7 @@ export const AboutPage = ({ data }) => {
     <h1>About</h1>
     <hr/>
     <br/>
-    <MDXRenderer>{post.body}</MDXRenderer>
-    <ContactForm/>
+    <MDXRenderer components={shortCodes}>{post.body}</MDXRenderer>
   </Layout>
   )
 }

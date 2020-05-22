@@ -2,15 +2,21 @@ import React from "react"
 import Layout from "../components/layout"
 import { graphql } from "gatsby"
 import SEO from "../components/seo"
+import { MDXRenderer } from "gatsby-plugin-mdx"
+import MetaData from "../components/postMetadata"
 
 export default ({ data }) => {
-  const post = data.allWordpressPost.edges[0].node
+  console.log(data)
+  const post = data.mdx
   return (
     <Layout>
-    <SEO title={post.title} />
+    <SEO title={post.frontmatter.title} />
       <div>
-        <h1>{post.title}</h1>
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        <h1>{post.frontmatter.title}</h1>
+        <MetaData date={post.frontmatter.date} timeToRead={post.timeToRead}/>
+        <hr/>
+        <br/>
+        <MDXRenderer>{post.body}</MDXRenderer>
       </div>
     </Layout>
   )
@@ -18,13 +24,14 @@ export default ({ data }) => {
 
 export const query = graphql`
   query($slug: String!) {
-    allWordpressPost(filter: { slug: { eq: $slug } }) {
-    edges {
-      node {
-        title
-        content
-      }
-    }
+    mdx(frontmatter: {path: { eq: $slug }}) {
+        frontmatter {
+          path
+          title
+          date
+        }
+        body
+        timeToRead
   }
 }
 `

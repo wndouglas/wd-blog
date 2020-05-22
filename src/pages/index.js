@@ -5,9 +5,11 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { css } from "@emotion/core"
 
+import MetaData from "../components/postMetadata"
+
 const DecoratedLink = ({ slug, children }) => (
   <Link to={slug}>
-            <h2 css={css`
+            <h3 css={css`
               display: inline-block;
               transition: all 400ms ease-in;
               position: relative;
@@ -31,7 +33,9 @@ const DecoratedLink = ({ slug, children }) => (
                   width: 100%;
                 }
               }
-             `}>{children}</h2>
+             `}>
+               {children}
+             </h3>
   </Link>
 )
 
@@ -42,12 +46,17 @@ export default ({ data }) => {
       <h1> Latest posts</h1>
       <hr/>
       <br/>
-      {data.allWordpressPost.edges.map(({ node }) => (
-        <div key={node.slug}>
-          <DecoratedLink slug={node.slug}>
-            {node.title}
+      {data.mdxArticles.edges.map(({ node }) => (
+        <div key={node.frontmatter.path}>
+          <DecoratedLink slug={node.frontmatter.path}>
+            {node.frontmatter.title}
           </DecoratedLink>
+          &nbsp;&nbsp;&nbsp;
+          <MetaData 
+            date={node.frontmatter.date}
+            timeToRead={node.timeToRead}/>
           <div dangerouslySetInnerHTML={{ __html: node.excerpt }} />
+          <br/>
         </div>
       ))}
     </Layout>
@@ -56,12 +65,17 @@ export default ({ data }) => {
 
 export const query = graphql`
   query {
-    allWordpressPost(sort: { fields: [date] }) {
+    mdxArticles: allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {category: {ne: "header_page"}}}) {
       edges {
         node {
-          title
+          frontmatter {
+            title
+            path
+            date
+          }
+          timeToRead
           excerpt
-          slug
+          id
         }
       }
     }

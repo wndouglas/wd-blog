@@ -4,23 +4,22 @@ exports.createPages = ({ graphql, actions }) => {
   const { createPage } = actions
     return graphql(`
       {
-        allWordpressPost(sort: { fields: [date] }) {
+        allMdx(sort: {fields: frontmatter___date}, filter: {frontmatter: {category: {ne: "header_page"}}}) {
           edges {
-          node {
-            title
-             excerpt
-             content
-             slug
+            node {
+              frontmatter {
+                path
+              }
+            }
           }
         }
-      }
-    }`).then(result => {
-    result.data.allWordpressPost.edges.forEach(({ node }) => {
+      }`).then(result => {
+    result.data.allMdx.edges.forEach(({ node }) => {
       createPage({
-        path: node.slug,
+        path: node.frontmatter.path,
         component: path.resolve(`./src/templates/blog-post.js`),
         context: {
-        slug: node.slug,
+        slug: node.frontmatter.path,
         },
       })    
     })
