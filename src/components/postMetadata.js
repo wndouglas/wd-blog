@@ -12,14 +12,26 @@ const timeToReadText = ( timeToRead ) => {
     {
       return timeToRead + " mins" + textOut
     }
-  }
+}
 
-export default ({ date, timeToRead }) => (
+
+const metadataOut = ( date, timeToRead, category ) => {
+  moment.locale('en-gb')
+  let endText = moment(date).format('LL') + " · " + timeToReadText(timeToRead)
+  if (category !== undefined)
+  {
+    endText = "[" + category + "] · " + endText
+  }
+  return endText
+}
+
+
+export default ({ date, timeToRead, category }) => (
 <span
     css={css`
     color: #bbb;
     display: inline-block;
     `}>
-    {moment(date).format('LL')}{" · "}{timeToReadText(timeToRead)}
+    {metadataOut(date, timeToRead, category)}
 </span>
 )

@@ -33,7 +33,7 @@ export default AboutPage
 
 export const query = graphql`
   query {
-    markdown: allMdx(filter: {frontmatter: {title: {eq: "About Page"}}}) {
+    markdown: allMdx(filter: {frontmatter: {path: {eq: "/about"}}}) {
       edges {
         node {
           body

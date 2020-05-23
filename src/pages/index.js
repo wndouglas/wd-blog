@@ -1,43 +1,11 @@
 import React from "react"
-import { Link, graphql } from "gatsby"
+import { graphql, Link } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import { css } from "@emotion/core"
+import DecoratedLink from "../components/decoratedLink"
 
 import MetaData from "../components/postMetadata"
-
-const DecoratedLink = ({ slug, children }) => (
-  <Link to={slug}>
-            <h3 css={css`
-              display: inline-block;
-              transition: all 400ms ease-in;
-              position: relative;
-              
-              :after {
-                position: absolute;
-                bottom: -1px;
-                left: 0;
-                right: 0;
-                width: 0%;
-                content: ".";
-                color: transparent;
-                background: rgb(159,57,43);
-                height: 1px;
-                transition: all 0.5s ease-in;
-              }
-            
-              :hover {
-                color: rgb(159,57,43);
-                ::after {
-                  width: 100%;
-                }
-              }
-             `}>
-               {children}
-             </h3>
-  </Link>
-)
 
 export default ({ data }) => {
   return (
@@ -49,14 +17,17 @@ export default ({ data }) => {
       {data.mdxArticles.edges.map(({ node }) => (
         <div key={node.frontmatter.path}>
           <DecoratedLink slug={node.frontmatter.path}>
-            {node.frontmatter.title}
+            <h3 style={{ margin: '0 0 0 0' }}>{node.frontmatter.title}</h3>
           </DecoratedLink>
           &nbsp;&nbsp;&nbsp;
           <MetaData 
             date={node.frontmatter.date}
-            timeToRead={node.timeToRead}/>
-          <div dangerouslySetInnerHTML={{ __html: node.excerpt }} />
+            timeToRead={node.timeToRead}
+            category={node.frontmatter.category}/>
           <br/>
+          <div dangerouslySetInnerHTML={{ __html: node.excerpt }} />
+          <Link to={node.frontmatter.path}>Read more...</Link>
+          <br/><br/>
         </div>
       ))}
     </Layout>
@@ -65,17 +36,17 @@ export default ({ data }) => {
 
 export const query = graphql`
   query {
-    mdxArticles: allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {category: {ne: "header_page"}}}) {
+    mdxArticles: allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {post_type: {ne: "header_page"}}}) {
       edges {
         node {
           frontmatter {
-            title
             path
+            title
+            category
             date
           }
           timeToRead
           excerpt
-          id
         }
       }
     }

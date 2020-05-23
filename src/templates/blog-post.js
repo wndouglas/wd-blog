@@ -13,7 +13,7 @@ export default ({ data }) => {
     <SEO title={post.frontmatter.title} />
       <div>
         <h1>{post.frontmatter.title}</h1>
-        <MetaData date={post.frontmatter.date} timeToRead={post.timeToRead}/>
+        <MetaData date={post.frontmatter.date} timeToRead={post.timeToRead} category={post.frontmatter.category}/>
         <hr/>
         <br/>
         <MDXRenderer>{post.body}</MDXRenderer>
@@ -28,6 +28,7 @@ export const query = graphql`
         frontmatter {
           path
           title
+          category
           date
         }
         body

@@ -22,7 +22,7 @@ export default ContactPage
 
 export const query = graphql`
   query {
-    markdown: allMdx(filter: {frontmatter: {title: {eq: "Contact Page"}}}) {
+    markdown: allMdx(filter: {frontmatter: {path: {eq: "/contact"}}}) {
       edges {
         node {
           body

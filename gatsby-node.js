@@ -4,7 +4,7 @@ exports.createPages = ({ graphql, actions }) => {
   const { createPage } = actions
     return graphql(`
       {
-        allMdx(sort: {fields: frontmatter___date}, filter: {frontmatter: {category: {ne: "header_page"}}}) {
+        allMdx(sort: {fields: frontmatter___date}, filter: {frontmatter: {post_type: {ne: "header_page"}}}) {
           edges {
             node {
               frontmatter {

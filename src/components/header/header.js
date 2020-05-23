@@ -52,7 +52,7 @@ const Navbox = styled.nav`
     width: 100%;
     justify-content: flex-start;
     padding-top: 10vh;
-    background-color: rgb(255, 244, 224);
+    background-color: rgb(233,221,209);
     transition: all 0.3s ease-in;
     top: 52px;
     left: ${props => (props.open ? "-100%" : "0")};
