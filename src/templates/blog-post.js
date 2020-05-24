@@ -6,7 +6,6 @@ import { MDXRenderer } from "gatsby-plugin-mdx"
 import MetaData from "../components/postMetadata"
 
 export default ({ data }) => {
-  console.log(data)
   const post = data.mdx
   return (
     <Layout>

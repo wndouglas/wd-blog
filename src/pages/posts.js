@@ -15,13 +15,14 @@ const PostsPage = ({ data }) => (
     {data.postCategories.distinct.sort().map(category => (
       <div key={category}>
         <h3>{category}</h3>
-        {data.allPosts.edges.filter(({ node }) => (node.frontmatter.category === category)).map(({ node }) => node.frontmatter.sub_category).filter((v, i, a) => a.indexOf(v) === i).sort().map(
-          subcategory => (
+        {data.allPosts.edges.filter(({ node }) => (node.frontmatter.category === category)).map(({ node }) => node.frontmatter.sub_category).filter((v, i, a) => a.indexOf(v) === i).sort()
+        .map(subcategory => (
             <div key={subcategory}>
               <h6>{subcategory}</h6>
               <ul style={{ display: 'inline-block'}}>
               {data.allPosts.edges.filter(({ node }) => (
-                  node.frontmatter.category === category && node.frontmatter.sub_category === subcategory)).map(({ node }) => (
+                  node.frontmatter.category === category && node.frontmatter.sub_category === subcategory)).slice(0, 5)
+                  .map(({ node }) => (
                       <li key={node.frontmatter.path}>
                         <div style={{display: 'inline-block'}}>
                           <DecoratedLink slug={node.frontmatter.path}>
@@ -34,6 +35,7 @@ const PostsPage = ({ data }) => (
                           timeToRead={node.timeToRead}/>
                       </li>
               ))}
+              <li key={subcategory} style={{listStyle: 'none'}}>See all.</li>
               </ul>
             </div>
           ))}

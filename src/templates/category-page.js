@@ -1,31 +1,27 @@
 import React from "react"
-import { graphql, Link } from "gatsby"
-
 import Layout from "../components/layout"
+import { graphql } from "gatsby"
 import SEO from "../components/seo"
 import DecoratedLink from "../components/decoratedLink"
 
-import MetaData from "../components/postMetadata"
-
-function getSlug(node)
+function getSlug(sub_category)
 {
-  let category_path = "/" + node.frontmatter.category
-  category_path = category_path.replace(/\s+/g, '-').toLowerCase()
-  let sub_category_path = "/" + node.frontmatter.sub_category
-  sub_category_path = sub_category_path.replace(/\s+/g, '-').toLowerCase()
-  return category_path + sub_category_path + node.frontmatter.path
+  let category_path = "/" + sub_category
+  return category_path.replace(/\s+/g, '-').toLowerCase()
 }
 
 export default ({ data }) => {
+  const allPosts = data.allMdx
+  const category = allPosts.edges[0].frontmatter.category
   return (
     <Layout>
-      <SEO title="Home"/>
-      <h1> Latest posts</h1>
+    <SEO title={category} />
+    <h1>{category}</h1>
       <hr/>
       <br/>
-      {data.mdxArticles.edges.map(({ node }) => (
+      {allPosts.edges.map(({ node }) => (
         <div key={node.frontmatter.path}>
-          <DecoratedLink slug={getSlug(node)}>
+          <DecoratedLink slug={getSlug(node.frontmatter.sub_category)}>
             <h3 style={{ marginBottom: '-2px' }}>{node.frontmatter.title}</h3>
           </DecoratedLink>
           <br/>
@@ -35,7 +31,7 @@ export default ({ data }) => {
             category={node.frontmatter.category}/>
           <br/>
           <div dangerouslySetInnerHTML={{ __html: node.excerpt }} />
-          <Link to={node.frontmatter.path}>Read more...</Link>
+
           <br/><br/>
         </div>
       ))}
@@ -44,11 +40,11 @@ export default ({ data }) => {
 }
 
 export const query = graphql`
-  query {
-    mdxArticles: allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {post_type: {ne: "header_page"}}}) {
-      edges {
-        node {
-          frontmatter {
+  query($category: String!) {
+  allMdx(filter: {frontmatter: {category: {eq: $category}}}) {
+    edges {
+      node {
+        frontmatter {
             path
             title
             category
@@ -57,8 +53,8 @@ export const query = graphql`
           }
           timeToRead
           excerpt
-        }
       }
     }
   }
+}
 `
