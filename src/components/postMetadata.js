@@ -27,11 +27,11 @@ const metadataOut = ( date, timeToRead, category ) => {
 
 
 export default ({ date, timeToRead, category }) => (
-<span
+<div
     css={css`
     color: #bbb;
     display: inline-block;
     `}>
     {metadataOut(date, timeToRead, category)}
-</span>
+</div>
 )

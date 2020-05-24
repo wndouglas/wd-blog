@@ -17,9 +17,9 @@ export default ({ data }) => {
       {data.mdxArticles.edges.map(({ node }) => (
         <div key={node.frontmatter.path}>
           <DecoratedLink slug={node.frontmatter.path}>
-            <h3 style={{ margin: '0 0 0 0' }}>{node.frontmatter.title}</h3>
+            <h3 style={{ marginBottom: '-2px' }}>{node.frontmatter.title}</h3>
           </DecoratedLink>
-          &nbsp;&nbsp;&nbsp;
+          <br/>
           <MetaData 
             date={node.frontmatter.date}
             timeToRead={node.timeToRead}

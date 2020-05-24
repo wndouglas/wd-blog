@@ -8,7 +8,6 @@ export default ({ slug, children }) => (
         transition: all 400ms ease-in;
         white-space: nowrap;
         position: relative;
-        bottom: -1px;
         
         :after {
           position: absolute;
