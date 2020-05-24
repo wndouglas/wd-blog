@@ -1,11 +1,15 @@
 import React from "react"
-import { graphql, Link } from "gatsby"
-
 import Layout from "../components/layout"
+import { graphql } from "gatsby"
 import SEO from "../components/seo"
 import DecoratedLink from "../components/decoratedLink"
-
 import MetaData from "../components/postMetadata"
+
+function getCategorySlug(category)
+{
+  let category_path = "/" + category
+  return "/posts" + category_path.replace(/\s+/g, '-').toLowerCase()
+}
 
 function getFullSlug(node)
 {
@@ -17,13 +21,25 @@ function getFullSlug(node)
 }
 
 export default ({ data }) => {
+  const allPosts = data.allMdx
+  const subcategory = allPosts.edges[0].node.frontmatter.sub_category
+  const category = allPosts.edges[0].node.frontmatter.category
   return (
     <Layout>
-      <SEO title="Home"/>
-      <h1> Latest posts</h1>
-      <hr/>
-      <br/>
-      {data.mdxArticles.edges.map(({ node }) => (
+    <SEO title={subcategory} />
+    <DecoratedLink slug="/posts">
+      <h1 style={{ marginBottom: '-8px' }}>Posts</h1>
+    </DecoratedLink>
+    <br/>
+    <DecoratedLink slug={getCategorySlug(category)}>
+        <h3 style={{ marginBottom: '-4px', marginTop: '4px' }}>{category}</h3>
+    </DecoratedLink>
+    <h5 style={{ marginTop: '8px' }}>{subcategory}</h5>
+    <hr/>
+    <br/>
+    {allPosts.edges.filter(({ node }) => (
+      node.frontmatter.category === category && node.frontmatter.sub_category === subcategory))
+      .map(({ node }) => (
         <div key={node.frontmatter.path}>
           <DecoratedLink slug={getFullSlug(node)}>
             <h3 style={{ marginBottom: '-4px' }}>{node.frontmatter.title}</h3>
@@ -31,24 +47,22 @@ export default ({ data }) => {
           <br/>
           <MetaData 
             date={node.frontmatter.date}
-            timeToRead={node.timeToRead}
-            category={node.frontmatter.category}/>
+            timeToRead={node.timeToRead}/>
           <br/>
           <div dangerouslySetInnerHTML={{ __html: node.excerpt }} />
-          <Link to={node.frontmatter.path}>Read more...</Link>
           <br/><br/>
         </div>
-      ))}
+    ))}
     </Layout>
   )
 }
 
 export const query = graphql`
-  query {
-    mdxArticles: allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {post_type: {ne: "header_page"}}}) {
-      edges {
-        node {
-          frontmatter {
+  query($category: String!, $sub_category: String!) {
+  allMdx(filter: {frontmatter: {category: {eq: $category}, sub_category: {eq: $sub_category}}}) {
+    edges {
+      node {
+        frontmatter {
             path
             title
             category
@@ -57,8 +71,8 @@ export const query = graphql`
           }
           timeToRead
           excerpt
-        }
       }
     }
   }
+}
 `

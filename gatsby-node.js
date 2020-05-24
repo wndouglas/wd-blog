@@ -4,7 +4,7 @@ exports.createPages = async ({ graphql, actions }) => {
   const { createPage } = actions
   const postPage = path.resolve("./src/templates/blog-post.js")
   const categoryPage = path.resolve("./src/templates/category-page.js")
-
+  const subcategoryPage = path.resolve("./src/templates/subcategory-page.js")
   const mdxQueryResult = await graphql(`
   {
     postCategories:
@@ -31,7 +31,7 @@ exports.createPages = async ({ graphql, actions }) => {
     category_path = category_path.replace(/\s+/g, '-').toLowerCase()
     let sub_category_path = "/" + node.frontmatter.sub_category
     sub_category_path = sub_category_path.replace(/\s+/g, '-').toLowerCase()
-    let curr_path = category_path + sub_category_path + node.frontmatter.path
+    let curr_path = "/posts" + category_path + sub_category_path + node.frontmatter.path
 
     createPage({
       path: curr_path,
@@ -45,14 +45,28 @@ exports.createPages = async ({ graphql, actions }) => {
   const categories = mdxQueryResult.data.postCategories.distinct
   categories.forEach((currCategory) =>
   {
-    let category_path = "/" + currCategory
-    category_path = category_path.replace(/\s+/g, '-').toLowerCase()
+    curr_path = "/posts" + "/" + currCategory.replace(/\s+/g, '-').toLowerCase()
     createPage({
-      path: category_path,
+      path: curr_path,
       component: categoryPage,
       context: {
-      slug: category_path,
+      category: currCategory,
       },
     })    
+
+    const currCategoryEdges = postsEdges.filter(({ node }) => (node.frontmatter.category === currCategory))
+    const currCategorySubCategories = currCategoryEdges.map(({ node }) => node.frontmatter.sub_category).filter((v, i, a) => a.indexOf(v) === i).sort()
+    currCategorySubCategories.forEach((currSubcategory) =>
+    {
+      curr_subpath = curr_path + "/" + currSubcategory.replace(/\s+/g, '-').toLowerCase()
+      createPage({
+        path: curr_subpath,
+        component: subcategoryPage,
+        context: {
+        category: currCategory,
+        sub_category: currSubcategory,
+        },
+      })
+    })
   })
 }
