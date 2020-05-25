@@ -19,7 +19,7 @@ export default ({ slug, children }) => (
           color: transparent;
           background: rgb(159,57,43);
           height: 1px;
-          transition: all 0.3s ease-in;
+          transition: all 0s ease-in;
         }
       
         :hover {

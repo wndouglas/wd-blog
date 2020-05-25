@@ -5,15 +5,17 @@ import SEO from "../components/seo"
 import { MDXRenderer } from "gatsby-plugin-mdx"
 import MetaData from "../components/postMetadata"
 import DecoratedLink from "../components/decoratedLink"
+import { getSubcategoryPath } from "../functions/getPaths"
 
 export default ({ data }) => {
-  const post = data.mdx
+  const post = data.markdown
+  const pathEdges = data.allConfig.edges
   return (
     <Layout>
     <SEO title={post.frontmatter.title} />
       <div>
         <h1 style={{ marginBottom: '-4px'}}>{post.frontmatter.title}</h1>
-        <DecoratedLink slug="/posts" style={{ display: 'inline-block'}}>
+        <DecoratedLink slug={getSubcategoryPath(post.frontmatter.category, post.frontmatter.sub_category, pathEdges)} style={{ display: 'inline-block'}}>
           <h4 style={{ marginBottom: '-4px'}}>{post.frontmatter.sub_category}</h4>
         </DecoratedLink>
         <br/>
@@ -28,7 +30,7 @@ export default ({ data }) => {
 
 export const query = graphql`
   query($slug: String!) {
-    mdx(frontmatter: {path: { eq: $slug }}) {
+    markdown: mdx(frontmatter: {path: { eq: $slug }}) {
         frontmatter {
           path
           title
@@ -38,6 +40,17 @@ export const query = graphql`
         }
         body
         timeToRead
+  }
+  allConfig: allMdx(filter: {frontmatter: {config: {eq: true}}}) {
+    edges {
+      node {
+        frontmatter {
+          sub_category
+          category
+          path
+        }
+      }
+    }
   }
 }
 `

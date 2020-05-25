@@ -5,50 +5,28 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import DecoratedLink from "../components/decoratedLink"
 import MetaData from "../components/postMetadata"
+import { getPostPath, getSubcategoryPath, getCategoryPath } from "../functions/getPaths"
 
-function getCategorySlug(category)
+const PostsPage = ({ data }) => 
 {
-  let category_path = "/" + category
-  category_path = category_path.replace(/\s+/g, '-').toLowerCase()
-  return "/posts" + category_path
-}
-
-function getSubCategorySlug(category, subcategory)
-{
-  let category_path = "/" + category
-  category_path = category_path.replace(/\s+/g, '-').toLowerCase()
-  let sub_category_path = "/" + subcategory
-  sub_category_path = sub_category_path.replace(/\s+/g, '-').toLowerCase()
-  return "/posts" + category_path + sub_category_path
-}
-
-function getFullSlug(node)
-{
-  let category_path = "/" + node.frontmatter.category
-  category_path = category_path.replace(/\s+/g, '-').toLowerCase()
-  let sub_category_path = "/" + node.frontmatter.sub_category
-  sub_category_path = sub_category_path.replace(/\s+/g, '-').toLowerCase()
-  return "/posts" + category_path + sub_category_path + node.frontmatter.path
-}
-
-const PostsPage = ({ data }) => (
+  const pathEdges = data.allConfig.edges
+  return(
   <Layout>
     <SEO title="Posts" />
     <h1>Posts</h1>
     <hr/>
     <br/>
-    {console.log(data)}
     {data.postCategories.distinct.sort().map(category => (
       <div key={category}>
-        <DecoratedLink slug={getCategorySlug(category)}>
-            <h3 style={{ marginBottom: '-4px' }}>{category}</h3>
+        <DecoratedLink slug={getCategoryPath(category, pathEdges)}>
+            <h3 style={{ marginBottom: '-6px' }}>{category}</h3>
         </DecoratedLink>
         <br/>
         {data.allPosts.edges.filter(({ node }) => (node.frontmatter.category === category)).map(({ node }) => node.frontmatter.sub_category).filter((v, i, a) => a.indexOf(v) === i).sort()
         .map(subcategory => (
           <>
-            <DecoratedLink slug={getSubCategorySlug(category, subcategory)}>
-              <h6 style={{marginTop: '8px', marginBottom: '-1px'}}>{subcategory}</h6>
+            <DecoratedLink slug={getSubcategoryPath(category, subcategory, pathEdges)}>
+              <h6 style={{marginTop: '8px', marginBottom: '-2px'}}>{subcategory}</h6>
             </DecoratedLink>
             <div key={subcategory}>
               <ul style={{ display: 'inline-block', marginTop: '6px', marginBottom: '-2px'}}>
@@ -57,7 +35,7 @@ const PostsPage = ({ data }) => (
                   .map(({ node }) => (
                       <li key={node.frontmatter.path}>
                         <div style={{display: 'inline-block'}}>
-                          <Link to={getFullSlug(node)}>
+                          <Link to={getPostPath(category, subcategory, node.frontmatter.path, pathEdges)}>
                           {node.frontmatter.title}
                           </Link>
                         </div>
@@ -67,7 +45,7 @@ const PostsPage = ({ data }) => (
                           timeToRead={node.timeToRead}/>
                       </li>
               ))}
-              <li key={subcategory} style={{listStyle: 'none'}}><Link to={getSubCategorySlug(category, subcategory)}>See all.</Link></li>
+              <li key={subcategory} style={{listStyle: 'none'}}><Link to={getSubcategoryPath(category, subcategory, pathEdges)}>See all.</Link></li>
               </ul>
             </div>
           </>
@@ -76,8 +54,8 @@ const PostsPage = ({ data }) => (
           <br/>
       </div>
       ))}
-  </Layout>
-)
+  </Layout>)
+}
 
 export default PostsPage
 
@@ -88,7 +66,7 @@ export const query = graphql`
         distinct(field: frontmatter___category)
       }
     allPosts:
-      allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {post_type: {ne: "header_page"}}}) {
+      allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {config: {ne: true}, post_type: {ne: "header_page"}}}) {
         edges {
           node {
             frontmatter {
@@ -99,6 +77,19 @@ export const query = graphql`
               date
             }
             timeToRead
+          }
+        }
+      }
+
+    allConfig: 
+      allMdx(filter: {frontmatter: {config: {eq: true}}}) {
+        edges {
+          node {
+            frontmatter {
+              sub_category
+              category
+              path
+            }
           }
         }
       }

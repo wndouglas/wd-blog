@@ -4,19 +4,12 @@ import { graphql, Link } from "gatsby"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import DecoratedLink from "../components/decoratedLink"
+import { getPostPath } from "../functions/getPaths"
 
 import MetaData from "../components/postMetadata"
 
-function getFullSlug(node)
-{
-  let category_path = "/" + node.frontmatter.category
-  category_path = category_path.replace(/\s+/g, '-').toLowerCase()
-  let sub_category_path = "/" + node.frontmatter.sub_category
-  sub_category_path = sub_category_path.replace(/\s+/g, '-').toLowerCase()
-  return "/posts" + category_path + sub_category_path + node.frontmatter.path
-}
-
 export default ({ data }) => {
+  const pathEdges = data.allConfig.edges
   return (
     <Layout>
       <SEO title="Home"/>
@@ -25,8 +18,8 @@ export default ({ data }) => {
       <br/>
       {data.mdxArticles.edges.map(({ node }) => (
         <div key={node.frontmatter.path}>
-          <DecoratedLink slug={getFullSlug(node)}>
-            <h3 style={{ marginBottom: '-4px' }}>{node.frontmatter.title}</h3>
+          <DecoratedLink slug={getPostPath(node.frontmatter.category, node.frontmatter.sub_category, node.frontmatter.path, pathEdges)}>
+            <h3 style={{ marginBottom: '-6px' }}>{node.frontmatter.title}</h3>
           </DecoratedLink>
           <br/>
           <MetaData 
@@ -45,7 +38,7 @@ export default ({ data }) => {
 
 export const query = graphql`
   query {
-    mdxArticles: allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {post_type: {ne: "header_page"}}}) {
+    mdxArticles: allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {post_type: {ne: "header_page"}, config: {ne: true}}}) {
       edges {
         node {
           frontmatter {
@@ -60,5 +53,17 @@ export const query = graphql`
         }
       }
     }
+    allConfig: 
+      allMdx(filter: {frontmatter: {config: {eq: true}}}) {
+        edges {
+          node {
+            frontmatter {
+              sub_category
+              category
+              path
+            }
+          }
+        }
+      }
   }
 `
