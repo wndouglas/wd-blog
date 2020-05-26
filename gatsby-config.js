@@ -62,6 +62,7 @@ module.exports = {
         defaultLayouts: {
           default: require.resolve(`./src/components/layout.js`),
         },
+        remarkPlugins: [ require('remark-math'), require('remark-html-katex') ]
       },
     },
   ],

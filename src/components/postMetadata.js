@@ -30,7 +30,9 @@ export default ({ date, timeToRead, category, pathEdges }) => {
       color: #bbb;
       display: inline-block;
       `}>
-      <Link to={getCategoryPath(category, pathEdges)} style={{ color: 'inherit' }}>[{category}]</Link>{" · "}{formattedDate}{" · "}{formattedTTR}
+      <Link to={getCategoryPath(category, pathEdges)} 
+        style={{ color: 'inherit' }}>[{category}]</Link>
+        {" · "}{formattedDate}{" · "}{formattedTTR}
     </div>)
   }
   else

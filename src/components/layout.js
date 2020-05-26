@@ -3,6 +3,7 @@ import { css } from "@emotion/core"
 import { rhythm } from "../utils/typography"
 import Header from "./header/header"
 import Footer from "./footer"
+require('katex/dist/katex.min.css')
 
 export default ({ children }) => (
   <>
