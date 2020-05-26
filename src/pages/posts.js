@@ -3,7 +3,6 @@ import { graphql, Link } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import DecoratedLink from "../components/decoratedLink"
 import MetaData from "../components/postMetadata"
 import { getPostPath, getSubcategoryPath, getCategoryPath } from "../functions/getPaths"
 
@@ -18,18 +17,17 @@ const PostsPage = ({ data }) =>
     <br/>
     {data.postCategories.distinct.sort().map(category => (
       <div key={category}>
-        <DecoratedLink slug={getCategoryPath(category, pathEdges)}>
-            <h3 style={{ marginBottom: '-6px' }}>{category}</h3>
-        </DecoratedLink>
-        <br/>
+        <Link to={getCategoryPath(category, pathEdges)}>
+            <h3>{category}</h3>
+        </Link>
         {data.allPosts.edges.filter(({ node }) => (node.frontmatter.category === category)).map(({ node }) => node.frontmatter.sub_category).filter((v, i, a) => a.indexOf(v) === i).sort()
         .map(subcategory => (
           <>
-            <DecoratedLink slug={getSubcategoryPath(category, subcategory, pathEdges)}>
-              <h6 style={{marginTop: '8px', marginBottom: '-2px'}}>{subcategory}</h6>
-            </DecoratedLink>
+            <Link to={getSubcategoryPath(category, subcategory, pathEdges)}>
+              <h5>{subcategory}</h5>
+            </Link>
             <div key={subcategory}>
-              <ul style={{ display: 'inline-block', marginTop: '6px', marginBottom: '-2px'}}>
+              <ul style={{ display: 'inline-block'}}>
               {data.allPosts.edges.filter(({ node }) => (
                   node.frontmatter.category === category && node.frontmatter.sub_category === subcategory)).slice(0, 5)
                   .map(({ node }) => (

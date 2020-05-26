@@ -1,6 +1,8 @@
 import moment from "moment"
 import { css } from "@emotion/core"
 import React from "react"
+import { Link } from "gatsby"
+import { getCategoryPath } from "../functions/getPaths"
 
 const timeToReadText = ( timeToRead ) => {
     let textOut = " to read"
@@ -15,23 +17,31 @@ const timeToReadText = ( timeToRead ) => {
 }
 
 
-const metadataOut = ( date, timeToRead, category ) => {
+export default ({ date, timeToRead, category, pathEdges }) => {
   moment.locale('en-gb')
-  let endText = moment(date).format('LL') + " · " + timeToReadText(timeToRead)
+  const formattedDate = moment(date).format('LL')
+  const formattedTTR = timeToReadText(timeToRead)
+
   if (category !== undefined)
   {
-    endText = "[" + category + "] · " + endText
+    return (
+      <div
+      css={css`
+      color: #bbb;
+      display: inline-block;
+      `}>
+      <Link to={getCategoryPath(category, pathEdges)} style={{ color: 'inherit' }}>[{category}]</Link>{" · "}{formattedDate}{" · "}{formattedTTR}
+    </div>)
   }
-  return endText
+  else
+  {
+    return (
+      <div
+      css={css`
+      color: #bbb;
+      display: inline-block;
+      `}>
+        {formattedDate}{" · "}{formattedTTR}
+      </div>)
+  }
 }
-
-
-export default ({ date, timeToRead, category }) => (
-<div
-    css={css`
-    color: #bbb;
-    display: inline-block;
-    `}>
-    {metadataOut(date, timeToRead, category)}
-</div>
-)

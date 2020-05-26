@@ -2,7 +2,6 @@ import React from "react"
 import Layout from "../components/layout"
 import { graphql, Link } from "gatsby"
 import SEO from "../components/seo"
-import DecoratedLink from "../components/decoratedLink"
 import MetaData from "../components/postMetadata"
 import { getPostPath, getSubcategoryPath } from "../functions/getPaths"
 
@@ -13,19 +12,18 @@ export default ({ data }) => {
   return (
     <Layout>
     <SEO title={category} />
-    <DecoratedLink slug="/posts">
-        <h1 style={{ marginBottom: '-8px' }}>Posts</h1>
-    </DecoratedLink>
-    <h3 style={{ marginTop: '8px' }}>{category}</h3>
+    <Link to="/posts">
+        <h1>Posts</h1>
+    </Link>
+    <h3>{category}</h3>
       <hr/>
       <br/>
       {allPosts.edges.map(({ node }) => node.frontmatter.sub_category).filter((v, i, a) => a.indexOf(v) === i).sort()
         .map(subcategory => (
             <div key={subcategory}>
-              <DecoratedLink slug={getSubcategoryPath(category, subcategory, pathEdges)}>
-                <h3 style={{marginBottom: '-4px'}}>{subcategory}</h3>
-              </DecoratedLink>
-              <br/>
+              <Link to={getSubcategoryPath(category, subcategory, pathEdges)}>
+                <h3>{subcategory}</h3>
+              </Link>
               <ul style={{ display: 'inline-block', marginTop: '10px'}}>
               {allPosts.edges.filter(({ node }) => (
                   node.frontmatter.category === category && node.frontmatter.sub_category === subcategory)).slice(0, 10)
@@ -42,7 +40,7 @@ export default ({ data }) => {
                           timeToRead={node.timeToRead}/>
                       </li>
               ))}
-              <li key={subcategory} style={{listStyle: 'none'}}>See all.</li>
+              <li key={subcategory} style={{listStyle: 'none'}}><Link to={getSubcategoryPath(category, subcategory, pathEdges)}>See all...</Link></li>
               </ul>
             </div>
           ))}
