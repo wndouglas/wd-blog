@@ -53,7 +53,8 @@ height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
-  background-color: linear-gradient(to top, rgba(25, 84, 123, 0.01), rgba(255, 216, 155, 0.15));
+  background-color: linear-gradient(to top, rgba(25, 84, 123, 0.01), 
+                                    rgba(255, 216, 155, 0.15));
 `
 
 export default StyledMultiBackground

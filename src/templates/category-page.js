@@ -19,40 +19,55 @@ export default ({ data }) => {
     <h3>{category}</h3>
       <hr/>
       <br/>
-      <MDXRenderer>{data.allConfig.edges.filter(({ node }) => node.frontmatter.category === category && node.frontmatter.sub_category === null)[0].node.body}</MDXRenderer>
-      {allPosts.edges.map(({ node }) => node.frontmatter.sub_category).filter((v, i, a) => a.indexOf(v) === i).sort()
-        .map(subcategory => (
-            <div key={subcategory}>
-              <Link to={getSubcategoryPath(category, subcategory, pathEdges)}>
-                <h3>{subcategory}</h3>
+      <MDXRenderer>
+        {data.allConfig.edges
+        .filter(({ node }) => node.frontmatter.category === category &&
+          node.frontmatter.sub_category === null)[0].node.body}
+      </MDXRenderer>
+      {allPosts.edges.map(({ node }) => node.frontmatter.sub_category)
+      .filter((v, i, a) => a.indexOf(v) === i)
+      .sort()
+      .map(subcategory => (
+        <div key={subcategory}>
+          <Link to={getSubcategoryPath(category, subcategory, pathEdges)}>
+            <h3>{subcategory}</h3>
+          </Link>
+          <ul style={{ display: 'inline-block', marginTop: '10px'}}>
+            {allPosts.edges.filter(({ node }) => (
+                node.frontmatter.category === category 
+                  && node.frontmatter.sub_category === subcategory))
+                .slice(0, 10)
+                .map(({ node }) => (
+                    <li key={node.frontmatter.path}>
+                      <div style={{display: 'inline-block'}}>
+                        <Link to={getPostPath(category, subcategory, 
+                          node.frontmatter.path, pathEdges)}>
+                        {node.frontmatter.title}
+                        </Link>
+                      </div>
+                      &nbsp;&nbsp;&nbsp;
+                      <MetaData 
+                        date={node.frontmatter.date}
+                        timeToRead={node.timeToRead}/>
+                    </li>
+            ))}
+            <li key={subcategory} style={{listStyle: 'none'}}>
+              <Link to={getSubcategoryPath(category, 
+                subcategory, pathEdges)}>
+                  See all...
               </Link>
-              <ul style={{ display: 'inline-block', marginTop: '10px'}}>
-              {allPosts.edges.filter(({ node }) => (
-                  node.frontmatter.category === category && node.frontmatter.sub_category === subcategory)).slice(0, 10)
-                  .map(({ node }) => (
-                      <li key={node.frontmatter.path}>
-                        <div style={{display: 'inline-block'}}>
-                          <Link to={getPostPath(category, subcategory, node.frontmatter.path, pathEdges)}>
-                          {node.frontmatter.title}
-                          </Link>
-                        </div>
-                        &nbsp;&nbsp;&nbsp;
-                        <MetaData 
-                          date={node.frontmatter.date}
-                          timeToRead={node.timeToRead}/>
-                      </li>
-              ))}
-              <li key={subcategory} style={{listStyle: 'none'}}><Link to={getSubcategoryPath(category, subcategory, pathEdges)}>See all...</Link></li>
-              </ul>
-            </div>
-          ))}
+            </li>
+          </ul>
+        </div>
+      ))}
     </Layout>
   )
 }
 
 export const query = graphql`
   query($category: String!) {
-  allPosts: allMdx(filter: {frontmatter: {config: {ne: true}, category: {eq: $category}}}) {
+  allPosts: allMdx(filter: {frontmatter: {config: {ne: true},
+                                          category: {eq: $category}}}) {
     edges {
       node {
         frontmatter {

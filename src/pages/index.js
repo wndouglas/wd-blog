@@ -12,14 +12,17 @@ export default ({ data }) => (
     <hr/>
     <br/>
     {data.mdxArticles.edges.map(({ node }) => (
-      <Post pathEdges={data.allConfig.edges} node={node} key={node.frontmatter.path}/> 
+      <Post pathEdges={data.allConfig.edges} 
+          node={node} key={node.frontmatter.path}/> 
     ))}
   </Layout>
 )
 
 export const query = graphql`
   query {
-    mdxArticles: allMdx(sort: {fields: [frontmatter___date], order: DESC}, filter: {frontmatter: {post_type: {ne: "header_page"}, config: {ne: true}}}) {
+    mdxArticles: allMdx(sort: {fields: [frontmatter___date], 
+      order: DESC}, filter: {frontmatter:
+        {post_type: {ne: "header_page"}, config: {ne: true}}}) {
       edges {
         node {
           frontmatter {

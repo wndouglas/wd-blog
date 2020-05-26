@@ -22,7 +22,8 @@ export default ({ data }) => {
     <hr/>
     <br/>
     {data.allPosts.edges.map(({ node }) => (
-        <Post pathEdges={data.allConfig.edges} node={node} key={node.frontmatter.path}/> 
+        <Post pathEdges={data.allConfig.edges} 
+          node={node} key={node.frontmatter.path}/> 
     ))}
     </Layout>
   )
@@ -30,7 +31,9 @@ export default ({ data }) => {
 
 export const query = graphql`
   query($category: String!, $sub_category: String) {
-  allPosts: allMdx(filter: {frontmatter: {config: {ne: true}, category: {eq: $category}, sub_category: {eq: $sub_category}}}) {
+  allPosts: allMdx(filter: {frontmatter: 
+    {config: {ne: true}, category: {eq: $category}, 
+    sub_category: {eq: $sub_category}}}) {
     edges {
       node {
         frontmatter {

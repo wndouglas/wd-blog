@@ -27,7 +27,9 @@ export default () => {
 
   return (
     <LogoWrap as={Link} to="/">
-      <h3 style={{ display: `inline-block` }}> {data.site.siteMetadata.title} </h3>
+      <h3 style={{ display: `inline-block` }}>
+        {data.site.siteMetadata.title}
+      </h3>
     </LogoWrap>
   )
 }

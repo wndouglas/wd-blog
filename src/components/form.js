@@ -4,7 +4,8 @@ import { Row, Col, Button } from 'react-bootstrap'
 
 export default () => (
     <div style={{ marginLeft: "auto", marginRight: "auto" }}>
-    <Form method="post" action="/success" data-netlify="true" data-netlify-honeypot="bot-field" name="contact">
+    <Form method="post" action="/success" data-netlify="true" 
+        data-netlify-honeypot="bot-field" name="contact">
         <input type="hidden" name="form-name" value="contact" />
         <Form.Group controlId="formGroupName">
             <Form.Label>Name</Form.Label>
@@ -16,7 +17,8 @@ export default () => (
         </Form.Group>
         <Form.Group controlId="formGroupMessage">
             <Form.Label>Message</Form.Label>
-            <Form.Control as="textarea" rows="4" placeholder="Enter message" required/>
+            <Form.Control as="textarea" rows="4" 
+                placeholder="Enter message" required/>
         </Form.Group>
         <Form.Group as={Row}>
             <Col sm={{ span: 10, offset: 5 }}>

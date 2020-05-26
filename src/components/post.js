@@ -5,7 +5,9 @@ import { getPostPath } from "../functions/getPaths"
 
 export default ({ pathEdges, node }) => (
     <div>
-        <Link to={getPostPath(node.frontmatter.category, node.frontmatter.sub_category, node.frontmatter.path, pathEdges)}>
+        <Link to={getPostPath(node.frontmatter.category, 
+                    node.frontmatter.sub_category,
+                    node.frontmatter.path, pathEdges)}>
         <h3>{node.frontmatter.title}</h3>
         </Link>
         <MetaData 
@@ -14,7 +16,11 @@ export default ({ pathEdges, node }) => (
         category={node.frontmatter.category}
         pathEdges={pathEdges}/>
         <div dangerouslySetInnerHTML={{ __html: node.excerpt }}/>
-        <Link to={getPostPath(node.frontmatter.category, node.frontmatter.sub_category, node.frontmatter.path, pathEdges)}>Read more...</Link>
+        <Link to={getPostPath(node.frontmatter.category,
+                              node.frontmatter.sub_category,
+                              node.frontmatter.path, pathEdges)}>
+            Read more...
+        </Link>
         <br/><br/><br/>
     </div>
 )

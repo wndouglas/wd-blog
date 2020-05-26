@@ -9,7 +9,8 @@ export default ({ children }) => (
   <>
   <Header />
   <div css={css`
-  background: linear-gradient(135deg, rgb(242,235,228) 0%, rgb(228,213,199) 90%); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */  
+  background: linear-gradient(135deg, rgb(242,235,228) 0%, 
+                                      rgb(228,213,199) 90%);
   `}>
     <div css={css`
     margin: 0 auto;

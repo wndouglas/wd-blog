@@ -28,7 +28,8 @@ export default () => {
 
   return (
   <Footer>
-    © {new Date().getFullYear()} {data.site.siteMetadata.author}, All Rights Reserved.
+    © {new Date().getFullYear()} {data.site.siteMetadata.author}, 
+    All Rights Reserved.
   </Footer>
   )
 }

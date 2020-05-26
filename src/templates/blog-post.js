@@ -15,11 +15,14 @@ export default ({ data }) => {
     <SEO title={post.frontmatter.title} />
       <div>
         <h1>{post.frontmatter.title}</h1>
-        <Link to={getSubcategoryPath(post.frontmatter.category, post.frontmatter.sub_category, pathEdges)} style={{ display: 'inline-block'}}>
+        <Link to={getSubcategoryPath(post.frontmatter.category, 
+          post.frontmatter.sub_category, pathEdges)}
+          style={{ display: 'inline-block'}}>
           <h4>{post.frontmatter.sub_category}</h4>
         </Link>
         <br/>
-        <MetaData date={post.frontmatter.date} timeToRead={post.timeToRead} category={post.frontmatter.category} pathEdges={pathEdges}/>
+        <MetaData date={post.frontmatter.date} timeToRead={post.timeToRead}
+          category={post.frontmatter.category} pathEdges={pathEdges}/>
         <hr/>
         <br/>
         <MDXRenderer>{post.body}</MDXRenderer>
