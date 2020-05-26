@@ -4,6 +4,7 @@ import { graphql, Link } from "gatsby"
 import SEO from "../components/seo"
 import { getCategoryPath } from "../functions/getPaths"
 import Post from "../components/post"
+import { MDXRenderer } from "gatsby-plugin-mdx"
 
 export default ({ data }) => {
   const subcategory = data.allPosts.edges[0].node.frontmatter.sub_category
@@ -21,6 +22,11 @@ export default ({ data }) => {
     <h5>{subcategory}</h5>
     <hr/>
     <br/>
+    <MDXRenderer>
+      {data.allConfig.edges
+      .filter(({ node }) => node.frontmatter.category === category &&
+        node.frontmatter.sub_category === subcategory)[0].node.body}
+    </MDXRenderer>
     {data.allPosts.edges.map(({ node }) => (
         <Post pathEdges={data.allConfig.edges} 
           node={node} key={node.frontmatter.path}/> 
@@ -56,6 +62,7 @@ export const query = graphql`
           category
           path
         }
+        body
       }
     }
   }
