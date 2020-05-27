@@ -6,9 +6,14 @@ import { getLearnPostPath } from "../functions/getPaths"
 
 const timeToReadText = ( timeToRead ) => {
     let textOut = " to read"
+    timeToRead *= 2
     if (timeToRead === 1)
     {
       return timeToRead + " min" + textOut
+    }
+    else if (timeToRead === null)
+    {
+      return 0 + " mins" + textOut
     }
     else
     {

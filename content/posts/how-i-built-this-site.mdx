@@ -1,0 +1,109 @@
+---
+title: How I Built This Site From Scratch
+path: /how-i-built-this-site-from-scratch
+category: Programming
+post_type: blog
+date: 2020-05-27
+---
+
+Building a website has been on my to-do list for a few years now. I've wanted a
+platform to showcase my work and to expand on thoughts and ideas I have
+during my downtime from work. With working from home being the new norm due
+to the terrible COVID-19 pandemic I, like many, have found myself with
+some extra time saved from my lack of commute. I decided it was finally time to
+bite the bullet and build a site. In this post I will go through the
+various different software tools I used to develop this site and give some
+reasoning as to why I went the route that I did.
+
+## Gatsby
+Coming into this project I had very little web development experience. I did,
+however, have significant software development experience. I figured it couldn't 
+be that hard to pick up front-end web development, especially having come from
+a C++ background, a language many regard as the toughest out there to master. I 
+was wrong. Web development *is* hard, but maybe not for the same reason as a 
+language like C++ is hard. When it comes to web development, the difficultly lies
+in the sheer amount of *stuff* to learn. On top of this, there's about a million
+different **frameworks**, **libraries**, **CMS** or **website builders** to 
+choose from. Introductory courses point you to massive flow-charts of learning, 
+roadmaps telling you just how many different technologies you need to learn 
+before you can call yourself a web developer. I figured the best way to get 
+started was to just to get stuck in. 
+
+I wanted a solution that gave me exposure to the underlying code (and hence gave
+me flexibility and control), without reaching for a cookie-cutter solution like 
+*WordPress* or *Squarespace*. I ended up settling on 
+**Gatsby**. <a href="https://www.gatsbyjs.org/">Gatsby</a> is a **web 
+framework** (a bundle of code and functionality that makes building a 
+website or application much easier),  built on top of a **Javascript** library 
+called **React**. React is a massively popular technology, originally developed 
+by Facebook and since released to the public, that gives users a unique and 
+flexible way to build web applications. The problem with React is that there is 
+a *huge* amount of setup required before a single line of code can be written.
+Gatsby solves this problem by taking care of all the complex setup for you, 
+taking away some of your freedom while allowing you to focus on what matters 
+(in this case my site). 
+
+Gatsby falls under a category of frameworks known as **static site generators**. 
+Static site generators take your content and generate a bundle of purely static 
+HTML pages. This is great because all the **web server** hosting the site needs
+to do is return a file - all of the work constructing the pages on the site has
+been done a priori. There are many options available in this space. 
+Two other popular choices are **Jekyll** and **Hugo**. 
+The Gatsby homepage provides a 
+comprehensive <a href="https://www.gatsbyjs.org/features/jamstack/gatsby-vs-jekyll-vs-hugo/">
+comparison</a> between the three and hopefully sheds light on why I stuck with 
+Gatsby. Essentially, I decided that I wanted a static site generator that 
+allowed me to leverage the power of modern Javascript and React.
+
+## Netlify
+Once I had decided that Gatsby was my preferred choice of framework, I needed 
+somewhere to **host** my site. A static site on its own is just a bundle of 
+files. To actually make the site live and available to the public, the site 
+needs a piece of technology called a **web server**. While it *is* theoretically 
+possible to use your own machine as a web server, doing so is quite 
+possibly in breach of you ISP's terms of service. I didn't fancy losing my 
+internet, so along came 
+**Netlify**. <a href="https://www.netlify.com/">Netlify</a> is a platform that 
+automates every stage of the server deployment process of a static site. What 
+sold me on Netlify (Netlify is actually free for individual use) was the ease 
+with which a **GitHub** repository can be hooked up. In about 5 minutes of work,
+I was able to connect Netlify to a repository containing my code, and have
+it automatically trigger a rebuild every time I push new code to my repository.
+In this way, I was able to completely automate the build process of my site. All
+I have to focus on is the site itself, none of the fiddly **DevOps** work.
+
+## WordPress on the Backend
+While I specifically stated above that I didn't want to use WordPress to create
+my site, I did *use* WordPress. WordPress is a big, bloated mess of plugins and
+security issues. However, WordPress is *great* as a way of *managing content*.
+I wanted a central place to store all of the posts, articles and tutorials I
+write, but I didn't want to use WordPress as the user facing **front-end** of
+my site. Welcome to **headless WordPress** and Gatsby **plugins**. WordPress
+exposes what is known as a **REST API**, or **Application Programming
+Interface**, essentially a specific set of endpoints that another user 
+can use to retrieve data from a WordPress site. By using this API, a user is 
+able to pull in posts and data from a WordPress site configured to allow it.
+Using a plugin written specifically for this purpose, it was incredibly easy to
+configure Gatsby to pull in the data from my WordPress account. Once I had settled
+on this approach, I went ahead and setup 
+a free-tier <a href="https://wordpress.com/">wordpress.com</a> account and 
+configured Gatsby to pull in the data from my account. 
+
+A final useful feature
+I got up and running was a Netlify webhook that triggers a rebuild every time a
+new piece of content is added to my WordPress page. Now, every time I write an 
+article or post, Netlify is automatically informed and my site rebuilt. See
+this <a href="https://adam-mould.co.uk/building-deploying-gatsby-wordpress-api-netlify/">site</a>
+for a tutorial on how this can be done.
+
+## Summary
+While building a website from scratch is not as easy as using an out-of-the-box
+tool like Wordpress, Squarespace or Wix, it *doesn't* have to be an overwhelming
+task, even for a beginner like me. By using a combination of: Gatsby, GitHub,
+Netlify and WordPress, I was able to streamline the whole process in such a way
+that allows me to benefit from all of the strengths of WordPress, all of the
+power of Gatsby, and all without the pain of DevOps.
+
+If you're interested in checking out the code behind my site, see 
+my <a href="https://github.com/wndouglas/wd-blog">GitHub repository</a> containing
+my up-to-date site.
