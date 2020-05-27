@@ -3,8 +3,9 @@ import Layout from "../components/layout"
 import { graphql, Link } from "gatsby"
 import SEO from "../components/seo"
 import MetaData from "../components/postMetadata"
-import { getPostPath, getSubcategoryPath } from "../functions/getPaths"
+import { getLearnPostPath } from "../functions/getPaths"
 import { MDXRenderer } from "gatsby-plugin-mdx"
+import { LearnPageDescription } from "../pages/learn"
 
 export default ({ data }) => {
   const allPosts = data.allPosts
@@ -13,8 +14,8 @@ export default ({ data }) => {
   return (
     <Layout>
     <SEO title={category} />
-    <Link to="/posts">
-        <h1>Posts</h1>
+    <Link to="/learn">
+        <h1>{LearnPageDescription}</h1>
     </Link>
     <h3>{category}</h3>
       <hr/>
@@ -29,7 +30,7 @@ export default ({ data }) => {
       .sort()
       .map(subcategory => (
         <div key={subcategory}>
-          <Link to={getSubcategoryPath(category, subcategory, pathEdges)}>
+          <Link to={getLearnPostPath(category, subcategory, null, pathEdges)}>
             <h3>{subcategory}</h3>
           </Link>
           <ul style={{ display: 'inline-block', marginTop: '10px'}}>
@@ -40,7 +41,7 @@ export default ({ data }) => {
                 .map(({ node }) => (
                     <li key={node.frontmatter.path}>
                       <div style={{display: 'inline-block'}}>
-                        <Link to={getPostPath(category, subcategory, 
+                        <Link to={getLearnPostPath(category, subcategory, 
                           node.frontmatter.path, pathEdges)}>
                         {node.frontmatter.title}
                         </Link>
@@ -48,12 +49,14 @@ export default ({ data }) => {
                       &nbsp;&nbsp;&nbsp;
                       <MetaData 
                         date={node.frontmatter.date}
-                        timeToRead={node.timeToRead}/>
+                        timeToRead={node.timeToRead}
+                        category={node.frontmatter.category}
+                        pathEdges={pathEdges}/>
                     </li>
             ))}
             <li key={subcategory} style={{listStyle: 'none'}}>
-              <Link to={getSubcategoryPath(category, 
-                subcategory, pathEdges)}>
+              <Link to={getLearnPostPath(category, 
+                subcategory, null, pathEdges)}>
                   See all...
               </Link>
             </li>
@@ -66,8 +69,9 @@ export default ({ data }) => {
 
 export const query = graphql`
   query($category: String!) {
-  allPosts: allMdx(filter: {frontmatter: {config: {ne: true},
-                                          category: {eq: $category}}}) {
+  allPosts: allMdx(filter: {frontmatter: {config: {ne: true}, 
+    post_type: {nin: ["header_page", "blog"]},
+    category: {eq: $category}}}) {
     edges {
       node {
         frontmatter {
@@ -82,7 +86,7 @@ export const query = graphql`
       }
     }
   }
-  allConfig: allMdx(filter: {frontmatter: {config: {eq: true}}}) {
+  allConfig: allMdx(filter: {frontmatter: {config: {eq: true}, post_type: {nin: ["header_page", "blog"]}}}) {
     edges {
       node {
         frontmatter {

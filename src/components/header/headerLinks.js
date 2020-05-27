@@ -2,6 +2,11 @@ import React from "react"
 import { Link } from "gatsby"
 import styled from "styled-components"
 import { rhythm } from "../../utils/typography"
+import { LearnPageName } from "../../pages/learn"
+import { IndexPageName } from "../../pages/index"
+import { AboutPageName } from "../../pages/about"
+import { ContactPageName } from "../../pages/contact"
+import { PostsPageName } from "../../pages/posts"
 
 const NavItem = styled(Link)`
   dispay: inline-block; 
@@ -46,10 +51,11 @@ const NavItem = styled(Link)`
 export default () => {
   return (
     <>
-      <NavItem to="/">Home</NavItem>
-      <NavItem to="/posts">Posts</NavItem>
-      <NavItem to="/about/">About</NavItem>
-      <NavItem to="/contact">Contact</NavItem>
+      <NavItem to="/">{IndexPageName}</NavItem>
+      <NavItem to="/posts">{PostsPageName}</NavItem>
+      <NavItem to="/learn">{LearnPageName}</NavItem>
+      <NavItem to="/about">{AboutPageName}</NavItem>
+      <NavItem to="/contact">{ContactPageName}</NavItem>
     </>
     )
 }

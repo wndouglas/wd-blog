@@ -1,11 +1,11 @@
-import { getCategoryPath, getSubcategoryPath, getPostPath } from "./src/functions/getPaths"
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript"
+import { getLearnPostPath, getBlogPostPath } from "./src/functions/getPaths"
 
 const path = require(`path`)
 
 exports.createPages = async ({ graphql, actions }) => {
   const { createPage } = actions
-  const postPage = path.resolve("./src/templates/blog-post.js")
+  const learnPostPage = path.resolve("./src/templates/learning-post.js")
+  const blogPostPage = path.resolve('./src/templates/blog-post.js')
   const categoryPage = path.resolve("./src/templates/category-page.js")
   const subcategoryPage = path.resolve("./src/templates/subcategory-page.js")
   const mdxQueryResult = await graphql(`
@@ -15,7 +15,7 @@ exports.createPages = async ({ graphql, actions }) => {
       distinct(field: frontmatter___category)
     }
 
-    allPosts: allMdx(sort: {fields: frontmatter___date}, filter: {frontmatter: {config: {ne: true}, post_type: {ne: "header_page"}}}) {
+    allLearning: allMdx(sort: {fields: frontmatter___date}, filter: {frontmatter: {config: {ne: true}, post_type: {nin: ["header_page", "blog"]}}}) {
       edges {
         node {
           frontmatter {
@@ -27,7 +27,18 @@ exports.createPages = async ({ graphql, actions }) => {
       }
     }
 
-    allConfig: allMdx(filter: {frontmatter: {config: {eq: true}}}) {
+    allBlogPosts: allMdx(sort: {fields: frontmatter___date}, filter: {frontmatter: {config: {ne: true}, post_type: {eq: "blog"}}}) {
+      edges {
+        node {
+          frontmatter {
+            path
+            category
+          }
+        }
+      }
+    }
+
+    allConfig: allMdx(filter: {frontmatter: {config: {eq: true}, post_type: {nin: ["header_page", "blog"]}}}) {
       edges {
         node {
           frontmatter {
@@ -39,13 +50,28 @@ exports.createPages = async ({ graphql, actions }) => {
       }
     }
   }`)
-  const pathEdges = mdxQueryResult.data.allConfig.edges
-  const postsEdges = mdxQueryResult.data.allPosts.edges
-  postsEdges.forEach(({ node }) =>
+
+  const blogPostsEdges = mdxQueryResult.data.allBlogPosts.edges
+  blogPostsEdges.forEach(({ node }) =>
   {
     createPage({
-      path: getPostPath(node.frontmatter.category, node.frontmatter.sub_category, node.frontmatter.path, pathEdges),
-      component: postPage,
+      path: getBlogPostPath(node.frontmatter.path),
+      component: blogPostPage,
+      context: {
+        slug: node.frontmatter.path,
+      },
+    })
+  })
+
+  const pathEdges = mdxQueryResult.data.allConfig.edges
+  const learningPostsEdges = mdxQueryResult.data.allLearning.edges
+  learningPostsEdges.forEach(({ node }) =>
+  {
+    createPage({
+      path: getLearnPostPath(node.frontmatter.category, 
+            node.frontmatter.sub_category, 
+            node.frontmatter.path, pathEdges),
+      component: learnPostPage,
       context: {
       slug: node.frontmatter.path,
       },
@@ -56,18 +82,22 @@ exports.createPages = async ({ graphql, actions }) => {
   categories.forEach((currCategory) =>
   {
     createPage({
-      path: getCategoryPath(currCategory, pathEdges),
+      path: getLearnPostPath(currCategory, null, null, pathEdges),
       component: categoryPage,
       context: {
       category: currCategory,
       },
     })    
 
-    const currCategorySubCategories = postsEdges.filter(({ node }) => (node.frontmatter.category === currCategory)).map(({ node }) => node.frontmatter.sub_category).filter((v, i, a) => a.indexOf(v) === i).sort()
+    const currCategorySubCategories = learningPostsEdges
+      .filter(({ node }) => (node.frontmatter.category === currCategory))
+      .map(({ node }) => node.frontmatter.sub_category)
+      .filter((v, i, a) => a.indexOf(v) === i)
+      .sort()
     currCategorySubCategories.forEach((currSubcategory) =>
     {
       createPage({
-        path: getSubcategoryPath(currCategory, currSubcategory, pathEdges),
+        path: getLearnPostPath(currCategory, currSubcategory, null, pathEdges),
         component: subcategoryPage,
         context: {
         category: currCategory,

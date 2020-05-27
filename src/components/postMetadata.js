@@ -2,7 +2,7 @@ import moment from "moment"
 import { css } from "@emotion/core"
 import React from "react"
 import { Link } from "gatsby"
-import { getCategoryPath } from "../functions/getPaths"
+import { getLearnPostPath } from "../functions/getPaths"
 
 const timeToReadText = ( timeToRead ) => {
     let textOut = " to read"
@@ -30,7 +30,7 @@ export default ({ date, timeToRead, category, pathEdges }) => {
       color: #bbb;
       display: inline-block;
       `}>
-      <Link to={getCategoryPath(category, pathEdges)} 
+      <Link to={getLearnPostPath(category, null, null, pathEdges)} 
         style={{ color: 'inherit' }}>[{category}]</Link>
         {" · "}{formattedDate}{" · "}{formattedTTR}
     </div>)

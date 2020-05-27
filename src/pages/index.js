@@ -1,19 +1,20 @@
 import React from "react"
 import { graphql } from "gatsby"
 
-import Post from "../components/post"
+import BlogPost from "../components/blogPost"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 
+export const IndexPageName = "Home"
+
 export default ({ data }) => (
   <Layout>
-    <SEO title="Home"/>
+    <SEO title={IndexPageName}/>
     <h1> Latest posts</h1>
     <hr/>
     <br/>
     {data.mdxArticles.edges.map(({ node }) => (
-      <Post pathEdges={data.allConfig.edges} 
-          node={node} key={node.frontmatter.path}/> 
+      <BlogPost node={node} key={node.frontmatter.path}/> 
     ))}
   </Layout>
 )
@@ -22,7 +23,7 @@ export const query = graphql`
   query {
     mdxArticles: allMdx(sort: {fields: [frontmatter___date], 
       order: DESC}, filter: {frontmatter:
-        {post_type: {ne: "header_page"}, config: {ne: true}}}) {
+        {post_type: {eq: "blog"}, config: {ne: true}}}) {
       edges {
         node {
           frontmatter {
@@ -37,17 +38,5 @@ export const query = graphql`
         }
       }
     }
-    allConfig: 
-      allMdx(filter: {frontmatter: {config: {eq: true}}}) {
-        edges {
-          node {
-            frontmatter {
-              sub_category
-              category
-              path
-            }
-          }
-        }
-      }
   }
 `

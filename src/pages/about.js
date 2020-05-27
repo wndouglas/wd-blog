@@ -11,11 +11,13 @@ import SEO from "../components/seo"
 
 const shortCodes = { ContactForm }
 
+export const AboutPageName = "About"
+
 export const AboutPage = ({ data }) => {
   const post = data.markdown.edges[0].node
   return (
   <Layout>
-    <SEO title="About" />
+    <SEO title={AboutPageName} />
     <Container align='center'>
         <Col xs={6} md={4}>
           <Img fluid={data.image.childImageSharp.fluid} 

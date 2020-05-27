@@ -2,9 +2,10 @@ import React from "react"
 import Layout from "../components/layout"
 import { graphql, Link } from "gatsby"
 import SEO from "../components/seo"
-import { getCategoryPath } from "../functions/getPaths"
-import Post from "../components/post"
+import { getLearnPostPath } from "../functions/getPaths"
+import LearningPost from "../components/learningPost"
 import { MDXRenderer } from "gatsby-plugin-mdx"
+import { LearnPageDescription } from "../pages/learn"
 
 export default ({ data }) => {
   const subcategory = data.allPosts.edges[0].node.frontmatter.sub_category
@@ -13,10 +14,10 @@ export default ({ data }) => {
   return (
     <Layout>
     <SEO title={subcategory} />
-    <Link slug="/posts">
-      <h1>Posts</h1>
+    <Link slug="/learn">
+      <h1>{LearnPageDescription}</h1>
     </Link>
-    <Link to={getCategoryPath(category, pathEdges)}>
+    <Link to={getLearnPostPath(category, null, null, pathEdges)}>
         <h3>{category}</h3>
     </Link>
     <h5>{subcategory}</h5>
@@ -28,7 +29,7 @@ export default ({ data }) => {
         node.frontmatter.sub_category === subcategory)[0].node.body}
     </MDXRenderer>
     {data.allPosts.edges.map(({ node }) => (
-        <Post pathEdges={data.allConfig.edges} 
+        <LearningPost pathEdges={data.allConfig.edges} 
           node={node} key={node.frontmatter.path}/> 
     ))}
     </Layout>
@@ -38,7 +39,8 @@ export default ({ data }) => {
 export const query = graphql`
   query($category: String!, $sub_category: String) {
   allPosts: allMdx(filter: {frontmatter: 
-    {config: {ne: true}, category: {eq: $category}, 
+    {post_type: {nin: ["header_page", "blog"]}, 
+    config: {ne: true}, category: {eq: $category}, 
     sub_category: {eq: $sub_category}}}) {
     edges {
       node {
@@ -54,7 +56,7 @@ export const query = graphql`
       }
     }
   }
-  allConfig: allMdx(filter: {frontmatter: {config: {eq: true}}}) {
+  allConfig: allMdx(filter: {frontmatter: {config: {eq: true}, post_type: {nin: ["header_page", "blog"]}}}) {
     edges {
       node {
         frontmatter {

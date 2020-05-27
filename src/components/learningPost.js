@@ -1,11 +1,11 @@
 import React from "react"
 import { Link } from "gatsby"
 import MetaData from "./postMetadata"
-import { getPostPath } from "../functions/getPaths"
+import { getLearnPostPath } from "../functions/getPaths"
 
 export default ({ pathEdges, node }) => (
     <div>
-        <Link to={getPostPath(node.frontmatter.category, 
+        <Link to={getLearnPostPath(node.frontmatter.category, 
                     node.frontmatter.sub_category,
                     node.frontmatter.path, pathEdges)}>
         <h3>{node.frontmatter.title}</h3>
@@ -16,7 +16,7 @@ export default ({ pathEdges, node }) => (
         category={node.frontmatter.category}
         pathEdges={pathEdges}/>
         <div dangerouslySetInnerHTML={{ __html: node.excerpt }}/>
-        <Link to={getPostPath(node.frontmatter.category,
+        <Link to={getLearnPostPath(node.frontmatter.category,
                               node.frontmatter.sub_category,
                               node.frontmatter.path, pathEdges)}>
             Read more...

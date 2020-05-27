@@ -1,91 +1,75 @@
 import React from "react"
 import { graphql, Link } from "gatsby"
-
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import MetaData from "../components/postMetadata"
-import { getPostPath, getSubcategoryPath, getCategoryPath } 
-  from "../functions/getPaths"
+import { getBlogPostPath } from "../functions/getPaths"
+import { getPostMonthsAndYears } from "../functions/getPostMonthsAndYears"
+import moment from "moment"
+
+export const PostsPageName = "Posts"
 
 const PostsPage = ({ data }) => 
 {
-  const pathEdges = data.allConfig.edges
-  return(
+  // map of years to a set of months
+  const sortedPostDates = getPostMonthsAndYears(data.allDates.distinct)
+  console.log(sortedPostDates)
+  return (
   <Layout>
-    <SEO title="Posts" />
-    <h1>Posts</h1>
+    <SEO title={PostsPageName} />
+    <h1>{PostsPageName}</h1>
     <hr/>
     <br/>
-    {data.postCategories.distinct.sort()
-    .map(category => (
-      <div key={category}>
-        <Link to={getCategoryPath(category, pathEdges)}>
-            <h3>{category}</h3>
-        </Link>
-        {data.allPosts.edges
-        .filter(({ node }) => (node.frontmatter.category === category))
-        .map(({ node }) => node.frontmatter.sub_category)
-        .filter((v, i, a) => a.indexOf(v) === i)
-        .sort()
-        .map(subcategory => (
-          <>
-            <Link to={getSubcategoryPath(category, subcategory, pathEdges)}>
-              <h5>{subcategory}</h5>
-            </Link>
-            <div key={subcategory}>
-              <ul style={{ display: 'inline-block'}}>
-                {data.allPosts.edges.filter(({ node }) => (
-                    node.frontmatter.category === category 
-                      && node.frontmatter.sub_category === subcategory))
-                    .slice(0, 5)
-                    .map(({ node }) => (
-                        <li key={node.frontmatter.path}>
-                          <div style={{display: 'inline-block'}}>
-                            <Link to={getPostPath(category, subcategory,
-                              node.frontmatter.path, pathEdges)}>
-                            {node.frontmatter.title}
-                            </Link>
-                          </div>
-                          &nbsp;&nbsp;&nbsp;
-                          <MetaData 
-                            date={node.frontmatter.date}
-                            timeToRead={node.timeToRead}/>
-                        </li>
-                ))}
-                <li key={subcategory} style={{listStyle: 'none'}}>
-                  <Link to={getSubcategoryPath(category, 
-                    subcategory, pathEdges)}>See all...</Link>
-                </li>
-              </ul>
-            </div>
-          </>
+    {sortedPostDates.map(date => 
+    {
+      const year = date[0]
+      return (
+      <div key={year}>
+        <h3>{year}</h3>
+        {date[1].map(month => (
+          <div key={year + ", " + month}>
+            <h5>{moment(month, "MM").format("MMMM")}</h5>
+            {data.allPosts.edges.filter(({ node }) => {
+              const date = node.frontmatter.date
+              const currYear = parseInt(moment(date).format("YYYY"))
+              const currMonth = parseInt(moment(date).format("MM"))
+              return currYear === year && currMonth === month
+            })
+            .map(({ node }) => (
+              <li key={node.frontmatter.path}>
+                <div style={{display: 'inline-block'}}>
+                  <Link to={getBlogPostPath(node.frontmatter.path)}>
+                  {node.frontmatter.title}
+                  </Link>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <MetaData 
+                  date={node.frontmatter.date}
+                  timeToRead={node.timeToRead}/>
+              </li>
           ))}
-          <br/>
-          <br/>
-      </div>
+          </div>
       ))}
-  </Layout>)
-}
+      <br/><br/>
+      </div>
+    )})}
+  </Layout>
+)}
 
 export default PostsPage
 
 export const query = graphql`
   query {
-    postCategories:
-      allMdx {
-        distinct(field: frontmatter___category)
-      }
     allPosts:
       allMdx(sort: {fields: [frontmatter___date], order: DESC}, 
         filter: {frontmatter: {config: {ne: true}, 
-                               post_type: {ne: "header_page"}}}) {
+          post_type: {eq: "blog"}}}) {
         edges {
           node {
             frontmatter {
               path
               title
               category
-              sub_category
               date
             }
             timeToRead
@@ -93,17 +77,10 @@ export const query = graphql`
         }
       }
 
-    allConfig: 
-      allMdx(filter: {frontmatter: {config: {eq: true}}}) {
-        edges {
-          node {
-            frontmatter {
-              sub_category
-              category
-              path
-            }
-          }
-        }
+    allDates:
+      allMdx(filter: {frontmatter: {config: {ne: true}, 
+        post_type: {eq: "blog"}}}) {
+        distinct(field: frontmatter___date)
       }
   }
 `

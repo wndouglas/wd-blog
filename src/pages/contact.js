@@ -5,12 +5,14 @@ import { MDXRenderer } from "gatsby-plugin-mdx"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 
+export const ContactPageName = "Contact"
+
 const ContactPage = ({ data }) => {
   const post = data.markdown.edges[0].node
   return (
   <Layout>
-    <SEO title="Contact" />
-    <h1>Contact</h1>
+    <SEO title={ContactPageName} />
+    <h1>{ContactPageName}</h1>
     <hr/>
     <br/>
     <MDXRenderer>{post.body}</MDXRenderer>
