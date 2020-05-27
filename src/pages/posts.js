@@ -13,7 +13,6 @@ const PostsPage = ({ data }) =>
 {
   // map of years to a set of months
   const sortedPostDates = getPostMonthsAndYears(data.allDates.distinct)
-  console.log(sortedPostDates)
   return (
   <Layout>
     <SEO title={PostsPageName} />

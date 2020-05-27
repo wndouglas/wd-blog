@@ -11,7 +11,7 @@ exports.createPages = async ({ graphql, actions }) => {
   const mdxQueryResult = await graphql(`
   {
     postCategories:
-    allMdx {
+    allMdx(filter: {frontmatter: {post_type: {nin: ["header_page", "blog"]}}}) {
       distinct(field: frontmatter___category)
     }
 

@@ -42,7 +42,7 @@ const LearnPage = ({ data }) =>
                     .slice(0, 5)
                     .map(({ node }) => (
                         <li key={node.frontmatter.path}>
-                          <div style={{display: 'inline-block'}}>
+                          <div style={{display: 'inline-block'}} key={node.frontmatter.path}>
                             <Link to={getLearnPostPath(category, subcategory,
                               node.frontmatter.path, pathEdges)}>
                             {node.frontmatter.title}
