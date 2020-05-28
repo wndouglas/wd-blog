@@ -37,8 +37,8 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `gatsby-starter-default`,
-        short_name: `starter`,
+        name: `alpha-beta-rho`,
+        short_name: `abr`,
         start_url: `/`,
         background_color: `#663399`,
         theme_color: `#663399`,

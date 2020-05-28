@@ -1,15 +1,12 @@
 import React from "react"
 import { graphql } from "gatsby"
 import { MDXRenderer } from "gatsby-plugin-mdx"
-import ContactForm from "../components/form"
 
 import { Container, Col } from "react-bootstrap"
 import Img from "gatsby-image"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-
-const shortCodes = { ContactForm }
 
 export const AboutPageName = "About"
 
@@ -27,7 +24,7 @@ export const AboutPage = ({ data }) => {
     <h1>About</h1>
     <hr/>
     <br/>
-    <MDXRenderer components={shortCodes}>{post.body}</MDXRenderer>
+    <MDXRenderer>{post.body}</MDXRenderer>
   </Layout>
   )
 }

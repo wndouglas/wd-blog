@@ -3,12 +3,221 @@ title: Is Your Student Loan Worth Paying Off Early?
 path: /is-your-student-loan-worth-paying-off-early
 category: Personal Finance
 post_type: blog
-date: 2020-05-24
+date: 2020-05-28
 ---
 
-If you're anything like me (i.e. you're an English or Welsh student who started
-an undergraduate course anywhere in the UK on or after the 1st September 2012
-and you took out a student loan to cover some or all of your fees), you
-probably find yourself with a significant student loan to your name.
+If you're like me (an English or Welsh student who started an undergraduate 
+degree anywhere in the UK on or after 1 September 2012 and you took out 
+a student loan to help cover your fees), you probably find yourself with a 
+significant student loan to your name. Most people I know have come to terms 
+with this fact. They treat their loan as an additional *tax* that they will 
+have to pay for 30 years after they start working. But is this the best strategy 
+for everyone? 
 
-In this series, we investigate what the best strategy is for repaying your loan.
+By building a simple **repayment model**, we will investigate whether the 
+passive strategy of letting the minimum repayment come out of your paycheck 
+automatically is an effective strategy from an investment point of view, or
+whether a student loan holder is better off making **early repayment contributions**.
+
+## Simplifying the Terms of the Loan
+Looking at the student 
+finance <a href="https://www.gov.uk/student-finance">website</a>, you're
+presented by a confusing and messy page explaining how repayment works. In
+reality, it's *not* that complicated. Here's how it works.
+
+#### How repayment works
+
+If, like me, your course started after 1 September 2012, you have a **Plan 2**
+loan. This just means that you will start repaying your loan the first **April** 
+after you finish studying, and you will *only* pay anything if your current **gross**
+income is over £26,575 a year (or £2,214) a month. You will then pay 9% 
+of your gross income **in excess** of this threshold each payment period. If you are 
+paid a monthly salary and you earn £2,314 per month, you would then repay 
+9% of £2,314 - £2,214 = £100, which is £9 per month.
+
+If you're looking at that £9 per month and thinking 'that doesn't seem like much,
+I spend that much on Netflix', I'd firstly recommend jumping in on your parents
+Netlfix account, but I would also recommend **voluntary repayments**. You have 
+the right to make extra contributions to your repayment on top of the automatic 
+contribution at any time, provided that this payment is larger than £5.
+
+Finally, if you still have an outstanding student loan after 30 years, your 
+loan is **written off** and your 50 year old self can relax in the knowledge 
+that the last trace of your naive student years is behind you.
+
+#### How the interest works
+It is important to realise here that even while you are studying, your loan is
+accruing **interest**. While you study, your rate of interest is the UK RPI plus
+3%. At the time of writing, UK RPI is at 2.4%. So while you are studying you 
+pay 5.4% of interest.
+
+Once you are eligible for repayment, you are charged an interest of RPI, plus
+an extra sliding charge of between 0% for those earning £26,575 per year or less 
+up to 3% for those earning over £47,835 per year. The exact way that the 
+additional rate scales from 0% to 3% turns out to be incredibly difficult to 
+find in the student finance documents. From a modelling perspective, we will
+assume a linear scale between 0 and 3.
+
+An important detail that doesn't seem to get mentioned anywhere online or on
+the student finance documents is the **interest rate schedule** of these interest
+payments. According 
+to <a href="https://www.ft.com/content/0c56a3ee-60e4-11e7-91a7-502f7ee26895">this</a>
+article in the FT, the repayments are **monthly**, and **compound**. To me, this
+is an egregious lack of transparency from the government. I spent the good part
+of an hour searching for this information, and the only source I could find
+was in a subscription newspaper that many students have no access to. The article
+shares my view and states that the details of the interest payments is 'hidden in
+the small print'. But, I digress.
+
+## Building the Model
+In order to analyse various different strategies of repayment, it is important 
+to lay down both some notation, and also some criteria for comparing approaches. 
+
+#### Notation
+In the following, we denote the **total outstanding debt** at the point of 
+starting repayment by $£D$. For most students who studied a 3 year undergraduate 
+degree after 1 September 2012, this quantity will be in the region of £40,000. 
+We denote the **total amount paid** towards the loan across its lifetime by $£P$.
+
+Since both interest payments and most professional's salaries are paid monthly,
+we consider a debtor's **gross monthly salary** in the $n$th month of repayment 
+by $£s(n)$ and the **total outstanding debt** in the same month by $£d(n)$.
+Clearly $d(0) = D$. We then denote the **automatic contributions** made towards 
+the loan in the $n$th month by $p_a(n)$, and the **voluntary contributions** 
+by $p_v(n)$, giving a **total contribution** in month $n$ 
+of $p(n) := p_a(n) + p_v(n)$. Finally, we denote the interest accrued on the 
+loan in the $n$th month by $i(n)$.
+
+Next, we denote the **nominal annual rate** on the loan in month $n$ by $r(n)$. 
+This is the headline figure of RPI plus an extra rate that we saw above. We
+break this rate down into the sum of an **inflation linked component** $r_i(n)$,
+and an additional, salary dependent component $r_a(n)$. Assuming a linear scale
+between the lower and upper yearly salary thresholds of £26,575 and £47,835, 
+which we denote by their equivalent monthly salary figures $l_i$ and $u_i$ 
+respectively, we have
+
+$$
+r_a(n) = 
+\begin{cases}
+0, & s(n) < l_i, \\
+\frac{0.03}{u_i-l_i}\left(s(n)- l_i\right), & l_i \le s(n) \le u_i, \\
+0.03, & s(n) > u_i.
+\end{cases}
+$$
+
+We then have
+
+$$
+r(n) = r_i(n) + r_a(n).
+$$ 
+
+Since the interest is charged monthly and is compound, we find that the interest
+owed in month $n+1$ is given by
+
+$$
+i(n+1) = \frac{r(n)}{12} d(n).
+$$
+
+Furthermore, letting the lower repayment threshold be denoted by $l_r = £26,575$,
+the automatic repayment contribution in month $n+1$ is given by
+
+$$
+p_a(n+1) =
+\begin{cases}
+0, & s(n) < l_r,\\
+0.09(s(n) - l_r), & s(n) \ge l_r.
+\end{cases}
+$$
+
+We're finally ready to give an expression for the debt at time $n+1$ in terms
+of the quantities in month $n$. This quantity is the sum of the debt in month 
+$n$ and the interest accrued in month $n$, minus the payment made at the start
+of month $n+1$. Thus, we have
+
+$$
+\begin{aligned}
+    d(n+1) & = d(n) + i(n+1) - p(n+1) \\
+    & = \left(1 + \frac{r(n)}{12}\right)d(n) - p(n+1).
+\end{aligned}
+$$
+
+To the mathematically inclined, you will notice that the above represents
+a difference equation, a discrete time version of an ordinary differential
+equation (ODE). If the repayment term $p(n+1)$ vanished, the above
+would simply represent the discrete-time equivalent of an exponential growth 
+model. All of this is a fancy way of saying that if your monthly repayments
+$p(n+1)$ are not sufficient to outpace the interest rate $r(n)$, then you will
+find yourself on the wrong side of an exponential growth curve, and you will *very*
+quickly find that your student debt blows so far out of proportion that early
+repayment becomes practically impossible.
+
+Finally, the total amount paid during the lifetime of the loan is given by
+
+$$
+P = \sum_{n=1}^N p(n),
+$$
+
+where $N$ is the minimum of 360 months (the 30 years before the loan is written
+off) and the first $n$ such that $d(n)$ hits zero, i.e.
+
+$$
+N := \min\left(360, \min_n \{d(n) \le 0 \}\right).
+$$
+
+#### Comparing strategies
+Now that we have the notation in place, it is easy to define a **repayment
+strategy**. By repayment strategy, I refer to a sequence of additional
+repayment contributions $p_a(1),\ldots,p_a(N)$, where clearly, each of 
+the $p_a(n) \ge 0$. 
+
+I think a good yard-stick for a strategy is the **effective rate of interest** 
+one ends up paying throughout the lifetime of their loan. This value 
+essentially represents a yearly **return** that the government makes off of you
+during the lifetime of your loan, and hence can be viewed as an equal and 
+opposite **negative return** to you, the holder of the loan. Starting with a
+loan of $£D$, if one was to to pay off their loan in $N$ months and to pay a
+total amount of $£P$ across the lifetime of the loan in doing do, then we could 
+say that the debtor paid a nominal annual rate $r_m$ with monthly compounding, 
+where $r_m$ satisfies
+
+$$
+\left(1 + \frac{r_m}{12}\right)^N \cdot D = P,
+$$
+or, upon rearranging,
+
+$$
+r_m = 12 \left[\left(\frac{P}{D}\right)^{1/N} - 1\right].
+$$
+
+To get the effective rate of interest $r$, we then find
+
+$$
+r = \left(1 + \frac{r_m}{12}\right)^{12} - 1.
+$$
+Upon using the above expression for $r_m$, this gives
+
+$$
+r = \left( \frac{P}{D}\right)^{12/N} - 1.
+$$
+
+Hopefully it is clear that this formula is consistent with reality. If one
+decided to pay off their entire student loan in the first month of repayment
+(perhaps they had the ability to take out another loan with better terms 
+elsewhere), then they would accrue no interest, close out their loan, and pay
+$P=D$, giving an effective rate of $r=0$, as you would expect.
+
+#### Assumptions
+While the framework we have built above is fairly general and allows for a lot
+of flexibility in the various different parameters, in order to generate useful
+results that we can compare easily, we need to add some assumptions and 
+constraints. The aim in this analysis is to give a **ballpark figure** for the 
+effective interest rates of different strategies, not an exact value. What is 
+important is that the effectiveness of various strategies relative to one 
+another is accurately modelled, not necessarily the final values themselves.
+
+A few assumptions have already been *baked in*. One of these is that the maximum
+additional interest rate one pays will always be 3% and that the upper and lower
+thresholds will remain where they are. The government is capable of changing these
+figures and has done so periodically. Nonetheless, building a model to predict
+where these values are headed in the coming weeks and months is beyond the scope
+of this post, and would only give marginally more accurate results.
