@@ -344,159 +344,6 @@ income, and peoples living costs tend to increase in line with their incomes.
 
 With these assumptions, we are ready to put our model to use. 
 
-#### Trial running the model
-Before blindly putting a model to use, it is always a good idea to develop some 
-understanding of how it works in some simple special cases. The simplest 
-modelling case is where you choose to invest all your disposable income into
-voluntary loan repayments, salaries are constant, i.e. $a=0$, and monthly salaries
-are larger than the variable interest rating ceiling, i.e. $s(0) > 3986.25$, so
-that $r(n) \equiv r = 6\%$.
-In this case, $x = 1$ while we have debt remaining,
-so
-
-$$
-    Q(n+1) = Q(n) = 0,
-$$
-
-for all $n$ such that $d(n) > 0$. Furthermore 
-$p(n) = p_a(n) + p_v(n) = I(n) = f s(n) = f(1 + a)^{n/12}s(0) = f s(0)$. Then, in month
-$n$ our debt is given by
-
-$$
-\begin{aligned}
-    d(n) & = \left(1 + \frac{r}{12} \right)d(n-1) - f s(0) \\
-    & = \left(D - \frac{12f s(0)}{r}\right) \left(1+ \frac{r}{12} \right)^n + \frac{12 f s(0)}{r}.
-\end{aligned}
-$$
-
-It is easy to see that $d(n)$ is decreasing if and only 
-if $f > \frac{r D}{12 s(0)}$. With $r = 6%$ and $D = £40,000$ this 
-gives $f > \frac{200}{s(0)}$. Since $s(0) > 3986.25$, we have $\frac{200}{s(0)} < 0.05$,
-but $f > 0.09$ by assumption, so $d(n)$ is decreasing for all choices of $f$.
-
-Next, we can find the month in which the loan is written off by setting $d(k) = 0$
-and rearranging for $k$, which gives
-
-$$
-    k = \left\lceil\frac{\log\left( \frac{12 f s(0)}{12 f s(0) - r D} \right)}{\log\left( 1 + \frac{r}{12}\right)}\right\rceil.
-$$
-
-Now we know that the loan is simply written off if it remains after 30 years.
-In order for a full repayment to be made before 30 years have passed we require
-$k < 360$. Setting $k=360$ and rearranging for $f s(0)$ gives
-
-$$
-   f s(0) = \frac{\frac{1}{12} rD \left(1 + \frac{r}{12} \right)^{360}}{\left(1 + \frac{r}{12} \right)^{360} - 1} = 240.
-$$
-
-With $s(0) > 3986$, $\frac{240}{s(0)} < 0.06$, so we can be sure that $k < 360$.
-
-Hence, with a total initial debt of £40,000, provided you earn over £3986.25 
-per month, the strategy of investing all of your disposable income into 
-voluntary loan repayments always leads to clearing all of your debt before it is
-written off. You then have the remaining $360 - k$ months to focus your income
-entirely on investing in the risky asset.
-
-Starting at $n = k+1$ we have
-
-$$
-\begin{aligned}
-    W(k) & = 0, \\
-    W(n) & = Q(n - 1)X(n - 1), \quad n > k, \\
-    Q(n) & = Q(n-1) + \frac{f s(0)}{X(n)}.
-\end{aligned}
-$$
-
-Therefore,
-
-$$
-\begin{aligned}
-    W(N) & = Q(N)X(N) \\
-    & = \left(Q(N-1) + \frac{f s(0)}{X(N)} \right)X(N) \\
-    & = Q(N-1)X(N) + f s(0) \\
-    & = \left(1 +\frac{\mu}{12} \right) W(N-1) + f s(0) \\
-    & = \left(1 + \frac{\mu}{12}\right)^2 W(N-2) + f s(0)\left(1 + \left(1 +\frac{\mu}{12} \right)\right) \\
-    & = \left(1 + \frac{\mu}{12}\right)^{N - k} W(k) + f s(0) \sum_{r = 0}^{N-k-1} \left(1 +\frac{\mu}{12} \right)^r \\
-    & = f s(0) \sum_{r = 0}^{N-k-1} \left(1 +\frac{\mu}{12} \right)^r \\
-    & = \frac{12}{\mu} f s(0) \left(\left(1 +\frac{\mu}{12} \right)^{N-k-1} - 1\right)
-\end{aligned}
-$$
-
-On the other extreme is where you choose to invest **none** of your disposable 
-income into voluntary loan repayments and again salaries are constant, 
-i.e. $a=0$, and monthly salaries are larger than the variable interest rating 
-ceiling, i.e. $s(0) > 3986.25$, so that $r(n) \equiv r = 6\%$.
-
-It should be intuitively clear in this case that there is a salary threshold,
-below which your loan is never fully repaid before the full 30 years has elapsed.
-In this case, we spend the whole 30 year period investing a sub-maximal amount
-of our potential disposable income, missing out on later years where we might
-have had more cash to invest if we had made some voluntary prepayments. It is
-a quick calculation to calculate the salary threshold at which ones loan is never
-fully repaid. Using the debt formula $d(n)$, we find $k$ such that $d(k) = 0$
-and assume $p_v(n) = 0$ for all $n$, giving
-
-$$
-\begin{aligned}
-    d(n) & = \left(1 + \frac{r}{12} \right)d(n-1) - 0.09(s(0) - l_r) \\
-    & = \left(1 + \frac{r}{12}\right)^n D - \frac{12}{r}0.09(s(0) - l_r) \left(\left(1 + \frac{r}{12}\right)^n - 1\right).
-\end{aligned}
-$$
-
-Setting $n = 360$, putting $d(360) > 0$ and rearranging for $s(0)$ gives
-
-$$
-    \left(1 + \frac{r}{12}\right)^{360} D - \frac{12}{r}0.09(s(0) - l_r) \left(\left(1 + \frac{r}{12}\right)^{360} - 1\right) > 0
-$$
-
-or, using $D = 40,000$,
-
-$$
-    s(0)  < l_r + \frac{r}{12\cdot 0.09}\frac{\left(1 + \frac{r}{12}\right)^{360}}{\left(\left(1 + \frac{r}{12}\right)^{360} - 1\right)}D = 4880.
-$$
-
-This is a sizeable salary. Most people in the UK will never exceed a salary
-of £4,880 per month or £58,560 per year! With $s(0) < 4880$, we can calculate
-$W(N)$ as before, giving
-
-$$
-\begin{aligned}
-    W(N) & = Q(N)X(N) \\
-    & = \left(1 +\frac{\mu}{12}\right)W(N-1) + (f - 0.09)s(0) + 0.09 l_r \\
-    & = \frac{12}{\mu}\left((f - 0.09)s(0) + 0.09 l_r \right) \left(\left(1 +\frac{\mu}{12}\right)^N - 1 \right).
-\end{aligned}
-$$
-
-Now, suppose that $3986 < s(0) < 4880$, we will use $s(0) = 4200$, $f=0.5$, 
-$r = 0.06$ and $D = 40000$. With the values we have used above, we find 
-that $k = 21$, i.e. after 21 months your entire student loan will be repaid.
-Then, our wealth is greater if we invest all of our disposable income into 
-voluntary prepayments than if we invest none into voluntary repayments if
-
-$$
-    \frac{12}{\mu}\left((f - 0.09)s(0) + 0.09 l_r \right) \left(\left(1 +\frac{\mu}{12}\right)^N - 1 \right) < \frac{12}{\mu} f s(0) \left(\left(1 +\frac{\mu}{12} \right)^{N-22} - 1\right).
-$$
-
-or equivalently
-
-$$
-    \left((f - 0.09)s(0) + 0.09 l_r \right) \left(\left(1 +\frac{\mu}{12}\right)^N - 1 \right) < f s(0) \left(\left(1 +\frac{\mu}{12} \right)^{N-22} - 1\right).
-$$
-
-Letting $c_1 := (f - 0.09)s(0) + 0.09 l_r$, $c_2 = f s(0)$ and $c_3 = 0.09 (l_r - s(0))$. Rearranging gives
-
-$$
-    g(\mu) := c_1 \left(1 +\frac{\mu}{12}\right)^N - c_2 \left(1 +\frac{\mu}{12} \right)^{N-22} - c_3 < 0.
-$$
-
-Notice that this function satisfies $g(0) = 0$ and $g$ is monotonic increasing.
-This shows that it is **never** a better choice to make full early
-repayments in this simple, special case, independent of the return you believe
-you can make on your investment.
-
-Perhaps the situation is different once we factor in other considerations, like
-partial repayments and salary growth?
-
 #### Implementation and results
 With our framework in place, it was easy to implement the model in Python. If
 you're interested, you can find the code 
@@ -528,26 +375,41 @@ this.
 
 Below, terminal wealth at the end of the 30 year period versus proportion
 of remaining income used to make voluntary prepayments for various different
-starting salary levels are plotted. The plots show that for *most* starting
-salary levels, one is better of **not** making voluntary prepayments. In other
-words, it is a better idea to take all of your disposable income and use it to
-invest prudentially across a well-diversified portfolio with a steady annual
-return. In the lower plot, the length of time to fully repay ones debt is also
+starting salary levels are plotted. The plots show that for starting
+salaries below a threshold, one is better off **not** making voluntary 
+prepayments. In other words, it is a better idea to take all of your disposable 
+income and use it to invest prudentially across a well-diversified portfolio 
+with a steady annual return. Beyond this threshold, it may be a better choice to
+make steady voluntary repayments. The middle plot shows a blown up version of the case
+of a starting salary of £40,000. Here we see that it is **slightly** more effective
+to make voluntary repayments, and that the benefit of doing so tapers off at
+around 50% of available income. Don't be misled by the vertical centering of this plot,
+it is still only a **minor** wealth increase.
+
+In the bottom plot, the length of time to fully repay ones debt is
 shown. Clearly, there is an exponential drop off in the time taken to repay
 your full student loan once you do breach the *threshold* at which your loan is
-not simply written-off after 30 years. 
+not simply written-off after 30 years.
 
 import RepaymentPlots from '../../src/components/post_components/student_debt/repaymentPhoto'
 
 <RepaymentPlots/>
 
-A more advanced analysis might investigate
-the relationship between the total amount you end up paying towards your loan
-and the total time it takes you to repay. Clearly, the longer you take to repay,
-the more you will spend. For some, this might be an important consideration,
-but it is clear from the above analysis that for many, paying a little more on
-your student loan over its lifetime to allow yourself to invest more is a
-wise tradeoff to make from a wealth-generation point of view.
+Upon reflection on these plots, it seems to me that with our assumptions, for
+an individual earning a starting salary of £40,000 or over, it is a good idea to
+invest a small percentage of your available income into voluntary repayments.
+An investment of just 20% makes the most out of the steepest part of the 
+terminal wealth curve and significantly deceases the time it takes for full
+repayment of your student loan. This gives a good balance between paying off
+your loan fast, allowing you to benefit from the halting of the automatic contributions
+at an earlier point, while giving you cash to use from day 1 to potentially benefit
+from riskier investments.
+
+It is also important to consider **tax** implications of repaying ones loan.
+In our analysis, we have neglected the important point that while the money 
+we use to make early repayments is tax-free, the capital gains we make on our
+investments are generally not. This should prompt us to consider placing more
+weight than our model would suggest on making early repayments.
 
 #### Conclusions
 Clearly, the model we have used is a large simplification of reality. In the
