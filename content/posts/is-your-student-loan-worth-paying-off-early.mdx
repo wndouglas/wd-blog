@@ -31,7 +31,7 @@ reality, it's *not* that complicated. Here's how it works.
 #### How repayment works
 
 If, like me, your course started after 1 September 2012, you have a **Plan 2**
-loan. This just means that you will start repaying your loan the first **April** 
+loan. This means that you will start repaying your loan the first **April** 
 after you finish studying, and you will *only* pay anything if your current **gross**
 income is over £26,575 a year (or £2,215) a month. You will then pay 9% 
 of your gross income **in excess** of this threshold each payment period. If you are 
@@ -77,10 +77,10 @@ In order to analyse various different strategies of repayment, it is important
 to lay down both some notation, and also some criteria for comparing approaches. 
 
 #### Notation and framework
-In the following, we denote the **total outstanding debt** at the point of 
+In the following, we will denote the **total outstanding debt** at the point of 
 starting repayment by £$D$. For most students who studied a 3 year undergraduate 
 degree after 1 September 2012 and took out a full tuition and maintenance loan,
-this quantity will be in the region of £40,000. We denote the 
+this quantity will be in the region of £30,000. We denote the 
 **total amount paid** towards the loan across its lifetime by £$P$.
 
 Since interest payments and most professional's salaries are paid monthly,
@@ -117,7 +117,7 @@ $$
 
 Since the interest is charged monthly and is compound, we find that the interest
 owed in month $n+1$ is given by
-ß
+
 $$
 i(n+1) = \frac{r(n)}{12} d(n).
 $$
@@ -188,7 +188,7 @@ $$
 Before we can use this cash, the amount $p_a(n)$ is automatically removed, 
 leaving us with $I(n) - p_a(n)$ left to invest.
 
-Finally, we need a measure of our **wealth** at time $n$, which we will denote
+Next, we need a measure of our **wealth** at time $n$, which we will denote
 by $W(n)$. This value consists of the value of our holdings in the risky asset,
 which is given by
 
@@ -198,14 +198,9 @@ $$
 
 where $Q(n)$ is the quantity of the asset that we hold at time $n$.
 
-At each timestep $n$ we have the choice of investing our remaining income 
-
-$$ 
-    I(n) - p_a(n) = f(n) s(n) - 0.09(s(n) - l_r) = s(n)(f(n) - 0.09) + 0.09 l_r
-$$ 
-
-in the risky asset, or using our cash to make voluntary loan 
-repayments. We use a proportion $x(n) \ge 0$ of this cash to make voluntary 
+At each timestep $n$ we have the choice of investing our remaining 
+income $I(n) - p_a(n)$ in the risky asset, or using our cash to make voluntary 
+loan repayments. We use a proportion $x(n) \ge 0$ of this cash to make voluntary 
 prepayments, i.e. 
 
 $$
@@ -215,7 +210,7 @@ $$
 and we invest the remainder in the risky asset, i.e. we invest 
 
 $$
-    I(n) - p_a(n) - p_v(n) = I(n) - p(n) = (1-x(n))(I(n) - p_a(n)).
+    I(n) - p_a(n) - p_v(n) = (1-x(n))(I(n) - p_a(n)),
 $$
 
 in the asset. Therefore, we have
@@ -231,9 +226,7 @@ so that
 
 $$
 \begin{aligned}
-    Q(n+1) & = Q(n) + \left(\frac{1-x(n)}{X(n+1)}\right)(f(n)s(n) - p_a(n)) \\
-    & = Q(n) + \left(\frac{1-x(n)}{X(n+1)}\right)(f(n)s(n) - 0.09(s(n) - l_r)) \\
-    & = Q(n) + \left(\frac{1-x(n)}{X(n+1)}\right)((f(n) - 0.09)s(n) + 0.09l_r)), \\
+    Q(n+1) & = Q(n) + \left(\frac{1-x(n)}{X(n+1)}\right)(I(n) - p_a(n)) \\
     Q(0) & = 0.
 \end{aligned}
 $$    
@@ -255,11 +248,18 @@ $$
     \hat{x} := \argmax_{x} W(N; x).
 $$
 
-To make this problem tractable, we only consider constant strategies, i.e. 
-strategies where $x(n) = x$ for all $n$. There is however, an important extra 
-consideration. If we have fully repaid our loan before the terminal date $N$, 
-i.e. if $d(n) = 0$ for some $n$, then we **stop** our voluntary repayments, 
-so if $k$ is the first index such that $d(k) = 0$ then we have
+If we were to consider the problem in full generality, a naive optimisation 
+would lead to a 360 dimensional problem. A reasonable simplification that will 
+make our problem far more tractable is that of a **constant strategy**, i.e. 
+strategies where $x(n) = x$ for all $n$. From a financial perspective, this 
+strategy reflects many people's attitude towards investing. It represents a 
+*set and forget* approach, where a fixed monthly loan repayment is automatically 
+paid out.
+
+There is an important extra consideration with this approach. If we have fully 
+repaid our loan before the terminal date $N$, i.e. if $d(n) = 0$ for some $n$, 
+then we **stop** our voluntary repayments, so if $k$ is the first index such 
+that $d(k) = 0$ then we have
 
 $$
     x(n) =
@@ -274,18 +274,21 @@ our remaining income into voluntary prepayments. In this case we build up no
 investments until our loan is fully repaid, but as soon as the loan is written 
 off we are able to maximally invest into the risky asset. The second is to make 
 no voluntary prepayments. In this case we focus on building up our investment 
-from the start, but have  less cash to use to invest since we incur an automatic 
+from the start, but have less cash to use to invest since we incur an automatic 
 repayment for the longest possible period of time.
+
+The problem is thus to deduce where the optimal strategy lies between these two 
+extremes.
 
 #### Assumptions
 While the framework we have built above is fairly general and allows for a lot
 of flexibility in the various different parameters, in order to generate useful
 results that we can easily compare, we need to add some assumptions and 
 constraints. The aim in this analysis is to give **ballpark figures** for the 
-terminal wealth of different strategies, not exact values. What is 
-important is that the effectiveness of various strategies **relative** to one 
-another is accurately modeled, not necessarily the **absolute** values 
-themselves.
+terminal wealth of different strategies, not exact values. The goal is that
+the effectiveness of various strategies **relative** to one 
+another is accurately modeled, not necessarily that the **absolute** values 
+themselves are.
 
 A few assumptions have already been *baked in*. One of these is that the maximum
 additional interest rate one pays will always be 3% and that the upper and lower
@@ -294,14 +297,13 @@ these figures and has done so periodically. Nonetheless, building a model to
 predict where these values are headed in the coming weeks and months is beyond 
 the scope of this post, and would be of questionable utility anyway.
 
-An assumption I believe is reasonable is that RPI will remain close to its 
-historic average.
-
 import RPI from '../../src/components/post_components/student_debt/rpiPhoto'
 
 <RPI/>
 
-The above plot shows RPI figures for the years 1990-2019. Observe that the values
+Another assumption I believe is reasonable is that RPI will remain close to its 
+historic average. The above plot shows RPI figures for the years 1990-2019. 
+Observe that the values
 tend to oscillate around a mean value of 3%. Hence, we will use an RPI of 3% in
 our model. I would also argue that a precise estimate of the RPI figure is 
 unnecessary. Any increase in RPI that leads to an increase in the 
@@ -312,7 +314,7 @@ The next assumption is perhaps the most restrictive but will be very useful
 in terms of simplifying our model. We will assume that salary **raises occur 
 monthly and at a constant nominal annual rate** of $a_m$. Of course normally 
 people get raises occur once a year. There *will* be a slight difference in the 
-results  using monthly increases compared to yearly, but again, our purpose 
+results using monthly increases compared to yearly, but again, our purpose 
 here is to come up with a tractable model. If a reasonable yearly increase is 
 $a$, then we can convert this to a monthly rate $a_m$ via
 
@@ -354,27 +356,31 @@ various parameters given above.
 
 Looking at UK average wage increases for the 
 year of 2019, the national average rise was 3.6%. I think this is a conservative 
-figure for an aspiring young professional, so we used a value of $a = 0.05$.
+figure for an aspiring young professional, so we will use a value of $a = 0.05$.
 
 In 2019, the average student entered repayment with a total student debt of
-£36,000, so we used $D = 36000$.
+£36,000, so we will use $D = 36000$.
 
 The average starting salary for a graduate beginning repayments in
-**London** is £30,000 at the time of writing, so this is the value we used as 
+**London** is £30,000 at the time of writing, so this is the value we will use as 
 input to the model.
 
-A disposable income of 40% of ones gross salary was used as the parameter $f$.
+We will use a disposable income of 40% of ones gross salary as the parameter $f$.
 I think this reflects a reasonable proportion once things like tax, National 
 Insurance and living costs like rent are taken into account.
 
-Finally, an average nominal annual return of 5% was assumed. By concentrating
+Finally, an average nominal annual return of 5% will be assumed. By concentrating
 your investments on index funds, this is historically a pretty good return.
 Clearly if you believe you can do better by generating a hand-picked portfolio,
 or if you are willing to take on more risk, you should use a larger figure than
 this.
 
-Below, terminal wealth at the end of the 30 year period versus proportion
-of remaining income used to make voluntary prepayments for various different
+import RepaymentPlots from '../../src/components/post_components/student_debt/repaymentPhoto'
+
+<RepaymentPlots/>
+
+Above, terminal wealth at the end of the 30 year period versus the proportion
+of remaining disposable income used to make voluntary prepayments for various different
 starting salary levels are plotted. The plots show that for starting
 salaries below a threshold, one is better off **not** making voluntary 
 prepayments. In other words, it is a better idea to take all of your disposable 
@@ -383,17 +389,13 @@ with a steady annual return. Beyond this threshold, it may be a better choice to
 make steady voluntary repayments. The middle plot shows a blown up version of the case
 of a starting salary of £40,000. Here we see that it is **slightly** more effective
 to make voluntary repayments, and that the benefit of doing so tapers off at
-around 50% of available income. Don't be misled by the vertical centering of this plot,
+around 50% of available income. Don't be misled by the vertical scaling of this plot,
 it is still only a **minor** wealth increase.
 
 In the bottom plot, the length of time to fully repay ones debt is
 shown. Clearly, there is an exponential drop off in the time taken to repay
 your full student loan once you do breach the *threshold* at which your loan is
 not simply written-off after 30 years.
-
-import RepaymentPlots from '../../src/components/post_components/student_debt/repaymentPhoto'
-
-<RepaymentPlots/>
 
 Upon reflection on these plots, it seems to me that with our assumptions, for
 an individual earning a starting salary of £40,000 or over, it is a good idea to
@@ -408,11 +410,11 @@ from riskier investments.
 It is also important to consider **tax** implications of repaying ones loan.
 In our analysis, we have neglected the important point that while the money 
 we use to make early repayments is tax-free, the capital gains we make on our
-investments are generally not. This should prompt us to consider placing more
+investments are generally not. This might prompt us to place more
 weight than our model would suggest on making early repayments.
 
 #### Conclusions
-Clearly, the model we have used is a large simplification of reality. In the
+Clearly, the model we have used is a simplification of reality. In the
 real world, portfolio values rise and fall - they don't grow at a constant rate.
 Furthermore, people's disposable incomes ebb and flow through different points of
 the year.
