@@ -19,7 +19,7 @@ const RepaymentPlots = ( ) => {
       )
     return (
       <Container align='center'>
-        <Col xs={10} md={10}>
+        <Col>
           <Img fluid={wealth.childImageSharp.fluid} />
         </Col>
         <br/>

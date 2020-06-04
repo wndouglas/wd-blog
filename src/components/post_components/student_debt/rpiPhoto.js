@@ -19,7 +19,7 @@ const RPI = () => {
       )
     return (
       <Container align='center'>
-        <Col xs={10} md={10}>
+        <Col>
           <Img fluid={rpi.childImageSharp.fluid} />
         </Col>
         <br/>
