@@ -37,7 +37,8 @@ export default ({ data }) => {
             {allPosts.edges.filter(({ node }) => (
                 node.frontmatter.category === category 
                   && node.frontmatter.sub_category === subcategory))
-                .slice(0, 10)
+                .sort((a, b) => a.node.frontmatter.index - b.node.frontmatter.index)
+                .slice(0, 5)
                 .map(({ node }) => (
                     <li key={node.frontmatter.path}>
                       <div style={{display: 'inline-block'}}>
@@ -80,6 +81,7 @@ export const query = graphql`
             category
             sub_category
             date
+            index
           }
           timeToRead
           excerpt

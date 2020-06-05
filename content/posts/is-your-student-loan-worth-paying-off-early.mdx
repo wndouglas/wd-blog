@@ -23,10 +23,10 @@ interest charges, all else being equal. This effect is counteracted by the fact
 that if you do not repay your loan at the end of 30 years, your debt is 
 **written off**. These two competing factors mean that there is a salary 
 threshold at which you **maximise** the total amount you will end up
-repaying. It turns out that with an initial student debt of £40,000 and an annual
-pay rise of 3.6%, you maximise the amount you end up repaying if you have an initial
-gross annual salary of £47,250. If this is your salary, you will end up paying
-close to an additional 100% of your initial loan in interest charges.
+repaying. It turns out that with an initial student debt of £40,000 and an 
+annual pay rise of 3.6%, you maximise the amount you end up repaying if you have 
+an initial gross annual salary of £47,250. If this is your salary, you will end 
+up paying close to an additional 100% of your initial loan in interest charges.
 
 While this effect is interesting and perhaps shocking, in my eyes, it is not 
 practical. Yes, if you earn £47,250 per year, you will pay the maximum in 
@@ -51,18 +51,18 @@ reality, it's *not* that complicated. Here's how it works.
 
 If, like me, your course started after 1 September 2012, you have a **Plan 2**
 loan. This means that you will start repaying your loan the first **April** 
-after you finish studying, and you will *only* pay anything if your current **gross**
-income is over £26,575 a year (or £2,215) a month. You will then pay 9% 
-of your gross income **in excess** of this threshold each payment period. If you are 
-paid a monthly salary and you earn £2,315 per month, you would then repay 
-9% of £2,315 - £2,215 = £100, which is £9 per month.
+after you finish studying, and you will *only* pay anything if your current 
+**gross** income is over £26,575 a year (or £2,215) a month. You will then pay 
+9% of your gross income **in excess** of this threshold each payment period. If 
+you are paid a monthly salary and you earn £2,315 per month, you would then 
+repay 9% of £2,315 - £2,215 = £100, which is £9 per month.
 
-If you're looking at that £9 per month and thinking 'that doesn't seem like much,
-I spend that much on Netflix', I'd firstly recommend jumping in on your parent's
-Netlfix account, but I would also point out that if you still have an outstanding 
-student loan after 30 years, your loan is **written off**. Your 50 year old self 
-can then relax in the knowledge that the last trace of your naive student years 
-is behind you.
+If you're looking at that £9 per month and thinking 'that doesn't seem like 
+much, I spend that much on Netflix', I'd firstly recommend jumping in on your 
+parent's Netlfix account, but I would also point out that if you still have an 
+outstanding student loan after 30 years, your loan is **written off**. Your 50 
+year old self can then relax in the knowledge that the last trace of your naive 
+student years is behind you.
 
 At any time, you also have the right to make extra, voluntary contributions to 
 your student loan repayment on top of the automatic contribution at any time, 
@@ -71,8 +71,8 @@ provided that this voluntary payment is larger than £5.
 #### How the interest works
 It is important to realise that even while you are studying, your loan is
 accruing **interest**. While you study, your rate of interest is the UK RPI plus
-3%. At the time of writing, UK RPI is at 2.4%. So if you are still studying right
-now, you are paying 5.4% in interest.
+3%. At the time of writing, UK RPI is at 2.4%. So if you are still studying 
+right now, you are paying 5.4% in interest.
 
 Once you are eligible for repayment, you are charged an interest of RPI, plus
 an extra sliding charge of between 0% for those earning £26,575 per year or less 
@@ -82,15 +82,15 @@ find in the student finance documents. From a modeling perspective, we will
 assume a linear scale between 0% and 3%.
 
 An important detail that doesn't seem to get mentioned anywhere online or on
-the student finance documents is the **interest rate schedule** of these interest
-payments. According 
+the student finance documents is the **interest rate schedule** of these 
+interest payments. According 
 to <a href="https://www.ft.com/content/0c56a3ee-60e4-11e7-91a7-502f7ee26895">this</a>
 article in the FT, the repayments are **monthly**, and **compound**. To me, this
 is an egregious lack of transparency from the government. I spent the good part
 of an hour searching for this information, and the only source I could find
-was in a subscription newspaper that many students have no access to. The article
-shares my view and states that the details of the interest payments is 'hidden in
-the small print'. But I digress.
+was in a subscription newspaper that many students have no access to. The 
+article shares my view and states that the details of the interest payments is
+'hidden in the small print'. But I digress.
 
 ## Building the Model
 In order to analyse the merits of different strategies of repayment, it is 
@@ -171,8 +171,8 @@ exponential growth curve, and you will *very* quickly find that your student
 debt blows so far out of proportion that early repayment becomes practically 
 impossible.
 
-The next step in our model is to introduce a **traded asset or portfolio** with a 
-(hopefully) positive return that we can invest in. We will denote the value of 
+The next step in our model is to introduce a **traded asset or portfolio** with 
+a (hopefully) positive return that we can invest in. We will denote the value of 
 this asset in month $n$ by $X(n)$ and will assume throughout that this has a 
 constant monthly compounding return of $\mu$, i.e. we have
 
@@ -181,12 +181,12 @@ $$
 $$
 
 Clearly, this is a big assumption. Even a well-diversified portfolio experiences
-**systematic risk**, meaning there are always random factors influencing returns.
-However, the point of our model is to provide a tractable way to generate 
-ballpark figures with which to compare repayment strategies. For now, we avoid 
-complications arising from more realistic assumptions in exchange for a more 
-tractable model that produces less realistic results, but can still hopefully 
-compare the **relative** merits of different approaches. 
+**systematic risk**, meaning there are always random factors influencing 
+returns. However, the point of our model is to provide a tractable way to 
+generate ballpark figures with which to compare repayment strategies. For now, 
+we avoid complications arising from more realistic assumptions in exchange for a 
+more tractable model that produces less realistic results, but can still 
+hopefully compare the **relative** merits of different approaches. 
 
 Without loss of generality, we will assume that $X(0) = 1$ so that
 
@@ -269,8 +269,8 @@ If we were to consider the problem in full generality, a naive optimisation
 would lead to a 360 dimensional problem. A reasonable simplification that will 
 make our problem far more tractable is that of a **constant strategy**, i.e. 
 strategies where $x(n) = x$ for all $n$. From a financial perspective, this 
-represents a *set and forget* approach, where a fixed proportion of ones remaining
-monthly income is used to make extra voluntary loan repayments.
+represents a *set and forget* approach, where a fixed proportion of ones 
+remaining monthly income is used to make extra voluntary loan repayments.
 
 There is an important extra consideration with this approach. If we have fully 
 repaid our loan before the terminal date $N$, i.e. if $d(n) = 0$ for some $n$, 
@@ -357,10 +357,11 @@ Therefore, specifying $a$ and $s(0)$ fully determines the sequence of salaries
 $s(1),\ldots,s(N)$.
 
 Another assumption we will use is that our disposable income, before accounting
-for automatic loan repayments, is a **fixed** value, so that $f(n) \equiv f >= 0.09$.
-This final constraint is just to ensure positivity of our disposable income. This
-assumption seems reasonable. Tax and NI contributions scale relatively linearly with
-income, and peoples living costs tend to increase in line with their incomes.
+for automatic loan repayments, is a **fixed** value, so 
+that $f(n) \equiv f >= 0.09$. This final constraint is just to ensure positivity 
+of our disposable income. This assumption seems reasonable. Tax and NI 
+contributions scale relatively linearly with income, and peoples living costs 
+tend to increase in line with their incomes.
 
 Lastly, as we touched on earlier, we have assumed that our investable asset
 returns a steady constant return month-on-month.
@@ -380,9 +381,9 @@ figure for an aspiring young professional, so we will use a value of $a = 0.05$.
 In 2019, the average student entered repayment with a total student debt of
 £36,000, so we will use $D = 36000$.
 
-We will use a disposable income of 40% of ones gross salary as the parameter $f$.
-I think this reflects a reasonable proportion once things like tax, National 
-Insurance and living costs like rent are taken into account.
+We will use a disposable income of 40% of ones gross salary as the 
+parameter $f$. I think this reflects a reasonable proportion once things like 
+tax, National Insurance and living costs like rent are taken into account.
 
 Finally, a return of $\mu = 0.05$ for the asset will be used. By concentrating
 your investments on index funds, this is historically a pretty good return.
@@ -395,17 +396,17 @@ import RepaymentPlots from '../../src/components/post_components/student_debt/re
 <RepaymentPlots/>
 
 Above, terminal wealth at the end of the 30 year period versus the proportion
-of remaining disposable income used to make voluntary prepayments for various different
-starting salary levels is plotted. The plots show that for starting
+of remaining disposable income used to make voluntary prepayments for various 
+different starting salary levels is plotted. The plots show that for starting
 salaries below a threshold, one is better off **not** making voluntary 
 prepayments. In other words, it is a better idea to take all of your disposable 
 income and use it to invest prudentially across a well-diversified portfolio 
 with a steady annual return. Beyond this threshold, it may be a better choice to
-make steady voluntary repayments. The middle plot shows a blown up version of the case
-of a starting salary of £40,000. Here we see that it is **slightly** more effective
-to make voluntary repayments, and that the benefit of doing so tapers off at
-around 50% of available income. Don't be misled by the vertical scaling of this plot,
-it is still only a **minor** wealth increase.
+make steady voluntary repayments. The middle plot shows a blown up version of 
+the case of a starting salary of £40,000. Here we see that it is **slightly** 
+more effective to make voluntary repayments, and that the benefit of doing so 
+tapers off at around 50% of available income. Don't be misled by the vertical 
+scaling of this plot, it is still only a **minor** wealth increase.
 
 In the bottom plot, the length of time to fully repay ones debt is
 shown. Clearly, there is an exponential drop off in the time taken to repay
@@ -431,8 +432,8 @@ weight than our model would suggest on making early repayments.
 #### Conclusions
 Clearly, the model we have used is a simplification of reality. In the
 real world, portfolio values rise and fall - they don't grow at a constant rate.
-Furthermore, people's disposable incomes ebb and flow through different points of
-the year.
+Furthermore, people's disposable incomes ebb and flow through different points 
+of the year.
 
 It's also clear that restricting our proportion of remaining wealth, technically
 our *control* variable, to constant values is another big simplification
@@ -440,8 +441,8 @@ our *control* variable, to constant values is another big simplification
 setting up monthly loan repayments). A more advanced study might leverage the
 power of Richard E. Bellman's dynamic programming principle, and the area of
 **optimal control**. I think this could be an interesting application of the
-**optimal stochastic control** framework, similar in vein to **Merton's portfolio
-problem**.
+**optimal stochastic control** framework, similar in vein to **Merton's 
+portfolio problem**.
 
 For now, these extensions are beyond the scope of this analysis. Interesting
 though they are from a technical perspective, my intuition tells me that the 

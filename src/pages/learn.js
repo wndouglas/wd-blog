@@ -39,7 +39,8 @@ const LearnPage = ({ data }) =>
                 {data.allPosts.edges.filter(({ node }) => (
                     node.frontmatter.category === category 
                       && node.frontmatter.sub_category === subcategory))
-                    .slice(0, 5)
+                    .sort((a, b) => a.node.frontmatter.index - b.node.frontmatter.index)
+                    .slice(0, 3)
                     .map(({ node }) => (
                         <li key={node.frontmatter.path}>
                           <div style={{display: 'inline-block'}} key={node.frontmatter.path}>
@@ -91,6 +92,7 @@ export const query = graphql`
               category
               sub_category
               date
+              index
             }
             timeToRead
           }

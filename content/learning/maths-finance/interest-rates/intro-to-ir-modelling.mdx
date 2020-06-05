@@ -3,25 +3,26 @@ title: Intro to Interest Rate Modeling
 path: /intro-to-ir-modeling
 category: Maths Finance
 sub_category: Interest Rate Modeling
+index: 0
 date: 2020-06-04
 ---
 
 In my eyes, **interest rate modeling** is one of the most interesting areas of
-mathematical finance. Interest rate (IR) models are more complex than their simple
-**equity** counterparts. In the IR world, the underlying variable is an entire
-term structure of interest rates, an unobservable quantity. Compare this to the 
-equity world, where the underlying is often a single stock. IR models also lay 
-claim to a **wider set of instruments**, both in the underlying and in the 
-derivatives space. These instruments range from simple **government bonds** 
+mathematical finance. Interest rate (IR) models are more complex than their 
+simple **equity** counterparts. In the IR world, the underlying variable is an 
+entire term structure of interest rates, an unobservable quantity. Compare this 
+to the equity world, where the underlying is often a single stock. IR models 
+also lay claim to a **wider set of instruments**, both in the underlying and in 
+the derivatives space. These instruments range from simple **government bonds** 
 through to exotic derivatives such as **target redemption notes (TARNs)**. 
 Accordingly, IR modeling lays claim to the most abundant theoretical literature 
 on pricing and hedging, and a fascinating history of how these models came into
 existence.
 
 Beyond the theoretical merits of focusing on IR modeling, it's also the area
-in which I work. I sit on the interest rates derivative trading desk at Barclays,
-building and extending in-house models that the desk use for pricing and risk 
-management. Accordingly, I feel comfortable weighing in on the existing 
+in which I work. I sit on the interest rates derivative trading desk at 
+Barclays, building and extending in-house models that the desk use for pricing 
+and risk management. Accordingly, I feel comfortable weighing in on the existing 
 literature and research from the perspective of a practitioner. 
 
 ## The literature
@@ -49,7 +50,7 @@ Mercurio whenever a more detailed look on some of the more technical aspects is
 required.
 
 Beyond these *big three* of the IR modeling literature, I highly recommend a 
-couple of texts covering the more general **volatility modeling* space, these 
+couple of texts covering the more general **volatility modeling** space, these 
 are
 
 1. The Volatility Surface, *Gatheral*
@@ -57,39 +58,14 @@ are
 3. Dynamic Hedging, Managing Vanilla and Exotic Options, *Taleb*
 
 ## Tutorial structure
-In the following, I will follow the structure of Andersen and Piterbarg's trilogy
-of interest rate modeling, assuming that a reader has a basic understanding
-of **stochastic calculus**, **Monte Carlo methods** and **PDEs**. My aim is to 
-present these topics in a concise and digestible way, while still maintaining 
-the key concepts and ideas. The structure of the tutorials is as follows:
+In the following, I will follow the structure of Andersen and Piterbarg's 
+trilogy of interest rate modeling, assuming that a reader has a basic 
+understanding of **stochastic calculus**, **Monte Carlo methods** and **PDEs**. 
+My aim is to present these topics in a concise and digestible way, while still 
+maintaining the key concepts and ideas. The structure of the tutorials is as 
+follows:
 
-<ol>
-    <li>Fixed Income Notation</li>
-    <li>Fixed Income Probability Measures</li>
-    <li>Multi-Currency Markets</li>
-    <li>The HJM framework</li>
-    <li>Basic Fixed Income Instruments</li>
-    <li>Caps, Floors and Swaptions</li>
-    <li>CMS Swaps, Caps and Floors</li>
-    <li>Bermudan Swaptions</li>
-    <li>Structured Notes and Exotic Swaps</li>
-    <li>Callable Libor Exotics and TARNs</li>
-    <li>Volatility derivatives</li>
-    <li>Introduction to Yield Curves and Curve Construction</li>
-    <li>Managing Yield Curve Risk</li>
-    <li>Vanilla Models With Local Volatility</li>
-    <li>Vanilla Models With Stochastic Volatility</li>
-    <li>Introduction to Term Structure Models</li>
-    <li>One-Factor Short Rate Models I</li>
-    <li>One-Factor Short Rate Models II</li>
-    <li>Multi-Factor Short Rate Models</li>
-    <li>The Libor Market Model I</li>
-    <li>The Libor Market Model II</li>
-    <li>Risk Management and Sensitivity Computations</li>
-    <li>P&L Attribution</li>
-    <li>Payoff Smoothing</li>
-    <li>Vegas in the Libor Market Model</li>
-</ol>
+<props.TutorialList props={props}/>
 
 ## Notation
 * $\mathcal{F}(t)$: **Filtration** of a $\sigma$-algebra
@@ -97,19 +73,30 @@ the key concepts and ideas. The structure of the tutorials is as follows:
 * $\mathbb{Q}$: **Risk-neutral** probability measure
 * $\mathbb{Q}^N$: Measure for **numeraire** $N$
 * $\mathbb{Q}^T$ or $\mathbb{Q}^n$: **Forward measure** for date $T$ or $T_n$
-* $\mathbb{E}_t^N[\cdot]$: **Conditional expectation** with respect to $\mathcal{F}(t)$ under measure $N$
+* $\mathbb{E}_t^N[\cdot]$: **Conditional expectation** with respect to 
+$\mathcal{F}(t)$ under measure $N$
 * $T_0 < \cdots < T_N$: **Tenor structure**
 * $\beta(t)$: **Continuously compounded money market account**
 * $P(t,T)$: **Zero-coupon bond (ZCB)** price at time $t$ for **maturity** $T$
-* $P(t,T,S)$: **Forward bond price** at time $t$ for delivery of $S$-maturity ZCB on date $T \in [t,S]$
-* $y(t,T,S)$: Continuously compounded **forward yield** at time $t$ for the period $[T, S]$
+* $P(t,T,S)$: **Forward bond price** at time $t$ for delivery of $S$-maturity 
+ZCB on date $T \in [t,S]$
+* $y(t,T,S)$: Continuously compounded **forward yield** at time $t$ for the 
+period $[T, S]$
 * $f(t,T)$: **Instantaneous forward rate** at time $t$ for maturity $T$
 * $r(t)$: **Short rate** at time $t$
 * $L(t,T,S)$: **Forward Libor rate** at time $t$ for the period $[T,S]$
-* $L_n(t)$: Forward Libor rate at time $t$ for the period $[T_n, T_{n+1}]$, i.e. $L_n(t) = L(t, T_n, T_{n+1})$
-* $S_{n,m}(t)$: **Forward swap rate** at time $t$, starting at date $T_n$ with final payment on date $T_{n+m}$
-* $A_{n,m}(t)$: **Annuity** at time $t$ with first payment date $T_{n+1}$ and final payment date at $T_{n+m}$
-* $U_n(t)$: The $n$th **exercise value** of a **Bermudan swaption** or **callable Libor Exotic**
-* $\sigma_B(t,S;T,K)$: **Implied Black volatility smile**, parameterised by the time $t$ **spot** $S$, **strike** $K$ and **expiry** $T$
-* $c_B(t,S; T, K, \sigma)$: Price of a **call option** in the **Black model** with time $t$ spot $S$, strike $K$, expiry $T$ and **Black volatility** $\sigma$
-* $c_N(r,S;T, K, \sigma)$: Price of a call option in the **normal (Bachelier) model** with time $t$ spot $S$, strike $K$, expiry $T$ and **normal volatility** $\sigma$
+* $L_n(t)$: Forward Libor rate at time $t$ for the 
+period $[T_n, T_{n+1}]$, i.e. $L_n(t) = L(t, T_n, T_{n+1})$
+* $S_{n,m}(t)$: **Forward swap rate** at time $t$, starting at date $T_n$ with 
+final payment on date $T_{n+m}$
+* $A_{n,m}(t)$: **Annuity** at time $t$ with first payment date $T_{n+1}$ and 
+final payment date at $T_{n+m}$
+* $U_n(t)$: The $n$th **exercise value** of a **Bermudan swaption** or 
+**callable Libor Exotic**
+* $\sigma_B(t,S;T,K)$: **Implied Black volatility smile**, parameterised by the 
+time $t$ **spot** $S$, **strike** $K$ and **expiry** $T$
+* $c_B(t,S; T, K, \sigma)$: Price of a **call option** in the **Black model** 
+with time $t$ spot $S$, strike $K$, expiry $T$ and **Black volatility** $\sigma$
+* $c_N(r,S;T, K, \sigma)$: Price of a call option in the 
+**normal (Bachelier) model** with time $t$ spot $S$, strike $K$, expiry $T$ 
+and **normal volatility** $\sigma$

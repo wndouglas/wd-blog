@@ -41,7 +41,7 @@ export const query = graphql`
   allPosts: allMdx(filter: {frontmatter: 
     {post_type: {nin: ["header_page", "blog"]}, 
     config: {ne: true}, category: {eq: $category}, 
-    sub_category: {eq: $sub_category}}}) {
+    sub_category: {eq: $sub_category}}}, sort: {fields: frontmatter___index, order: ASC}) {
     edges {
       node {
         frontmatter {
@@ -50,6 +50,7 @@ export const query = graphql`
             category
             sub_category
             date
+            index
           }
           timeToRead
           excerpt
