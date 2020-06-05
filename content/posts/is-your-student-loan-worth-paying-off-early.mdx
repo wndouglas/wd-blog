@@ -11,16 +11,35 @@ degree anywhere in the UK on or after 1 September 2012 and you took out
 a student loan to help cover your fees), you probably find yourself with a 
 significant student loan to your name. Most people I know have come to terms 
 with this fact. They treat their loan as an additional *tax* that they will 
-have to pay for 30 years after they start working. But is this the best strategy 
-for everyone? In particular, after accounting for things like tax, NI 
-contributions, rent and living costs, are you better off investing your leftover 
-cash, or using some of it to make voluntary loan repayments.
+have to pay for 30 years after they start working. 
 
-By building a simple **repayment model**, we will investigate 
-whether the passive strategy of letting the minimum repayment come out of your 
-paycheck automatically is an effective strategy from an investment point of 
-view, or whether a student loan holder is better off 
-making **early repayment contributions**.
+By letting your student loan repayments take care of themselves, you subject
+yourself to fairly hefty interest charges on your loan. There are calculators 
+online, such as <a href="https://www.student-loan-calculator.co.uk/">this</a>,
+which calculate exactly how much debt you will end up paying as a percentage of
+your initial student debt, factoring in these interest charges. Clearly, the 
+longer it takes you to repay your loan, the longer you expose yourself to 
+interest charges, all else being equal. This effect is counteracted by the fact 
+that if you do not repay your loan at the end of 30 years, your debt is 
+**written off**. These two competing factors mean that there is a salary 
+threshold at which you **maximise** the total amount you will end up
+repaying. It turns out that with an initial student debt of £40,000 and an annual
+pay rise of 3.6%, you maximise the amount you end up repaying if you have an initial
+gross annual salary of £47,250. If this is your salary, you will end up paying
+close to an additional 100% of your initial loan in interest charges.
+
+While this effect is interesting and perhaps shocking, in my eyes, it is not 
+practical. Yes, if you earn £47,250 per year, you will pay the maximum in 
+interest charges, but your alternative is to make voluntary repayments towards 
+your student loan. In doing so, you are paying the opportunity cost of investing 
+in the market, where your cash could potentially earn a return in excess of the 
+interest you pay on your loan.
+
+In the following, we will investigate whether making early voluntary repayments
+towards your loan is an effective strategy from an investment point of 
+view, or whether a student loan holder is best off biting the bullet, and paying
+the extra interest charges in order to take advantage of the extra cash they 
+have to invest with.
 
 ## Simplifying the Terms of the Loan
 Looking at the student 
@@ -40,25 +59,26 @@ paid a monthly salary and you earn £2,315 per month, you would then repay
 
 If you're looking at that £9 per month and thinking 'that doesn't seem like much,
 I spend that much on Netflix', I'd firstly recommend jumping in on your parent's
-Netlfix account, but I would also recommend **voluntary repayments**. You have 
-the right to make extra contributions to your repayment on top of the automatic 
-contribution at any time, provided that this payment is larger than £5.
+Netlfix account, but I would also point out that if you still have an outstanding 
+student loan after 30 years, your loan is **written off**. Your 50 year old self 
+can then relax in the knowledge that the last trace of your naive student years 
+is behind you.
 
-Finally, if you still have an outstanding student loan after 30 years, your 
-loan is **written off** and your 50 year old self can relax in the knowledge 
-that the last trace of your naive student years is behind you.
+At any time, you also have the right to make extra, voluntary contributions to 
+your student loan repayment on top of the automatic contribution at any time, 
+provided that this voluntary payment is larger than £5.
 
 #### How the interest works
-It is important to realise here that even while you are studying, your loan is
+It is important to realise that even while you are studying, your loan is
 accruing **interest**. While you study, your rate of interest is the UK RPI plus
-3%. At the time of writing, UK RPI is at 2.4%. So if you are still studying you 
-are paying 5.4% in interest.
+3%. At the time of writing, UK RPI is at 2.4%. So if you are still studying right
+now, you are paying 5.4% in interest.
 
 Once you are eligible for repayment, you are charged an interest of RPI, plus
 an extra sliding charge of between 0% for those earning £26,575 per year or less 
 up to 3% for those earning over £47,835 per year. The exact way that the 
 additional rate scales from 0% to 3% turns out to be incredibly difficult to 
-find in the student finance documents. From a modelling perspective, we will
+find in the student finance documents. From a modeling perspective, we will
 assume a linear scale between 0% and 3%.
 
 An important detail that doesn't seem to get mentioned anywhere online or on
@@ -73,32 +93,33 @@ shares my view and states that the details of the interest payments is 'hidden i
 the small print'. But I digress.
 
 ## Building the Model
-In order to analyse various different strategies of repayment, it is important 
-to lay down both some notation, and also some criteria for comparing approaches. 
+In order to analyse the merits of different strategies of repayment, it is 
+important to lay down both some notation, and also some criteria for comparing 
+approaches. 
 
 #### Notation and framework
 In the following, we will denote the **total outstanding debt** at the point of 
 starting repayment by £$D$. For most students who studied a 3 year undergraduate 
 degree after 1 September 2012 and took out a full tuition and maintenance loan,
-this quantity will be in the region of £30,000. We denote the 
+this quantity will be in the region of £40,000. We denote the 
 **total amount paid** towards the loan across its lifetime by £$P$.
 
 Since interest payments and most professional's salaries are paid monthly,
 we consider a debtor's **gross monthly salary**. In the $n$th month of repayment 
-we will denote this by £$s(n)$ and we will denote the **total outstanding debt** 
+we will denote this by £$s(n)$. We will denote the **total outstanding debt** 
 in the same month by £$d(n)$. Clearly $d(0) = D$. We then denote the 
 **automatic contributions** made towards the loan in the $n$th month by 
 $p_a(n)$, and the **voluntary contributions** by $p_v(n)$, giving a 
 **total contribution** in month $n$ of $p(n) := p_a(n) + p_v(n)$. Finally, we 
 denote the interest accrued on the loan in the $n$th month by $i(n)$.
 
-Next, we denote the **nominal annual rate** on the loan in month $n$ by $r(n)$. 
-This is the headline figure of RPI plus an extra rate that we saw above. We
-break this rate down into the sum of an **inflation linked component** $r_i(n)$,
-and an additional, salary dependent component $r_a(n)$. Assuming a linear scale
-between the lower and upper yearly salary thresholds of £26,575 and £47,835, 
-which we denote by their equivalent monthly salary figures $l_i$ and $u_i$ 
-respectively, we have
+Next, we have the **nominal annual rate** on the loan in month $n$, which we 
+denote by $r(n)$. This is the headline figure of RPI plus an extra rate that we 
+saw above. We break this rate down into the sum of an 
+**inflation linked component** $r_i(n)$, and an additional, salary dependent 
+component $r_a(n)$. Assuming a linear scale between the lower and upper yearly 
+salary thresholds of £26,575 and £47,835, which we denote by their equivalent 
+monthly salary figures $l_i$ and $u_i$ respectively, we have
 
 $$
 r_a(n) = 
@@ -109,11 +130,7 @@ r_a(n) =
 \end{cases}
 $$
 
-We then have
-
-$$
-r(n) = r_i(n) + r_a(n).
-$$ 
+Then $r(n) = r_i(n) + r_a(n)$.
 
 Since the interest is charged monthly and is compound, we find that the interest
 owed in month $n+1$ is given by
@@ -134,15 +151,10 @@ p_a(n+1) =
 \end{cases}
 $$
 
-In the following, we will assume that $s(n) \ge l_r$ for each month $n$. It
-seems unreasonable to attempt to model the best strategy of paying off your
-student loan if you're aren't even earning enough to start paying it off in the
-first place!
-
-We're finally ready to give an expression for the outstanding debt at time $n+1$ 
-in terms of the quantities in month $n$. This quantity is the sum of the debt 
-in month $n$ and the interest accrued in month $n$, minus the payment made at 
-the start of month $n+1$. Thus, we have
+With the above notation in place, the outstanding debt at time $n+1$ can be
+expressed in terms of the various quantities in month $n$. The debt in month 
+$n+1$ is just the sum of the debt in month $n$ and the interest accrued in month 
+$n$, minus the payment made at the start of month $n+1$. Thus, we have
 
 $$
 \begin{aligned}
@@ -151,25 +163,30 @@ $$
 \end{aligned}
 $$
 
-The mathematically inclined will notice that the above represents
-a difference equation, the discrete time version of an ordinary differential
-equation (ODE). If the repayment term $p(n+1)$ vanished, the above
-would simply represent the discrete-time equivalent of an exponential growth 
-model, just like any compound investment. All of this is a fancy way of saying 
-that if your monthly repayments $p(n+1)$ are not sufficient to outpace the 
+As is always the case when compound interest is involved, this equation 
+represents a discrete-time version of the exponential growth model.
+If your monthly repayments $p(n+1)$ are not sufficient to outpace the 
 interest rate $r(n)$, then you will find yourself on the wrong side of an 
 exponential growth curve, and you will *very* quickly find that your student 
 debt blows so far out of proportion that early repayment becomes practically 
 impossible.
 
-The next step is to introduce another **risky asset or portfolio** with a 
-(hopefully) positive return. We will denote the value of this asset in month $n$ 
-by $X(n)$ and will assume throughout that this has a constant monthly 
-compounding return of $\mu$, i.e. we have
+The next step in our model is to introduce a **traded asset or portfolio** with a 
+(hopefully) positive return that we can invest in. We will denote the value of 
+this asset in month $n$ by $X(n)$ and will assume throughout that this has a 
+constant monthly compounding return of $\mu$, i.e. we have
 
 $$
     X(n+1) = \left(1 + \frac{\mu}{12}\right)X(n),
 $$
+
+Clearly, this is a big assumption. Even a well-diversified portfolio experiences
+**systematic risk**, meaning there are always random factors influencing returns.
+However, the point of our model is to provide a tractable way to generate 
+ballpark figures with which to compare repayment strategies. For now, we avoid 
+complications arising from more realistic assumptions in exchange for a more 
+tractable model that produces less realistic results, but can still hopefully 
+compare the **relative** merits of different approaches. 
 
 Without loss of generality, we will assume that $X(0) = 1$ so that
 
@@ -199,7 +216,7 @@ $$
 where $Q(n)$ is the quantity of the asset that we hold at time $n$.
 
 At each timestep $n$ we have the choice of investing our remaining 
-income $I(n) - p_a(n)$ in the risky asset, or using our cash to make voluntary 
+income $I(n) - p_a(n)$ in the asset, or using our cash to make voluntary 
 loan repayments. We use a proportion $x(n) \ge 0$ of this cash to make voluntary 
 prepayments, i.e. 
 
@@ -231,7 +248,7 @@ $$
 \end{aligned}
 $$    
 
-Our goal, then, is to find the optimal sequence of proportions $x(n) \ge 0$ to 
+Our goal is thus to find the optimal sequence of proportions $x(n) \ge 0$ to 
 make early repayments with, in order to maximise our terminal wealth $W(N)$. 
 Here, $N$ is the final month of repayment, i.e. the 360th month. At this time, 
 our debt may or may not have already been written off via earlier repayments.
@@ -252,13 +269,12 @@ If we were to consider the problem in full generality, a naive optimisation
 would lead to a 360 dimensional problem. A reasonable simplification that will 
 make our problem far more tractable is that of a **constant strategy**, i.e. 
 strategies where $x(n) = x$ for all $n$. From a financial perspective, this 
-strategy reflects many people's attitude towards investing. It represents a 
-*set and forget* approach, where a fixed monthly loan repayment is automatically 
-paid out.
+represents a *set and forget* approach, where a fixed proportion of ones remaining
+monthly income is used to make extra voluntary loan repayments.
 
 There is an important extra consideration with this approach. If we have fully 
 repaid our loan before the terminal date $N$, i.e. if $d(n) = 0$ for some $n$, 
-then we **stop** our voluntary repayments, so if $k$ is the first index such 
+then we **stop** all repayments, so if $k$ is the first index such 
 that $d(k) = 0$ then we have
 
 $$
@@ -284,7 +300,9 @@ extremes.
 While the framework we have built above is fairly general and allows for a lot
 of flexibility in the various different parameters, in order to generate useful
 results that we can easily compare, we need to add some assumptions and 
-constraints. The aim in this analysis is to give **ballpark figures** for the 
+constraints. 
+
+The aim in this analysis is to give **ballpark figures** for the 
 terminal wealth of different strategies, not exact values. The goal is that
 the effectiveness of various strategies **relative** to one 
 another is accurately modeled, not necessarily that the **absolute** values 
@@ -338,21 +356,22 @@ $$
 Therefore, specifying $a$ and $s(0)$ fully determines the sequence of salaries
 $s(1),\ldots,s(N)$.
 
-The final assumption we will use is that our disposable income, before accounting
+Another assumption we will use is that our disposable income, before accounting
 for automatic loan repayments, is a **fixed** value, so that $f(n) \equiv f >= 0.09$.
 This final constraint is just to ensure positivity of our disposable income. This
 assumption seems reasonable. Tax and NI contributions scale relatively linearly with
 income, and peoples living costs tend to increase in line with their incomes.
 
-With these assumptions, we are ready to put our model to use. 
+Lastly, as we touched on earlier, we have assumed that our investable asset
+returns a steady constant return month-on-month.
 
 #### Implementation and results
 With our framework in place, it was easy to implement the model in Python. If
 you're interested, you can find the code 
 on <a href="https://github.com/wndouglas/blog-projects/tree/master/student-debt">GitHub</a>.
 
-In the following, the method was applied using the *sensible* values for the 
-various parameters given above. 
+In the following, the method was applied using *sensible* values for the 
+various parameters. 
 
 Looking at UK average wage increases for the 
 year of 2019, the national average rise was 3.6%. I think this is a conservative 
@@ -361,18 +380,14 @@ figure for an aspiring young professional, so we will use a value of $a = 0.05$.
 In 2019, the average student entered repayment with a total student debt of
 £36,000, so we will use $D = 36000$.
 
-The average starting salary for a graduate beginning repayments in
-**London** is £30,000 at the time of writing, so this is the value we will use as 
-input to the model.
-
 We will use a disposable income of 40% of ones gross salary as the parameter $f$.
 I think this reflects a reasonable proportion once things like tax, National 
 Insurance and living costs like rent are taken into account.
 
-Finally, an average nominal annual return of 5% will be assumed. By concentrating
+Finally, a return of $\mu = 0.05$ for the asset will be used. By concentrating
 your investments on index funds, this is historically a pretty good return.
 Clearly if you believe you can do better by generating a hand-picked portfolio,
-or if you are willing to take on more risk, you should use a larger figure than
+or if you are willing to take on more risk, you could use a larger figure than
 this.
 
 import RepaymentPlots from '../../src/components/post_components/student_debt/repaymentPhoto'
@@ -381,7 +396,7 @@ import RepaymentPlots from '../../src/components/post_components/student_debt/re
 
 Above, terminal wealth at the end of the 30 year period versus the proportion
 of remaining disposable income used to make voluntary prepayments for various different
-starting salary levels are plotted. The plots show that for starting
+starting salary levels is plotted. The plots show that for starting
 salaries below a threshold, one is better off **not** making voluntary 
 prepayments. In other words, it is a better idea to take all of your disposable 
 income and use it to invest prudentially across a well-diversified portfolio 
@@ -403,9 +418,9 @@ invest a small percentage of your available income into voluntary repayments.
 An investment of just 20% makes the most out of the steepest part of the 
 terminal wealth curve and significantly deceases the time it takes for full
 repayment of your student loan. This gives a good balance between paying off
-your loan fast, allowing you to benefit from the halting of the automatic contributions
-at an earlier point, while giving you cash to use from day 1 to potentially benefit
-from riskier investments.
+your loan fast, allowing you to benefit from the halting of the automatic 
+contributions at an earlier point, while giving you cash to use from day 1 to 
+potentially benefit from riskier investments.
 
 It is also important to consider **tax** implications of repaying ones loan.
 In our analysis, we have neglected the important point that while the money 
@@ -429,9 +444,9 @@ power of Richard E. Bellman's dynamic programming principle, and the area of
 problem**.
 
 For now, these extensions are beyond the scope of this analysis. Interesting
-though they are from a technical perspective, my intuition tells me that the conclusion
-will not change - **you are probably better off treating your student loan as
-another tax**.
+though they are from a technical perspective, my intuition tells me that the 
+conclusion will not change - **you are probably better off treating your student 
+loan as another tax**.
 
 
 
