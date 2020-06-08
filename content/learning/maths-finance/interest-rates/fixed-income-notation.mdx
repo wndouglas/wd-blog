@@ -11,12 +11,12 @@ date: 2020-06-05
 
 The archetypal fixed income security is the **bond**. A bond is an instrument
 of indebtedness of the **issuer** to the **holder**. The holder pays an upfront
-fee to the issuer in exchange for a series of pre-determined future cash-flows. 
-Hence, the issuer borrows money *now* in order to finance their needs, and pays 
-the holder back across the lifetime of the bond along with **interest**. 
-**Governments** and **corporations** both borrow money by issuing bonds, 
-utilising the upfront fees buyers pay for the instrument in order to finance 
-their activities.
+fee to the issuer in exchange for a series of pre-determined future 
+**cash-flows**. Hence, the issuer borrows money *now* in order to finance their 
+needs, and pays the holder back across the lifetime of the bond along with 
+**interest**. **Governments** and **corporations** both borrow money by issuing 
+bonds, utilising the upfront fees buyers pay for the instrument in order to
+finance their activities.
 
 The fundamental object we consider is that of a **zero-coupon bond (ZCB)**. A
 ZCB makes a single payment, at the so-called **maturity** date of the bond.
@@ -35,3 +35,166 @@ we will assume the existence of a **continuous** set of ZCB prices for a large
 range of maturities.
 
 ## Bonds and Forward Rates
+Zero-coupon bonds make a single payment at their maturity date $T$. For ease of
+calculation, we **normalise** this payment to 1 unit of currency, and refer to 
+a ZCB with maturity $T$ as a $T$-**bond**. Since I'm a proud Brit, unless 
+otherwise specified, we will assume a base currency of **Pound sterling**, £.
+
+##### Definition (T-Bonds)
+*A ZCB of maturity $T$ (or $T$-bond) is a contract paying 1 unit of currency on
+the maturity date $T$. We will denote its value at the 
+time $t \in [0,T]$ by $P(t, T).$*
+
+The next fundamental quantity that we are interested in is that of a 
+**forward rate**. To get to this, we introduce the concept of a **forward bond**.
+The best way to motivate this concept is through an example.
+
+Suppose we are interested in purchasing, at some future time $T$, a ZCB maturing
+at $T + \tau$, $\tau > 0$. Today, at time $t < T$, the price of such a bond can
+be **locked in** as follows:
+
+1. Today, purchase one $(T+\tau)$-bond for $P(t, T+\tau)$.
+2. To finance the purchase of the $(T+\tau)$-bond, sell 
+**short** $\tfrac{P(t,T+\tau)}{P(t,T)}$ $T$-bonds. This strategy has no upfront
+cost, since
+$$
+    -1 \cdot P(t, T+\tau) + \left( \frac{P(t,T+\tau)}{P(t,T)} \right)\cdot P(t,T) = 0.
+$$
+
+Despite costing nothing to setup, a flow of $-\tfrac{P(t,T+\tau)}{P(t,T)}$ will
+take place at time $T$ due to the maturity of our $T$-bond position. Likewise,
+a flow of $1$ will take place at time $T+\tau$ due to our position in
+the $(T+\tau)$-bond. In other words, our strategy **fixes** the time $T$
+price of the $(T+\tau)$ bond at
+
+$$
+    P(t,T,T+\tau) := \frac{P(t,T+\tau)}{P(t,T)},
+$$
+
+a quantity known as the time $t$ **forward price** for the ZCB spanning $[T, T+\tau]$.
+
+##### Definition (Forward bond)
+*The time $t$ price for a forward bond with expiry date $T$ into a bond with
+maturity date $T+\tau$, $\tau > 0$ is given by $P(t,T, T+\tau)$.*
+
+Often, it is convenient to characterize a forward bond price by a **discount rate**.
+There are numerous ways to do this, but one is the **continuously compounded forward yield**
+$y(t,T,T+\tau)$, defined implicitly by
+
+$$
+    P(t,T,T+\tau) = \exp\left( -y(t,T,T+\tau) \tau \right).
+$$
+
+##### Definition (Continuously compounded forward yield)
+*The time $t$ value for the continuously compounded forward yield corresponding 
+to the forward bond price for the interval $[T,T+\tau]$ is given 
+by $y(t,T,T+\tau)$.*
+
+The time between the expiry of the forward contract and the maturity of the
+underlying bond, $\tau$, is often called the **tenor** of the forward bond or
+forward yield. 
+
+The above yield is motivated by the idea that the issuer of the
+ZCB invests their proceeds into a continuously compounding
+account. The time scaling $\tau$ term in the exponential above ensures that 
+yields are **comparable** across tenors, making yields a useful metric for 
+comparing different ZCBs.
+
+Most actual market quotes, however, are based on **discrete-time compounding**
+of proceeds. Accordingly, we define a **simple forward rate** $L(t,T,T+\tau)$ as
+
+$$
+    1 + \tau L(t,T,T+\tau) = \frac{1}{P(t,T,T+\tau)}.
+$$
+
+##### Definition (Simple forward rate)
+*The time $t$ value for the simple forward rate corresponding to the forward 
+bond price for the interval $[T,T+\tau]$ is given by $L(t,T,T+\tau)$.*
+
+Again, $\tau$ is the tenor of the forward rate. For an arbitrary set of dates
+$T = T_0 < T_1 <\cdots < T_n$, define the tenor structure $\left\{ \tau_1,\ldots,\tau_n\right\}$
+by $\tau_i := T_i - T_{i-1}$. Notice that the forward bond prices can be
+recovered from the forward rates by simple compounding:
+
+$$
+    \frac{P(t,T_n)}{P(t,T)} = \prod_{i=1}^n \frac{1}{1 + \tau_i L(t,T_{i-1},T_{i-1} + \tau_i)}.
+$$
+
+We will always assume that the **spot rates** $L(t,T) := L(t, t, T)$, $t \le T$
+are the **Libor rates** quoted in the **interbank market**. Libor rates are
+quoted on values of $\tau = T - t$ ranging from one week ($\tau = \tfrac{1}{52}$)
+all the way through to 12 months ($\tau = 1$). Spot Libor rates are incredibly
+important in the **interest-rate derivatives** market. They form the benchmark
+for a number of instruments, such as **interest rate swaps** and 
+**Eurodollar futures**. 
+
+Note that for a number of reasons, the market is currently in the process of
+*transitioning* away from Libor to the so called **risk free rates (RFRs)**:
+**Sterling Overnight Interbank Average (SONIA)** and **Secured Overnight 
+Financing Rate (SOFR)**
+in the UK and the US respectively.
+
+Another important quantity is known as the **instantaneous forward rate** at time
+$T$, denoted by $f(t,T)$. This quantity can be seen as the forward rate at time 
+$t$ for the infinitesimal interval $[T, T+ \text{d}T]$. Hence, it is given by
+
+$$
+    f(t,T) := \lim_{\tau \searrow 0} L(t,T,T+\tau).
+$$
+
+##### Definition (Instantaneous forward rate)
+*The time $t$ value for the instantaneous forward rate corresponding to the 
+forward bond price for the infinitesimal interval $[T,T+\text{d}T]$ is given by 
+$f(t,T)$.*
+
+Using the definition of $L(t,T,T+\tau)$ and simple calculus we see that
+
+$$
+\begin{aligned}
+    f(t,T) & = \lim_{\tau \searrow 0} \frac{1}{\tau}\left( \frac{1 - P(t,T,T+\tau)}{P(t,T,T+\tau)} \right) &\\
+    & =  \lim_{\tau \searrow 0} \frac{1}{\tau}\left( \frac{P(t,T) - P(t,T+\tau)}{P(t,T+\tau)} \right) &\\
+    & = -\frac{1}{P(t,T)} \lim_{\tau \searrow 0} \left( \frac{P(t,T+\tau) - P(t,T)}{\tau} \right) & \\
+    & =  -\frac{1}{P(t,T)} \frac{\partial}{\partial T} P(t,T) & \\
+    & = - \frac{\partial \log P(t,T)}{\partial T}. &
+\end{aligned}
+$$
+
+Integrating both sides and taking exponentials shows that
+$$
+    P(t,T,T+\tau) = \exp \left( - \int_T^{T+\tau} f(t,u) \mathop{du} \right).
+$$
+
+By comparison with the continuously compounded yield formula we also have
+
+$$
+    y(t,T,T+\tau) = \frac{1}{\tau} \int_T^{T+\tau} f(t,u) \mathop{du}, \tag{1}
+$$
+
+or, upon using the *mean value theorem*,
+
+$$
+    f(t,T) = \lim_{\tau \searrow 0} y(t,T,T+\tau).
+$$
+
+Finally, by multiplying both sides of (1) by $\tau$ and differentiating, we see
+have
+
+$$
+\begin{aligned}
+    f(t,T) & = \frac{\partial}{\partial T} y(t,t,T)(T-t) \\
+    & = y(t,t,T) + (T-t)\frac{\partial}{\partial T} y(t,t,T).
+\end{aligned}
+$$
+
+The quantity $r(t) := f(t,t)$ is another important quantity in the interest rate
+modeling world. It is known as the **short rate** and is an $\mathcal{F}(t)$-
+measurable random variable. Loosely speaking, $r(t)$ can be thought of as the
+overnight rate at time $t$.
+
+##### Definition (Short rate)
+*The instantaneous forward rate at time $t$ for the infinitesimal 
+interval $[t,t+\text{d}t]$ is known as the short rate and is given by*
+
+$$
+    r(t) := f(t,t).
+$$
