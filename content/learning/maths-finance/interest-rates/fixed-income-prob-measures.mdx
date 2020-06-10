@@ -57,8 +57,7 @@ revealed, so that $\mathcal{F}(t)$ incorporates all of the previous information
 up to time $s \le t$, plus any additional information gained from $s$ to $t$.
 
 We will assume that the process $X(t)$ is **adapted** to $\mathcal{F}(t)$ for all
-$t$. Technically, this means that for all 
-$a \mathbb{R}$, $X(t)^{-1}((-\infty, a]) \in \mathcal{F}(t)$. Practically, this
+$t$. Practically speaking, this
 just means that $X(t)$ is fully observable at time $t$. Finally, we require that
 the filtration $\mathbb{F}$ satisifes the **usual conditions**, which I will leave
 to the interested reader to explore further.
@@ -91,8 +90,8 @@ are both themselves $\mathbb{F}$ adapted processes.
 
 An incredibly powerful and useful concept that we require for our framework is
 that of a **martingale**. Before giving the precise definition, I will note that
-the concept of a martingale is *really* a simple one. It just says that if a 
-process is a martingale, then the best guess for where the process will be in 
+the concept of a martingale is *really* a simple one. A process is a martingale 
+if the best guess for where the process will be in 
 the future is where it is today. In this way, it represents a **fair game**, in 
 the sense that if the martingale's current value represented the cost of 
 entering into a bet, and it's future value your payoff from the bet, then you 
@@ -107,7 +106,7 @@ $$
 $$
 
 The second important concept that we require is known as **Ito's Lemma**. Ito's
-lemma is really just a stochastic version of the **differential of a function**.
+lemma is essentially the stochastic version of the **differential of a function**.
 If we consider a simple scalar-valued function $f(x,y)$ then the standard
 differential of $f$ is clearly just given by
 $$
@@ -146,7 +145,7 @@ Ito's Lemma extends this result to *scalar-valued functions* of multiple variabl
 ##### Theorem (Ito's Lemma)
 *Let* $f(t,x)$, $x = (x_1,\ldots,x_p)^\intercal$, *denote a continuous function, let*
 $f(t,x) \in \mathbb{R}$ *for all* $t \in [0,T]$, $x \in \mathbb{R}^p$, *and let*
-$f \in C^{1,2}([0,T]\times \mathbb{R}^p)$. *Let* $X(t)$ *be given by (1) and define
+$f \in C^{1,2}([0,T]\times \mathbb{R}^p)$. *Let* $X(t)$ *be given by (2.1) and define
 a scalar process* $Y(t) := f(t,X(t))$. *Let* $\nabla_x f$ *represent the* $p$-*dimensional
 vector of partial derivatives of* $f$ *with respect to the non-time variables. Likewise,
 let* $H_x f$ *represent the Hessian of* $f$ *with respect to the same variables*.
@@ -161,7 +160,7 @@ $$
 $$
 
 ### Trading Gains and Arbitrage
-We now consider an **investor** engaging in a trading strategy involving the $p$
+Consider an **investor** engaging in a trading strategy involving the $p$
 assets $X_1,\ldots,X_p$. Let the trading strategy be characterized by a 
 **predictable** adapted process $\phi(t,\omega) = (\phi_1(t,\omega), \ldots, \phi_p(t,\omega))^\intercal$,
 with $\phi_i(t,\omega)$ denoting the holding at time $t$ in the $i$th asset
@@ -194,9 +193,11 @@ $$
     \pi(t) \ge 0 \text{ a.s.} \quad \text{and} \quad \mathbb{P}(\pi(t) > 0) > 0.
 $$
 
-In a well-functioning market, arbitrage opportunities cannot exist, and precluding
-arbitrage will form a key requirement for all of the asset processes that we will
-consider.
+In words, an arbitrage opportunity is a strategy that **creates something from 
+nothing**, a *free lunch*. In a well-functioning market, arbitrage opportunities 
+**cannot** exist. If they did, they would surely be exploited until the market
+returned to equilibrium at a level that eliminated the opportunity. No arbitrage 
+will form a key requirement for all of the markets that we will consider.
 
 ### Equivalent Martingale Measures, Complete Markets and Arbitrage
 Currently, the idea of an arbitrage opportunity is an abstract one that bears no
@@ -495,7 +496,7 @@ As usual,
 $$
     V(t) = P(t,T_N)\mathbb{E}_t^N\left[\frac{V(T)}{P(T,T_N)} \right].
 $$
-One interpretation of the term $\tfrac{V(T)}{P(T,T_N)}$ is a the time $T_N$
+One interpretation of the term $\tfrac{V(T)}{P(T,T_N)}$ is as the time $T_N$
 proceeds of rolling the payoff $V(T)$ into the $T_N$-bond. Alternatively, we
 could roll $V(T)$ into the spot numeraire asset $B(T)$, leading to $T_N$
 payoff $V(T) \cdot \tfrac{B(T)}{B(T_N)}$. This gives rise to the equivalent

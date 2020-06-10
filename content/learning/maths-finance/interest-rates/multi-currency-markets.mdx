@@ -8,3 +8,107 @@ date: 2020-06-04
 ---
 
 <props.TutorialContents props={props}/>
+
+Some derivatives depend on multiple currencies. If this is the case, the challenge
+of modeling such derivatives becomes more difficult. In this section, we
+introduce a framework for modeling such **multi-currency** derivatives.
+
+## Notation
+Consider a setup where we have two economies, a **domestic** economy and a
+**foreign** economy, each with their own currency. In the following, we will
+denote the domestic currency by £ (GBP) and the foreign currency by $ (USD). Note
+that these choices of currencies are *arbitrary* and are just used for 
+concreteness.
+
+Let $P_d(t,T)$ and $P_f(t,T)$ denote the time $t$ prices of $T$-bonds in the 
+domestic and foreign economies, respectively. Translating the value of the foreign
+$T$-bond to the domestic currency can be achieved at time $t$ through the 
+**spot FX rate** $X(t)$ measured in units of domestic currency per unit of
+foreign currency. In other words, the value $\hat{P}_d(t,T)$ to a
+domestic investor of one foreign $T$-bond is
+$$
+    \hat{P}_d(t,T) = X(t)P_f(t,T).
+$$
+
+## FX Forwards
+For no initial cash outlay, it is possible to generate a guaranteed cashflow at 
+time $T$ of one unit of foreign currency and $-X_T(t)$ units of domestic currency, 
+where $X_T(t)$ represents the time $t$ value of the **forward FX rate** with 
+maturity $T$. The strategy is as follows:
+1. Buy one foreign $T$-bond for $\hat{P}_d(t,T)$ in domestic currency.
+2. Finance this purchase by short-selling $\tfrac{\hat{P}_d(t,T)}{P_d(t,T)}$ 
+units of the domestic $T$-bond.
+Clearly, this strategy is free to enter, and will generate a time $T$ cashflow
+of $\$1 - £\tfrac{\hat{P}_d(t,T)}{P_d(t,T)}$. To preclude arbitrage, we find that this
+expression must be zero at time $t$. Hence, we have locked in an exchange rate of
+$$
+    X_T(t) := \frac{\hat{P}_d(t,T)}{P_d(t,T)} = X(t)\frac{P_f(t,T)}{P_d(t,T)}
+$$
+at time $t$ for an FX trade at maturity $T$.
+
+## Risk Neutral Measures
+Let $\beta_d(t)$ and $\beta_f(t)$ denote the continuously compounded money markets
+in the domestic and foreign economies, respectively. $\beta_d(t)$ and $\beta_f(t)$
+induce two separate risk-neutral measures, which we denote by $\mathbb{Q}^d$ and
+$\mathbb{Q}^f$, respectively. Clearly, these two measures are *related*. If $g(T)$
+is a random payoff at time $T$ made in the foreign currency, in a complete market
+this payoff is worth
+$$
+    V_f(t) = \beta_f(t) \mathbb{E}_t^f \left[\frac{g(T)}{\beta_f(T)} \right],
+$$
+to the foreign investor, where $\mathbb{E}_t^f[\cdot]$ represents the conditional 
+expectation operator under $\mathbb{Q}^f$. From the point of view of a domestic 
+investor, the payoff $g(T)$ must translate to a domestic currency at a rate of 
+$X(T)$ at time $T$, making the effective domestic payoff $g(T)X(T)$. Hence,
+$$
+    V_d(t) = \beta_d(t)\mathbb{E}_t^d \left[\frac{g(T)X(T)}{\beta_d(T)} \right],
+$$
+where $\mathbb{E}_t^d[\cdot]$ represents the same operator under $\mathbb{Q}^d$.
+Importantly, to preclude arbitrage, we find that $V_f(t)$ and $V_d(t)$ must also
+be linked by the spot rate. Specifically, we have
+$$
+    V_d(t) = X(t)V_f(t),
+$$
+or
+$$
+    \beta_d(t)\mathbb{E}_t^d \left[\frac{g(T)X(T)}{\beta_d(T)} \right] = X(t) \beta_f(t) \mathbb{E}_t^f \left[\frac{g(T)}{\beta_f(T)} \right].
+$$
+If we now consider the arbitrary payoff $Y(T) := \tfrac{g(T)X(T)}{\beta_d(T)}$,
+the above shows that
+$$
+    \mathbb{E}_t^d\left[ Y(T)\right] = \mathbb{E}_t^d\left[ Y(T) \frac{X(t)\beta_f(t)\beta_d(T)}{X(T)\beta_f(T)\beta_d(t)}\right].
+$$
+By our earlier theory, this shows that the density process linking $\mathbb{Q}^d$
+and $\mathbb{Q}^f$ is given by
+$$
+    \mathbb{E}_t^d \left[\frac{\text{d}\mathbb{Q}^f}{\text{d}\mathbb{Q}^d} \right] = \frac{\beta_f(t)X(t)}{\beta_d(t)X(0)}, \quad t \ge 0.
+$$
+Because we know that this density process is a martingale under $\mathbb{Q}^d$,
+if $X(t)$ is to be an Ito process, it must take the form
+$$
+    \frac{\text{d}X(t)}{X(t)} = (r_d(t) - r_f(t))\text{d}t + \sigma_X(t)^\intercal \text{d}W(t),
+$$
+under $\mathbb{Q}^d$, i.e. its drift is completely determined by the **spread**
+in the short-rates between the two economies.
+
+## Other Measures
+Heuristically, by using a relation analogous to the *chain rule* applied to Radon-Nikodym
+derivatives, relations between other domestic and foreign probabilty measures
+are easy to deduce. Suppose our desired numeraire is $N$, with values $N_d$ 
+and $N_f$ in the domestic and foreign economies respectively. Denote the 
+measures under these numeraires by $\mathbb{Q}^{N, d}$ and $\mathbb{Q}^{N, f}$
+under the domestic and foreign currencies respectively. Then, we find that
+$$
+\begin{aligned}
+    & \mathbb{E}_t^{N,d}\left[\frac{\text{d}\mathbb{Q}^{N,f}}{\text{d}\mathbb{Q}^{N,d}} \right] \\
+    & = \frac{N_f(t)/N_f(0)}{\beta_f(t)}\cdot \frac{\beta_f(t)X(t)}{\beta_d(t)X(0)}\cdot\frac{\beta_d(t)}{N_d(t)/N_d(0)} \\
+    & = \frac{N_f(t)X(t)N_d(0)}{N_f(0)X(0)N_d(t)}.
+\end{aligned}
+$$
+In particular, if we set $N$ to be the $T$-bond in each currency, by noting the
+formula for the FX forward rate we see that
+$$
+    \mathbb{E}_t^{T,d}\left[\frac{\text{d}\mathbb{Q}^{T,f}}{\text{d}\mathbb{Q}^{T,d}} \right] = \frac{X_T(t)}{X_T(0)}.
+$$
+This also demonstrates the fact that $X_T(t)$ is a $\mathbb{Q}^{T,d}$-martingale
+satisfying $X_T(T) = X(T)$.
