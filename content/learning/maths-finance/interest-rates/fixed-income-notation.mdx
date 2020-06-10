@@ -161,13 +161,13 @@ $$
 
 Integrating both sides and taking exponentials shows that
 $$
-    P(t,T,T+\tau) = \exp \left( - \int_T^{T+\tau} f(t,u) \mathop{du} \right).
+    P(t,T,T+\tau) = \exp \left( - \int_T^{T+\tau} f(t,u) \mathop{du} \right). \tag{1.1}
 $$
 
 By comparison with the continuously compounded yield formula we also have
 
 $$
-    y(t,T,T+\tau) = \frac{1}{\tau} \int_T^{T+\tau} f(t,u) \mathop{du}, \tag{1}
+    y(t,T,T+\tau) = \frac{1}{\tau} \int_T^{T+\tau} f(t,u) \mathop{du}, \tag{1.2}
 $$
 
 or, upon using the *mean value theorem*,
@@ -176,7 +176,7 @@ $$
     f(t,T) = \lim_{\tau \searrow 0} y(t,T,T+\tau).
 $$
 
-Finally, by multiplying both sides of (1) by $\tau$ and differentiating, we see
+Finally, by multiplying both sides of (1.2) by $\tau$ and differentiating, we see
 have
 
 $$
@@ -203,7 +203,7 @@ $$
 A quantity closely related to the forward rate is the **futures rate**. Through
 the **Eurodollar futures market**, investors can enter into a security paying
 $$
-    1 - L(T,T,T+\tau), \tag{2}
+    1 - L(T,T,T+\tau), \tag{1.3}
 $$
 at time $T$. At inception, i.e. time 0, a **Eurodollar futures contract** can be
 entered into for no upfront cost, but with the implicit obligation of the holder
@@ -211,7 +211,7 @@ paying
 $$
     1 - F(0,T,T+\tau),
 $$
-per unit of notional at time $T$, in return for the payout (2). Here, the 
+per unit of notional at time $T$, in return for the payout (1.3). Here, the 
 quantity $F(t,T,T+\tau)$ is known as the **simple futures rate** at time $t$ for 
 the period $[T,T+\tau]$.
 
