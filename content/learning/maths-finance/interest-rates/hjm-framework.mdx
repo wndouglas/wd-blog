@@ -9,15 +9,14 @@ date: 2020-06-05
 
 <props.TutorialContents props={props}/>
 
-With our basic arbitrage relationships in place, we can start to assign dynamics
-to the major quantities we have defined so far. Specifically, we look at the
-ZCB prices $P(t,T)$ and the instantaneous forward rate $f(t,T)$. By ensuring
-that our dynamics do not admit arbitrage, we find that, in a universe where
-our dynamics are dictated by a finite number of Brownian Motions, the dynamics 
-of our various quantities must satisfy certain conditions. This is the *crux* of 
-the **Heath-Jarrow-Morton (HJM)** framework. The HJM framework prescribes the way
-in which the *drift* terms of our dynamics must relate to the *diffusion* terms
-in order to satisfy no-arbitrage.
+In this section, we assign dynamics to the major quantities we have defined thus 
+far. Specifically, we look at the ZCB prices $P(t,T)$ and the instantaneous 
+forward rate $f(t,T)$. By ensuring that the dynamics of these quantities do not 
+admit arbitrage, we find that, when these values are driven by a finite number of 
+Brownian Motions, the dynamics of our various quantities must satisfy certain 
+conditions. This is the *crux* of the **Heath-Jarrow-Morton (HJM)** framework. 
+The HJM framework prescribes the way in which the *drift* terms of our dynamics 
+must relate to the *diffusion* terms in order to satisfy no-arbitrage.
 
 ## Bond Price Dynamics
 Within the HJM framework, we focus on modeling an entire continuum of $T$-indexed
@@ -281,7 +280,10 @@ $$
 *where* $\xi(t) \in \mathbb{R}$ *and* $\sigma_r(t) \in \mathbb{R}^d$ *are deterministic
 functions of time, and*
 $$
-    a(t) = \frac{\partial f(0,t)}{\partial t} + \xi(t)f(0,t) + \int_0^t \sigma_f(u,t)^\intercal \sigma_f(u,t)\text{d}u.
+\begin{aligned}
+    a(t) & = \frac{\partial f(0,t)}{\partial t} + \xi(t)f(0,t) \\
+    & \quad\quad + \int_0^t \sigma_f(u,t)^\intercal \sigma_f(u,t)\text{d}u.
+\end{aligned}
 $$
 
 ### Log-Normal HJM Models
