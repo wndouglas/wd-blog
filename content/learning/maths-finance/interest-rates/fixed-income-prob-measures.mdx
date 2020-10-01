@@ -116,8 +116,8 @@ This follows as the first order limit to the Taylor expansion
 $$
 \begin{aligned}
     \Delta f(x,y) & = \frac{\partial f(x,y)}{\partial x} \Delta x + \frac{\partial f(x,y)}{\partial y} \Delta y \\
-    & \quad \quad + \frac{1}{2} \frac{\partial^2 f}{\partial x^2} \Delta x^2 + \frac{1}{2} \frac{\partial^2 f}{\partial y^2} \Delta y^2 \\
-    & \quad\quad + \frac{\partial^2 f}{\partial x \partial y} \Delta x \Delta y + \text{H.O.T.}
+    & \quad \quad \quad + \frac{1}{2} \frac{\partial^2 f}{\partial x^2} \Delta x^2 + \frac{1}{2} \frac{\partial^2 f}{\partial y^2} \Delta y^2 \\
+    & \quad\quad \quad + \frac{\partial^2 f}{\partial x \partial y} \Delta x \Delta y + \text{H.O.T.}
 \end{aligned}
 $$
 where H.O.T. represents the *higher-order terms* in the expansion, 
@@ -133,11 +133,8 @@ Thus, we see that in the first order limit, the stochastic case leads to
 differential
 $$
 \begin{aligned}
-   & \text{d} f(t,X(t)) \\
-    & = \frac{\partial f}{\partial t} \text{d} t + \frac{\partial f}{\partial x}(\mu(t,\omega)\text{d}t + \sigma(t,\omega)\text{d}W(t)) \\
-    & \quad + \frac{1}{2} \sigma(t,\omega)^2 \frac{\partial^2 f}{\partial x^2} \text{d}t \\
-    & = \left(\frac{\partial f}{\partial t} + \mu \frac{\partial f}{\partial x} +\frac{1}{2}\sigma^2 \frac{\partial^2 f}{\partial x^2}\right)\text{d}t \\
-    & \quad\quad + \sigma \frac{\partial f}{\partial x} \text{d}W(t).
+   \text{d} f(t,X(t)) & = \frac{\partial f}{\partial t} \text{d} t + \frac{\partial f}{\partial x}(\mu(t,\omega)\text{d}t + \sigma(t,\omega)\text{d}W(t)) + \frac{1}{2} \sigma(t,\omega)^2 \frac{\partial^2 f}{\partial x^2} \text{d}t \\
+    & = \left(\frac{\partial f}{\partial t} + \mu \frac{\partial f}{\partial x} +\frac{1}{2}\sigma^2 \frac{\partial^2 f}{\partial x^2}\right)\text{d}t + \sigma \frac{\partial f}{\partial x} \text{d}W(t).
 \end{aligned}
 $$
 Ito's Lemma extends this result to *scalar-valued functions* of multiple variables.
@@ -152,10 +149,7 @@ let* $H_x f$ *represent the Hessian of* $f$ *with respect to the same variables*
 *Then* $Y(t)$ *is an* **Ito process** *with stochastic differential given by*
 $$
 \begin{aligned}
-    & \text{d} Y(t) \\
-    & = \frac{\partial f(t,X(t))}{\partial t} \text{d} t + \nabla_x f(t,X(t)) \mu \text{d} t \\
-    & \quad + \nabla_x f(t,X(t)) \sigma \text{d}W(t) \\
-    & \quad + \frac{1}{2} \sigma^\intercal H_x f(t,X(t)) \sigma \text{d}t.
+    \text{d} Y(t) & = \frac{\partial f(t,X(t))}{\partial t} \text{d} t + \nabla_x f(t,X(t)) \mu \text{d} t + \nabla_x f(t,X(t)) \sigma \text{d}W(t) + \frac{1}{2} \sigma^\intercal H_x f(t,X(t)) \sigma \text{d}t.
 \end{aligned}
 $$
 
@@ -279,11 +273,10 @@ $$
     \mathbb{E}_t^N \left[ \frac{N(t) M(T)}{N(T) M(t)} Y(T) \right] = \mathbb{E}_t^M \left[Y(T) \right],
 $$
 By comparison, this shows that the Radon-Nikodym derivative for the measure change
-between measures $\mathbb{Q}^N$ and $\mathbb{Q}^M$ is characterized by the process
+between measures $\mathbb{Q}^N$ and $\mathbb{Q}^M$ is characterised by the process
 $$
 \begin{aligned}
-    \eta(t) & = \mathbb{E}_t^N \left[ \tfrac{\text{d}\mathbb{Q}^M}{\text{d}\mathbb{Q}^N}\right] \\
-    & = \frac{M(t)/M(0)}{N(t)/N(0)}. \tag{2.2}
+    \eta(t) & = \mathbb{E}_t^N \left[ \tfrac{\text{d}\mathbb{Q}^M}{\text{d}\mathbb{Q}^N}\right] = \frac{M(t)/M(0)}{N(t)/N(0)}. \tag{2.2}
 \end{aligned}
 $$
 
@@ -448,8 +441,7 @@ $$
 Reinvesting (**rolling**) this amount at $T_1$ into $T_2$-bonds then returns
 $$
 \begin{aligned}
-    & \frac{1}{P(0,T_1)}\cdot\frac{1}{P(T_1,T_2)} = \\
-    &\quad (1 + \tau_0 L(0,0,T_1))(1 + \tau_1 L(T_1,T_1,T_2))
+    \frac{1}{P(0,T_1)}\cdot\frac{1}{P(T_1,T_2)} & = (1 + \tau_0 L(0,0,T_1))(1 + \tau_1 L(T_1,T_1,T_2))
 \end{aligned}
 $$
 at $T_2$. While $t \in (T_1, T_2]$, this investment clearly has value
@@ -458,8 +450,7 @@ at each date in the tenor structure, we arrive at an investment with time $t$
 value $B(t)$ given by
 $$
 \begin{aligned}
-    B(t) & = \prod_{i = 0}^n (1 + \tau_0 L_i(T_i))P(t,T_{n+1}), \\
-    & \quad\quad t \in (T_n, T_{n+1}],
+    B(t) & = \prod_{i = 0}^n (1 + \tau_0 L_i(T_i))P(t,T_{n+1}), \quad\quad t \in (T_n, T_{n+1}],
 \end{aligned}
 $$
 where we have again used the shorthand $L_n(t) = L(t,T_n,T_{n+1})$.
@@ -474,8 +465,7 @@ $$
 where
 $$
 \begin{aligned}
-    \frac{B(t)}{B(T)} & = \frac{P(t,T_{n+1})}{P(T,T_{k+1})} \prod_{i = n+1}^k \frac{1}{1 + \tau_k L_k(T_k)}, \\
-    & \quad\quad t \in (T_n, T_{n+1}], T \in (T_k,T_{k+1}].
+    \frac{B(t)}{B(T)} & = \frac{P(t,T_{n+1})}{P(T,T_{k+1})} \prod_{i = n+1}^k \frac{1}{1 + \tau_k L_k(T_k)}, \quad\quad t \in (T_n, T_{n+1}], T \in (T_k,T_{k+1}].
 \end{aligned}
 $$
 It is clear that the spot measure resembles the risk neutral measure, since the 

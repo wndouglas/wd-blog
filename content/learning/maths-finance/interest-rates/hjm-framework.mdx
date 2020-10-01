@@ -43,8 +43,7 @@ $$
 Considering the SDE for $\beta(t)$, using Ito's lemma shows that
 $$
     \begin{aligned}
-        & \frac{\text{d} P(t,T)}{P(t,T)} \\
-        & = \frac{\text{d} \left(\beta(t)\tilde{P}(t,T) \right)}{P(t,T)} \\
+        \frac{\text{d} P(t,T)}{P(t,T)} & = \frac{\text{d} \left(\beta(t)\tilde{P}(t,T) \right)}{P(t,T)} \\
         & = \frac{\tilde{P}(t,T)\text{d}\beta(t) + \beta(t)\text{d}\tilde{P}(t,T)}{P(t,T)} \\
         & = \frac{\text{d}\beta(t)}{\beta(t)} + \frac{\text{d}\tilde{P}(t,T)}{\tilde{P}(t,T)} \\
         & = r(t)\text{d}t -\sigma_P(t,T)^\intercal \text{d}W(t),
@@ -60,27 +59,17 @@ Another application of Ito's lemma shows that forward bond prices
 $P(t,T,T+\tau) = \tfrac{P(t,T+\tau)}{P(t,T)}$ must satisfy
 $$
     \begin{aligned}
-        & \text{d}P(t,T,T+\tau) \\
-        & = \text{d}\left(\frac{P(t,T+\tau)}{P(t,T)}\right) \\
-        & = \frac{\text{d}P(t,T+\tau)}{P(t,T)} - \frac{P(t,T+\tau)}{P(t,T)^2}\text{d}P(t,T) \\
-        & \quad\quad - \frac{\text{d}\left\langle P(t,T), P(t,T+\tau) \right\rangle}{P(t,T)^2}\\
-        & \quad\quad + \frac{P(t,T+\tau)}{P(t,T)^3}\text{d}\left\langle P(t,T)\right\rangle \\
-        & = \frac{P(t,T+\tau)}{P(t,T)}\cdot \\
-        & \quad \left(\frac{\text{d}P(t,T+\tau)}{P(t,T+\tau)} -\frac{\text{d}P(t,T)}{P(t,T)} \right.\\
-        & \quad\quad  \left. -\frac{\text{d}\left\langle P(t,T), P(t,T+\tau) \right\rangle}{P(t,T)P(t,T+\tau)} \right. \\
-        & \quad\quad \left. + \frac{\text{d}\left\langle P(t,T)\right\rangle}{P(t,T)^2}\right) \\
-        & = P(t,T,T+\tau) \cdot \\
-        & \quad \left( -(\sigma_P(t,T+\tau) - \sigma_P(t,T))^\intercal \text{d}W(t)\right. \\
-        & \quad \left. - \left( \sigma_P(t,T+\tau) - \sigma_P(t,T) \right)^\intercal \sigma_P(t,T) \text{d}t\right).
+        \text{d}P(t,T,T+\tau) & = \text{d}\left(\frac{P(t,T+\tau)}{P(t,T)}\right) \\
+        & = \frac{\text{d}P(t,T+\tau)}{P(t,T)} - \frac{P(t,T+\tau)}{P(t,T)^2}\text{d}P(t,T) - \frac{\text{d}\left\langle P(t,T), P(t,T+\tau) \right\rangle}{P(t,T)^2} + \frac{P(t,T+\tau)}{P(t,T)^3}\text{d}\left\langle P(t,T)\right\rangle \\
+        & = \frac{P(t,T+\tau)}{P(t,T)}\cdot \left(\frac{\text{d}P(t,T+\tau)}{P(t,T+\tau)} -\frac{\text{d}P(t,T)}{P(t,T)} -\frac{\text{d}\left\langle P(t,T), P(t,T+\tau) \right\rangle}{P(t,T)P(t,T+\tau)} + \frac{\text{d}\left\langle P(t,T)\right\rangle}{P(t,T)^2}\right) \\
+        & = P(t,T,T+\tau) \cdot \bigg( -(\sigma_P(t,T+\tau) - \sigma_P(t,T))^\intercal \text{d}W(t) - \left( \sigma_P(t,T+\tau) - \sigma_P(t,T) \right)^\intercal \sigma_P(t,T) \text{d}t \bigg).
     \end{aligned}
 $$
 
 Hence, under the risk-neutral measure, forward bond prices satisfy the SDE
 $$
 \begin{aligned}
-    & \frac{\text{d}P(t,T,T+\tau)}{P(t,T,T+\tau)} \\
-    & = -(\sigma_P(t,T+\tau) - \sigma_P(t,T))^\intercal \\
-    & \quad\quad\quad (\sigma_P(t,T)\text{d}t + \text{d}W(t)).
+    \frac{\text{d}P(t,T,T+\tau)}{P(t,T,T+\tau)} & = -(\sigma_P(t,T+\tau) - \sigma_P(t,T))^\intercal (\sigma_P(t,T)\text{d}t + \text{d}W(t)).
 \end{aligned}
 $$
 Since, under the $T$-forward measure $\mathbb{Q}^T$ $P(t,T,T+\tau)$ is a
@@ -106,7 +95,7 @@ lemma, under the risk-neutral measure, the quantity $Y(t,T) := \log P(t,T)$ sati
 $$
     \text{d} Y(t,T) = - \sigma_P(t,T)^\intercal \text{d}W(t) + g(t,T)\text{d}t,
 $$
-for some function $g$ that we don't need to specify. Differentiating both sides
+for some function $g$ that is irrelevant for our purposes. Differentiating both sides
 of the above SDE by $T$ and taking the partial differential inside the differential
 term, we see that $f(t,T) = \tfrac{\partial Y(t,T)}{\partial T}$ satisfies SDE
 $$
@@ -116,13 +105,11 @@ where
 $$
     \sigma_f(t,T) = \frac{\partial}{\partial T} \sigma_P(t,T). \tag{4.2}
 $$
-Using the relationship (4.1),we find that
+Using the relationship (4.1), we find that
 $$
     \begin{aligned}
-        \text{d}f(t,T) & = \mu_f(t,T)\text{d}t \\
-        & \quad + \sigma_f(t,T)^\intercal(\text{d}W^T(t) - \sigma_P(t,T)\text{d}t) \\
-        & = (\mu_f(t,T) - \sigma_f(t,T)^\intercal \sigma_P(t,T))\text{d}t \\
-        & \quad + \sigma_f(t,T)^\intercal \text{d}W^T(t).
+        \text{d}f(t,T) & = \mu_f(t,T)\text{d}t + \sigma_f(t,T)^\intercal(\text{d}W^T(t) - \sigma_P(t,T)\text{d}t) \\
+        & = (\mu_f(t,T) - \sigma_f(t,T)^\intercal \sigma_P(t,T))\text{d}t + \sigma_f(t,T)^\intercal \text{d}W^T(t).
     \end{aligned}
 $$
 Since $f(t,T)$ is a $\mathbb{Q}^T$ martingale, the drift term must vanish.
@@ -132,9 +119,9 @@ $$
     \mu_f(t,T) = \sigma_f(t,T)^\intercal \int_t^T \sigma_f(t,u)\text{d}u.
 $$
 This is the **main result** of Heath, Jarrow and Morton. Once the forward rate
-diffusion coefficients $\sigma_f(t,T)$ have been specified, the HJM model is
-fully specified. The HJM models take initial forward rates $f(0,T)$ as *inputs*,
-so that the models are automatically consistent with discount bond prices at
+diffusion coefficients $\sigma_f(t,T)$ have been specified, **the HJM model is
+fully specified**. The HJM models take initial forward rates $f(0,T)$ **as inputs**,
+so that the models are **automatically consistent** with discount bond prices at
 time $0$. This is true **irrespective** of the choice of $\sigma_f(t,T)$, which
 can be set freely.
 
@@ -160,9 +147,7 @@ short-rate $r(t)$ under $\mathbb{Q}$ satisfies
 $$
     \begin{aligned}
         r(t) & = f(t,t) \\
-        & = f(0,t) \\
-        & \quad\quad + \int_0^t \sigma_f(u, t)^\intercal \int_u^t \sigma_f(u,s)\text{d}s \text{d}u \\
-        & \quad\quad + \int_0^t \sigma_f(u, t)^\intercal \text{d}W(u).
+        & = f(0,t) + \int_0^t \sigma_f(u, t)^\intercal \int_u^t \sigma_f(u,s)\text{d}s \text{d}u + \int_0^t \sigma_f(u, t)^\intercal \text{d}W(u).
     \end{aligned}
 $$
 Clearly the process $r(t)$ is **not** Markovian in general, as can be seen by
@@ -173,9 +158,7 @@ $$
 for which we have
 $$
     \begin{aligned}
-        D(T) & = D(t) + \int_t^T \sigma_f(u,T)^\intercal \text{d}W(u) \\
-        & \quad\quad + \left[\int_0^t \sigma_f(u,T)^\intercal \text{d}W(u) \right.\\
-        & \quad\quad\quad \left. - \int_0^t \sigma_f(u,t)^\intercal \text{d}W(u) \right].
+        D(T) & = D(t) + \int_t^T \sigma_f(u,T)^\intercal \text{d}W(u) + \left[\int_0^t \sigma_f(u,T)^\intercal \text{d}W(u) - \int_0^t \sigma_f(u,t)^\intercal \text{d}W(u) \right].
     \end{aligned}
 $$
 Unless the square-bracketed terms are either non-random, or a deterministic function
@@ -192,12 +175,11 @@ that forward bond prices are then log-normal under both $\mathbb{Q}$ and
 $\mathbb{Q}^T$. The forward rate process under $\mathbb{Q}$ is
 $$
     \begin{aligned}
-        \text{d}f(t,T) & = \sigma_f(t,T)^\intercal \sigma_P(t,T)\text{d}t \\
-        & \quad\quad + \sigma_f(t,T)^\intercal\text{d}W(t), \\
-        \sigma_f(t,T) & = \frac{\partial}{\partial T} \sigma_P(t,T),
+        \text{d}f(t,T) & = \sigma_f(t,T)^\intercal \sigma_P(t,T)\text{d}t + \sigma_f(t,T)^\intercal\text{d}W(t), \\
+        \sigma_f(t,T) & = \frac{\partial}{\partial T} \sigma_P(t,T).
     \end{aligned}
 $$
-which implies that $r(T)$ is Gaussian with $\mathbb{Q}$ moments
+This implies that $r(T)$ is Gaussian with $\mathbb{Q}$ moments
 $$
     \begin{aligned}
         \mathbb{E}_t^\mathbb{Q}\left[f(T,T) \right] & = \int_t^T \sigma_f(u,T)^\intercal \sigma_P(u,T) \text{d}u, \\
@@ -205,8 +187,8 @@ $$
     \end{aligned}
 $$
 
-The Gaussian short-rate model benefits from being tractable and permitting
-analytical price formulas for a number of European options and futures. It is
+The Gaussian short-rate model benefits from being **tractable** and permitting
+**analytical price formulas** for a number of European options and futures. It is
 often a good starting point for the development of closed-form approximations in
 other models. An example of a derivative admitting a closed-form solution under
 the Gaussian model is an option on a ZCB:
@@ -217,7 +199,11 @@ on a $T$-bond. The payoff at time $S$ is given by
 $$
     V(S) = (P(S,T) - K)^+, \quad S < T.
 $$
-In the Gaussian model, we have
+Under the $S$-forward measure $\mathbb{Q}^S$ we know that
+$$
+    V(t) = P(t,S)\mathbb{E}_t^S\left[\left(P(S, S, T) - K\right)^+ \right].
+$$
+Applying the dynamics of $P(t, S, T)$ we find that
 $$
     V(t) = P(t, T)\phi(d_+) - K P(t, S)\phi(d_-),
 $$
@@ -228,8 +214,6 @@ $$
         \sigma^2 & = \int_t^T \left\vert \sigma_P(u,T) - \sigma_P(u,S) \right\vert^2 \text{d}u.
     \end{aligned}
 $$
-This expression follows from the dynamics of $P(t,S,T)$ under $\mathbb{Q}^T$
-after noting that $P(S,T) = P(S,S,T)$.
 
 ### Gaussian Models with Markovian Short Rate
 Although tractable, the Gaussian model does **not** generally allow for a
@@ -243,22 +227,19 @@ where $h$ is a positive-valued real function and $g(t) \in \mathbb{R}^d$,
 we can ensure that $r(t)$ *is* Markovian. In this case, we find that
 $$
 \begin{aligned}
-    \sigma_P(t,T)& = \int_t^T \sigma_f(t,u)\text{d}u \\
-    & = g(t) \int_t^T h(u)\text{d}u \tag{4.3}
+    \sigma_P(t,T) & = \int_t^T \sigma_f(t,u)\text{d}u = g(t) \int_t^T h(u)\text{d}u \tag{4.3}
 \end{aligned}
 $$
 and
 $$
 \begin{aligned}
-    r(t) & = f(0,t) + h(t)\int_0^t m_f(t,u)\text{d}u \\
-    & \quad\quad + h(t) \int_0^t g(u)^\intercal \text{d}W(u).\\ \tag{4.4}
+    r(t) & = f(0,t) + h(t)\int_0^t m_f(t,u)\text{d}u + h(t) \int_0^t g(u)^\intercal \text{d}W(u). \tag{4.4}
 \end{aligned}
 $$
 We find that the term
 $$
 \begin{aligned}
-    D(t) & = \int_0^t \sigma_f(u,t)^\intercal\text{d}W(u) \\
-    & = h(t)\int_0^t g(u)^\intercal \text{d}W(u)
+    D(t) & = \int_0^t \sigma_f(u,t)^\intercal\text{d}W(u) = h(t)\int_0^t g(u)^\intercal \text{d}W(u)
 \end{aligned}
 $$
 is Markov, since
@@ -281,8 +262,7 @@ $$
 functions of time, and*
 $$
 \begin{aligned}
-    a(t) & = \frac{\partial f(0,t)}{\partial t} + \xi(t)f(0,t) \\
-    & \quad\quad + \int_0^t \sigma_f(u,t)^\intercal \sigma_f(u,t)\text{d}u.
+    a(t) & = \frac{\partial f(0,t)}{\partial t} + \xi(t)f(0,t) + \int_0^t \sigma_f(u,t)^\intercal \sigma_f(u,t)\text{d}u.
 \end{aligned}
 $$
 
