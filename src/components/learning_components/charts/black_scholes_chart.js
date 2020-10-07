@@ -1,4 +1,3 @@
-/*
 import React from "react"
 import { Line } from 'react-chartjs-2';
 import { BlackScholesCall, BlackScholesPut, BlackScholesStraddle } from '../../../functions/blackScholesFormulae'
@@ -169,4 +168,3 @@ export default () => (
     <Line data={straddleData} />
     </>
 )
-*/

@@ -1,4 +1,3 @@
-/*
 import { create, all } from 'mathjs'
 
 const config = {
@@ -58,4 +57,3 @@ export function BlackScholesStraddle(r, sigma, K, t, T, lowerVal, upperVal, numS
 
     return { S : S, V : VStraddle }
 }
-*/
