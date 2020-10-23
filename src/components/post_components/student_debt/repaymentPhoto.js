@@ -3,7 +3,7 @@ import React from 'react'
 import Img from "gatsby-image"
 import { Container, Col } from "react-bootstrap"
 
-const RepaymentPlots = ( ) => {
+export default ( ) => {
     const { wealth } = useStaticQuery(
         graphql`
           query {
@@ -26,5 +26,3 @@ const RepaymentPlots = ( ) => {
       </Container>
     )
   }
-
-export default RepaymentPlots

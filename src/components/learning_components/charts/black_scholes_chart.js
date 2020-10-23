@@ -163,7 +163,23 @@ const straddleData = {
 
 export default () => (
     <>
-    <Line data={callData} />
+    <Line data={callData} options = {{
+  scales: {
+    yAxes: [{
+      //type: 'logarithmic',
+      scaleLabel: {
+        display: true,
+        labelString: 'Y text',
+      }
+    }],
+    xAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: 'X text'
+      }
+    }],
+  }}     
+}/>
     <Line data={putData} />
     <Line data={straddleData} />
     </>
