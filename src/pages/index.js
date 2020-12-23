@@ -23,7 +23,11 @@ export const query = graphql`
   query {
     mdxArticles: allMdx(sort: {fields: [frontmatter___date], 
       order: DESC}, filter: {frontmatter:
-        {post_type: {eq: "blog"}, config: {ne: true}}}) {
+        {
+          post_type: {eq: "blog"}, 
+          config: {ne: true},
+          hide: {ne: true}
+        }}) {
       edges {
         node {
           frontmatter {

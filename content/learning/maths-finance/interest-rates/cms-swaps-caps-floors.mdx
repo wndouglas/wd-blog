@@ -10,9 +10,15 @@ date: 2020-06-05
 <props.TutorialContents props={props}/>
 
 The plain vanilla swap market has grown into such an active and liquid market that quotes for corresponding swap rates are themselves often used as **indices**, i.e. as the underlying market variables
-for defining the payoffs of other securities. Demand for these products is often driven by particular segments of fixed income markets. For example, many mortgage lenders are concerned with hedging their 
+for defining the payoffs of other securities. Products that use swap rates as their underlying benchmark are known as **CMS** securities.
+
+Demand for these products is often driven by particular segments of fixed income markets. For example, many mortgage lenders are concerned with hedging their 
 interest rate risk arising from holding residential loans. Due to the potential of **prepayments**, the IR risk associated with such a pool of mortgages is assumed to be closely linked to movements in the
 10 year swap rate - consequently, mortgage lenders are natural buyers of IR securities linked to the 10 year swap rate.
+
+In the following, we explore the most common CMS securities.
+
+## CMS Swaps
 
 A **constant-maturity swap** (**CMS**) rate is defined as the break-even swap rate on a vanilla swap of a fixed maturity, for example 10 years or 30 years. A **CMS swap**, is a fixed-floating swap, where
 the floating leg payment is based on the CMS rate itself, as opposed to a simple rate like Libor. Formally, setting $S_{n,m}(\cdot)$ to be the $m$-period swap rate with the first fixing date $T_n$, the $m$-period
@@ -26,6 +32,8 @@ $$
 $$
 Notice that, while standard swaps can be valued with the current term structure of interest rates alone, CMS swaps require an IR model for valuation. This is due to the fact that while the forward Libor rate for $[T_n, T_{n+1}]$ is 
 a martingale under the $T_{n+1}$-forward measure, the swap rate $S_{n,m}(T_n)$ is **not**.
+
+## CMS Caps and Floors
 
 **CMS caps** and **CMS floors** are defined analogously to CMS swaps. They are strips of European options on CMS rates. Specifically, with $V_1(\cdot)$ and $V_2(\cdot)$ representing the value of the cap and the floor respectively, we have
 $$

@@ -8,3 +8,98 @@ date: 2020-06-05
 ---
 
 <props.TutorialContents props={props}/>
+
+**Volatility derivatives** are contingent claims where the underlying asset is the volatility of another financial observable, rather than a financial observable itself. The simplest example of such a derivative is the **variance swap**, a structure first seen in the equity and FX markets.
+
+The demand for volatility derivatives in the IR space is driven by the same reason as in other asset classes, the desire to have *direct* exposure to IR volatility, but not exposure to the outright level of rates. This is particularly desirable to more sophisticated players, particularly as hedge funds.
+
+In this section, we explore the most basic of such instruments: the **volatility** swap and **forward volatility** instruments.
+
+## Volatility swaps
+A volatility swap in the IR world is an instrument that measures **realised volatility** (or a related quantity) of a given rate. 
+
+Let $X_n(t)$ denote the time $t$ value of the rate used for the period $[T_n, T_{n+1}]$. Then, the most common coupon of a volatility swap is given by
+$$
+    C_n = \left\vert X_{n+1}(T_{n+1}) - X_n(T_n)\right\vert,
+$$
+or a capped version
+$$
+    C_n = \min\left(\left\vert X_{n+1}(T_{n+1}) - X_n(T_n) \right\vert, c\right).
+$$
+The value of the structured leg of a volatility swap measures realised variation of the rate $X_{n}(\cdot)$, so that to the receiver of the structured leg the swap has value
+$$
+    V(t) = \beta(t)\mathbb{E}_t^{\mathbb{Q}}\left[\sum_{n=0}^{N-1} \tau_n \beta(T_{n+1})^{-1}\left\vert X_{n+1}(T_{n+1}) - X_n(T_n) \right\vert \right] - V_{\text{floatleg}}(t),
+$$
+where
+$$
+    \begin{aligned}
+        V_{\text{floatleg}}(t) 
+        & = \sum_{n=0}^{N-1}\tau_n P(t,T_{n+1})L_n(t) \\
+        & = 1 - P(0, T_N).
+    \end{aligned}
+$$
+There are **two primary chices for the benchmark rate** $X_n$. One choice, used in what is known as a **fixed-tenor** volatility swap, involves a swap rate of **constant tenor** on each of the fixing dates. Hence, we have
+$$
+    X_n(t) = S_{n,m}(t),
+$$
+where $m \in \mathbb{N}$ is fixed and represents the number of periods in the swap rate. For example, one could use a rolling 10 year swap rate.
+
+The other choice, used in **fixed-expiry** volatility swaps, specifies the swap rate to have fixed **expiry** and **tenor**, i.e.
+$$
+    X_n(t) = S_{K, m}(t).
+$$
+In this definition, the rate $S_{K,m}(\cdot)$ is the forward swap rate for the same underlying swap with expiry $T_K$ and spanning $m$ periods. The volatility swap pays the **absolute variation** of this rate. Often, $K = N$, so that the variability of the rate $S_{N,m}(\cdot)$ is measured over its whole life.
+
+Recently, volatility swaps on **CMS spreads** have appeared. In this case, the rate is given by a spread such as
+$$
+    X_n(t) = S_{n,m_1}(t) - S_{n, m_2}(t).
+$$
+
+### Volatility swaps with a shout
+The structured coupon for a **volatility swap with a shout** allows the holder to choose when to fix the rate for use in the coupon payment (or to 'shout' when to fix). Specifically, the $n$th coupon is given by
+$$
+    C_n = \left\vert X_{n+1}(\eta_n) - X_n(T_n) \right\vert,
+$$  
+where $\eta_n \in [T_n, T_{n+1}]$ is a random stopping time chosen by the investor. In a standard, uncapped volatility swap, it is optimal to postpone the 'shout' until the end of the period, so that the shout optionality has no effect on the price or cashflows of the instrument. However, for the capped version, it is optimal to shout either when $\eta_t$ is such that
+$$
+    \left\vert X_{n+1}(\eta_t) - X_n(T_n)\right\vert = c
+$$
+for the first time, or at $T_{n+1}$. Hence, the capped volatility swap has structured coupon given by
+$$
+    \begin{aligned}
+        C_n & = c \cdot 1(\text{max}\left\{ \left\vert X_{n+1}(t) - X_n(T_n) \right\vert :t \in [T_n, T_{n+1}] \right\} \ge c ) \\
+        & \quad\quad + \left\vert X_{n+1}(t) - X_n(T_n) \right\vert \cdot 1(\text{max}\left\{ \left\vert X_{n+1}(t) - X_n(T_n) \right\vert :t \in [T_n, T_{n+1}] \right\} < c ).
+    \end{aligned}
+$$
+This decomposition shows that one can replace the optimal exercise feature of the instrument with a known static barrier, which allows for easy Monte Carlo valuation.
+
+### Min-max volatility swaps
+The structured coupon for a **min-max volatility swap** is given by
+$$
+    C_n = M_n - m_n,
+$$
+where
+$$
+    \begin{aligned}
+        M_n & = \text{max} \{ X_n(t) : t \in [T_n, T_{n+1}] \}, \\
+        m_n & = \text{min} \{ X_n(t) : t \in [T_n, T_{n+1}] \}.
+    \end{aligned}
+$$
+The coupon represents the spread between the maximum and the minimum values that the rate achieves during the reference period.
+
+## Forward starting options and forward volatility contracts
+While both standard European swaptions and fixed-expiry volatility swaps are linked to the volatility of the swap rate over its entire life, i.e. from the valuation date to the fixing date of such swap rate, some clients wish to have exposure to the volatility of a swap rate as measured over a **sub-period** of this time. In effect, the client wishes to own exposure to the **forward volatility**.
+
+**Midcurve swaptions** are swaptions whose expiry $T^e$ is **strictly** before the **fixing date** $T_0$ of the underlying swap rate. Their value depends on the volatility of the swap rate over the sub-period $[t,T^e] \subset [t,T_0]$. 
+
+Given a swap rate $S(\cdot)$ with fixing date $T_0$ and a date $T^s < T_0$, a **forward-starting swaption straddle** is an option with payoff given by
+$$
+    A(T_0) \cdot \left\vert S(T_0) - S(T^s) \right\vert,
+$$
+paid at time $T_0$.
+
+Recall that European swaptions are generally quoted in terms of their **implied Black** or **normal volatilities**. Due to this convention, many clients find the forward starting straddle too indirect, and instead wish to receive implied volatility itself. Particularly popular are contracts that pay implied normal volatility. Fortunately, the **at-the-money normal volatility** has a direct relationship to the swaption price, and the payoff of an **implied normal volatility contract** is
+$$
+    \sqrt{\frac{\pi}{2(T_0 - T^s)}} \cdot \left\vert S(T_0) - S(T^s) \right\vert
+$$
+paid at time $T_0$. Apart from the annuity factor $A(T_0)$ and a deterministic scale factor, the payoffs of forward-starting straddles and the implied normal volatility contract are identical. The differences in their prices are just a matter of a slight **convexity correction** that we will explore in further posts.
