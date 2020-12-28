@@ -14,7 +14,7 @@ export default ({ data }) => {
   return (
     <Layout>
     <SEO title={subcategory} />
-    <Link slug="/learn">
+    <Link to="/learn">
       <h1>{LearnPageDescription}</h1>
     </Link>
     <Link to={getLearnPostPath(category, null, null, pathEdges)}>

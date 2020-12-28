@@ -1,0 +1,148 @@
+---
+title: Introduction to Yield Curves and Curve Construction
+path: /intro-to-yield-curves-and-curve-construction
+category: Maths Finance
+sub_category: Interest Rate Modeling
+index: 12
+date: 2020-06-05
+---
+
+<props.TutorialContents props={props}/>
+
+Fundamentally, the goal of an **interest rate model** is to describe the random movement of a curve of discount bond prices (known as the **term structure of interest rates**) through time, starting from a known initial condition. In actuality, only a few **short-dated** discount bonds are quoted **directly** at any given time. This is far from the continuous curve of discount bond prices up to a maturity of 20 or 30 years required as input in most IR models. However, as we have seen, there are a number of liquid securities whose values, in a no-arbitrage environment, depend in a straightforward fashion upon discount bonds. This allows the backing out of theoretical values for these bonds for maturities far beyond those that are quoted directly. Even so, only a finite set of securities are quoted in the market, so constructing a **continuous** curve of discount bond prices requires some assumptions of how the curve should act between observed points, i.e. an **interpolation rule** is required. This interpolation procedure may be based on direct assumptions of the functional form of the curve, or on some regularity norm to be optimised over.
+
+This area is known as **discount curve construction**, and is a fundamental step in the modelling of fixed income products. Before the financial crisis of 07-08, it was standard to construct only a single discount curve based on **Libor rates**. However, since the crisis, it is no longer reasonable to assume that Libor rates are an accurate proxy for the OIS rates that underlie instruments such as vanilla swaps. It is hence necessary for a whole family of inter-related curves to be constructed in an unified manner. Nonetheless, it is crucial to understand single-curve construction before moving on to the construction of multiple curves. In this section, we explore the principles of single-curve construction, as used before the crisis.
+
+## Notation
+### Discount curves
+In this section, we are interested in a static discount curve at the initial time $t=0$. Hence, we freeze time in Tour notation and write
+$$
+    \begin{aligned}
+        & P : [0, \mathcal{T}] \rightarrow (0, 1], \\
+        & P(T) := P(0, T),
+    \end{aligned}
+$$
+to denote the **continuous, decreasing** discount curve. Here, $\mathcal{T} > 0$ denotes the maximum maturity of the constructed curve. 
+
+The curve is constructed using $N$ **benchmark securities**, with time 0 prices $V_1,\ldots,V_N$. We assume that each of the benchmark securities can be priced as a linear combination of the discount bond prices, i.e.
+$$
+    V_i = \sum_{j=1}^M c_{i,j} P(t_j), \quad i = 1,\ldots,N, \tag{1}
+$$
+where $0 < t_1 < \cdots < t_M \le \mathcal{T}$ is a given set of **discount security dates**. In practice, these dates are formed by merging the cashflow dates of the $N$ benchmark securities. Let $\{T_n\}_{n=1}^N$ denote the maturities dates of the benchmark securities, in which case we find that 
+$$
+    c_{i,j} = 0, \quad t_j > T_i.
+$$
+It should be clear that standard coupon-bearing bonds can be expressed in the form (1), but is also the case that, upon rearrangement, so can FRAs and standard vanilla fixed-floating swaps. 
+
+To see this in the case of the vanilla swap, suppose $t = T_0 = 0$. Then, the swap paying fixed rate $K$ has value
+$$
+    \begin{aligned}
+        V_{\text{swap}} 
+        & = A(0)(S(0) - K) \\
+        & = A(0)S(0) - A(0)K \\
+        & = \sum_{n=0}^{N-1} \tau_n P(T_{n+1})L_n(0) - \sum_{n=0}^{N-1} \tau_n K P(T_{n+1}) \\
+        & = \sum_{n=0}^{N-1} (P(T_n) - P(T_{n+1})) - \sum_{n=0}^{N-1} \tau_n K P(T_{n+1}) \\
+        & = 1 - P(T_{N}) - \sum_{n=1}^{N} \tau_{n-1} K P(T_{n}).
+    \end{aligned}
+$$
+to the fixed payer. By setting $V := 1 - V_{\text{swap}}$ we can write
+$$
+    V = \sum_{n=1}^{N} c_n P(T_n), \tag{2}
+$$
+where $c_n = \tau_{n-1}K$ for $n=1,\ldots,N-1$ and $c_N = 1+\tau_{N-1}K$. Very often it is the case that at initiation, $K$ is set such that $V_{\text{swap}} = 0$, so that in equation (2) we have $V = 1$ on the LHS.
+
+In the case of FRAs, consider a FRA on the Libor rate for the interval $[T_n, T_{n+1}]$. At $t=0$, with FRA rate given by $K$, the FRA has value
+$$
+    V_{\text{FRA}} = \tau (L_n(0) - K)P(T_{n+1}).
+$$
+Using the definition of $L_n$, the above rearranges to
+$$
+    \begin{aligned}
+        V_{\text{FRA}}
+        & = \tau L_n(0) P(T_{n+1}) - \tau K P(T_{n+1}) \\
+        & = P(T_n) - P(T_{n+1}) - \tau K P(T_{n+1}) \\
+        & = P(T_n) - (1 + \tau K)P(T_{n+1}),
+    \end{aligned}
+$$
+which takes the form of a linear combination of zero-coupon bonds, as required.
+
+Clearly, to construct a benchmark curve, it is important that all the instruments used represent borrowing from the same lender. For example, to construct the **US Treasury curve** it is appropriate to use **Treasury bonds** and **bills**, whereas the curve for a corporate lender should be built from debt issued by the lender in question, in order to consistently represent the embedded credit-worthiness of the issuer along with other nuances of the particular lender.
+
+The curve that we shall focus on is a generic **Libor curve**. Generally, this is constructed using **certificates of deposit** (**CDs**) for maturities up to 3 months, a strip of **Eurodollar futures** for maturities between 3 months and 3/4 years (after a **convexity adjustment** is applied to bring the **futures price** in line with the corresponding **forward price**), and **par swaps** for the rest of the curve (maturities of 5 up to 30 years).
+
+### Matrix representation
+Introducing the vector $P \in \mathbb{R}^M$ to represent the discount factors ordered by time, i.e.
+$$
+    P = (P(t_1), \ldots, P(t_M))^{\intercal}, \tag{3}
+$$
+and the vector $V \in \mathbb{R}^N$ to represent the observable security prices, i.e.
+$$
+    V = (V_1,\ldots,V_N)^\intercal,
+$$
+it is possible to write
+$$
+    V = C P, \tag{4}
+$$
+where $C \in \mathbb{R}^{N \times M}$ represents the coupons associated with each instrument at each payment date, i.e.
+$$
+    C = (c_{i,j})_{1 \le i \le N, 1 \le j \le M}.
+$$
+This formulation reposes the above challenge of deducing the discount curve as a **matrix inversion problem**. 
+
+Typically, the matrix $C$ will be quite sparse. Supposing the first two securities are CDs, the next four are FRAs and the remaining $N - 6$ are swaps, the first two rows of $C$ will only have a single non-zero entry, the next four only 2 non-zero entries, and the remainder will have non-zero entries up until a certain column, and will be zero thereafter.
+
+### Construction principles and yield curves
+In practice, our curve will contain many more cash flow dates than we have benchmark securities. In the above notation, this means $M > N$. In this case, the matrix problem (4) will not have a unique solution, as our system is **under-determined**.
+
+Our problem then, is to supplement equation (4) with enough additional assumptions in order for us to uniquely determine $P$ and to determine the entire function $P(\cdot)$ for values of $T$ not contained in the discount security date set $\{t_j\}_{j=1}^M$.
+
+Given that the discount curve has a roughly exponentially decaying shape, it is more common to perform the curve fitting exercise in **yield space**, rather than outright **price space** as discussed above. In yield space, the curve is much closer to a flat shape that can easily be interpolated and fitted. Specifically, we introduce the continuous yield function
+$$
+    \begin{aligned}
+        & y : [0, \mathcal{T}] \rightarrow \mathbb{R}_{\ge 0}, \\
+        & y(T) = -\frac{1}{T}\log P(T).
+    \end{aligned}
+$$
+Upon rearrangement, we see that the yield function $y(\cdot)$ satisfies
+$$
+    P(T) = e^{- y(T) \cdot T}, \tag{5}
+$$
+so that $y(T)$ can be seen as the **continuous yield-to-maturity** on the zero-coupon bond (discount factor) $P(T)$. Plugging equation (5) into (3) gives
+$$
+    P \equiv P(y) = \left(e^{-y(t_1) \cdot t_1},\ldots, e^{-y(t_M)\cdot t_M} \right)^\intercal.
+$$
+The mapping $T : y(T)$ is known as the **spot (zero) yield curve**. It is important to note that the yield curve is simply an **invertible transformation** of the discount curve, using the transformation (5). Hence, the yield curve is just a more convenient way of viewing the discount curve, but contains exactly the same information. Another curve formed as a simple transformation of the discount curve is the **instantaneous forward curve** $f(T)$ satisfying
+$$
+    P(T) = \exp\left(-\int_0^T f(u)\; \text{d}u \right).
+$$
+Note that we can retrieve $f(T)$ from $P(T)$ via
+$$
+    f(T) = -\frac{d}{d T} \log P(T).
+$$
+Likewise, using relationship (5) we find that
+$$
+    f(T) = \frac{d}{d T} \left[y(T) \cdot T \right] = y(T) + \frac{d y(T)}{d T} \cdot T,
+$$
+or
+$$
+    y(T) = \frac{1}{T}\int_0^T f(u) \; \text{d}u.
+$$
+This shows that the yield $y$ can be viewed as the average instantaneous forward rate up to the time $T$.
+
+In the following, we choose to work in yield space, i.e. we will consider $y(\cdot)$ as the fundamental curve which we seek to estimate.
+
+Fundamentally, there are three approaches to solving the equation (4). These are:
+
+1. Introduce new, unspanned securities such that $N = M$, giving (4) a single, unique solution.
+2. Parameterise the yield curve using $N$ parameters, so that the $N$ equations in (4) recover these parameters. 
+3. Search all possible solutions to (4) and pick the one that is **optimal** according to some criteria.
+
+Typically, option 1 is undesirable. If new securities were easy to include, they would already have been included. Hence, new securities generally have to be introduced via interpolation on already included prices. This often leads to odd looking curves and sub-optimal hedging parameters. Hence, if an interpolation rule is to be used, it is better to apply this directly to a fundamental quantity such as the yield curve itself.
+
+Option 2 is used more commonly. Sometimes, it is implemented using **functional forms**, but it is much more common to work with a **spline representation** with $N$ user-chosen knots, with the level of yields at these knots constituting the $N$ unknowns for which the problem should be solved.
+
+Option 3 represents the most sophisticated approach and can often be formulated as a totally non-parametric framework. If stated carefully, this approach can deal with situations where the system (4) is nearly singular, due to irregular/non-smooth solutions or linearly dependent benchmark securities.
+
+In the next section, we explore option 2.
+
+## Yield Curve Fitting with $N$-Knot Splines

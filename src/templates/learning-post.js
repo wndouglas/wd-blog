@@ -10,6 +10,7 @@ import TutorialList from "../components/tutorialList"
 import TutorialContents from "../components/tutorialContents"
 
 export default ({ data }) => {
+  console.log(data)
   const post = data.markdown
   const pathEdges = data.allConfig.edges
   const allIndexedPosts = data.allSubcategoryPosts.edges
