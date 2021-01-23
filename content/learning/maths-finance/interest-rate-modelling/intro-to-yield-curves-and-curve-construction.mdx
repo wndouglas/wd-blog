@@ -1,6 +1,6 @@
 ---
-title: Introduction to Yield Curves and Curve Construction
-path: /intro-to-yield-curves-and-curve-construction
+title: Yield Curves and Curve Construction
+path: /yield-curves-and-curve-construction
 category: Maths Finance
 sub_category: Interest Rate Modeling
 index: 12
@@ -8,6 +8,8 @@ date: 2020-06-05
 ---
 
 <props.TutorialContents props={props}/>
+
+import { BenchmarkTable, LinearYieldCurve, FlatForwardCurve } from '../../../../src/components/learning_components/maths_finance/ir_modeling/yield_curve_construction/yieldCurvePlots'
 
 Fundamentally, the goal of an **interest rate model** is to describe the random movement of a curve of discount bond prices (known as the **term structure of interest rates**) through time, starting from a known initial condition. In actuality, only a few **short-dated** discount bonds are quoted **directly** at any given time. This is far from the continuous curve of discount bond prices up to a maturity of 20 or 30 years required as input in most IR models. However, as we have seen, there are a number of liquid securities whose values, in a no-arbitrage environment, depend in a straightforward fashion upon discount bonds. This allows the backing out of theoretical values for these bonds for maturities far beyond those that are quoted directly. Even so, only a finite set of securities are quoted in the market, so constructing a **continuous** curve of discount bond prices requires some assumptions of how the curve should act between observed points, i.e. an **interpolation rule** is required. This interpolation procedure may be based on direct assumptions of the functional form of the curve, or on some regularity norm to be optimised over.
 
@@ -143,6 +145,71 @@ Option 2 is used more commonly. Sometimes, it is implemented using **functional 
 
 Option 3 represents the most sophisticated approach and can often be formulated as a totally non-parametric framework. If stated carefully, this approach can deal with situations where the system (4) is nearly singular, due to irregular/non-smooth solutions or linearly dependent benchmark securities.
 
-In the next section, we explore option 2.
+<BenchmarkTable tableNumber="1" tableCaption="Swap Benchmark set for yield curve construction tests."/>
+
+In the following, we explore options 2 and 3, using the sample data given in table 1. The table consists of a set of 10 vanilla IRSs with semi-annual fixed and floating payments so that $\tau_i = \tau = 0.5$ for all $i$.
 
 ## Yield Curve Fitting with $N$-Knot Splines
+A number of well known yield curve algorithms are based on **polynomial** and **exponential** splines of various degrees of differentiability. Here, we assume that we can arrange our benchmark security set to guarantee the maturities of the benchmark securities satisfy
+$$
+    T_{i+1} > T_{i}, \quad i = 1,2, \ldots,N-1.
+$$
+This equation constitutes a **spanning** condition and allows the $N$ maturities to represent distinct knots in our yield curve splines.
+
+### $C^0$ yield curves: bootstrapping
+
+If we simply require continuity of the yield curve, a common iterative procedure known as **bootstrapping** may be used. The basic idea is the following step by step procedure:
+1. Let $P(T_j)$ be known for $t_j \le T_{i-1}$, such that the prices of the benchmark securities with maturities $T_1,\ldots,T_{i-1}$ are matched.
+2. Guess a value for $P(T_i)$.
+3. Use an interpolation rule to fill in $P(t_j)$, $T_{i-1} < t_j < T_i$.
+4. Compute $V_i$ from the now-known values of $P(t_j)$, $t_j \le T_i$.
+5. If $V_i$ equals the value observed in the market, stop. Otherwise repeat step 2.
+6. While $i < N$, set $i = i+1$ and repeat step 1.
+
+Updating the guesses in step 2 through 5 can be handled through a one-dimensional root-finding algorithm (such as Newton's method).
+
+Importantly, there are **limitations** on the interpolation rule that can be applied in step 3. For example, one might use a representation of the yield curve in terms of instantaneous forward rates $f(T)$, assuming that $f(T)$ is a continuous, piecewise linear function on the maturity grid $\{T_i\}_{i=1}^N$. However, this interpolation rule is **numerically unstable** and prone to oscillations. 
+
+Some stable, standard choices for interpolation rules will be explored in the following.
+
+##### Piecewise linear yields
+Perhaps the most common discount curve bootstrapping algorithm assumes that the continuously compounded yield $y(\cdot)$ is a continuous, piecewise linear function on $\{T_i\}_{i=1}^N$. Formally, we write $P(T) = e^{-y(T)\cdot T}$ in step 3. above, where $y(T)$ satisfies
+$$
+    y(T) = \left( \frac{T_{i+1} - T}{T_{i+1} - T_i}\right)y(T_i) + \left(\frac{T - T_i}{T_{i+1} - T_i}\right) y(T_{i+1}), \quad T \in [T_i, T_{i+1}].
+$$
+Notice that this interpolation rule requires us to provide an equation for $y(t)$ when $t < T_1$. Normally, it is assumed that $y(t) = y(T_1)$ for $t < T_1$.
+
+<LinearYieldCurve/>
+
+The graph above shows this interpolation scheme applied to the swap data in Table 1. Notice that while yields are both linear and continuous under this scheme, forward rates are piecewise linear, but discontinuous. This motivates the use of a slightly different scheme - the piecewise **flat** forward rate scheme.
+
+##### Piecewise flat forward rates
+Under this scheme, we assume that between benchmark security dates $T_i$, the instantaneous forward rate $f(\cdot)$ is constant, i.e.
+$$
+    f(T) = f(T_i), \quad T \in [T_i, T_{i+1}).
+$$
+This rule is equivalent to assuming that $\log P(T)$ is piecewise linear in $T$ since
+$$
+    \log P(T) = \log P(T_i) - f(T_i)(T-T_i), \quad T \in [T_i, T_{i+1}].
+$$
+Now, a bootstrapping algorithm can be used to determine the values of the $N$ unknowns $f(T_0),\ldots,f(T_{N-1})$. From the equation
+$$
+    y(T)\cdot T = \int_0^T f(u) \text{d}u,
+$$
+we see that we have, for $T \in [T_i, T_{i+1}]$,
+$$
+    y(T) = \frac{y(T_i)\cdot T_i + f(T_i)(T-T_i)}{T}. \tag{6}
+$$
+By substituting in $T = T_{i+1}$ this gives
+$$
+    y(T_{i+1}) = \frac{y(T_i)\cdot T_i + f(T_i)(T_{i+1}-T_i)}{T_{i+1}}. \tag{7}
+$$
+By rearranging (7) for $f(T_i)$ and substituting into (6), we find that $y(T)$ satisfies
+$$
+    y(T) = \frac{1}{T}\left[\left(\frac{T_{i+1} - T}{T_{i+1} - T_i}\right)y(T_i)\cdot T_i + \left(\frac{T - T_i}{T_{i+1} - T_i}\right)y(T_{i+1})\cdot T_{i+1} \right].
+$$
+From this relationship, it should be clear that the yield curve will remain continuous under this scheme.
+
+<FlatForwardCurve tableNumber="2" tableCaption="Hello World"/>
+
+The graph above shows this scheme applied to the swap data in Table 1. Notice that under this scheme yields are not linear functions of maturity.
