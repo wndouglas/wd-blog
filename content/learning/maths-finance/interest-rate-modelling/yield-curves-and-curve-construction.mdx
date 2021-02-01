@@ -9,7 +9,7 @@ date: 2020-06-05
 
 <props.TutorialContents props={props}/>
 
-import { BenchmarkTable, LinearYieldCurve, FlatForwardCurve } from '../../../../src/components/learning_components/maths_finance/ir_modeling/yield_curve_construction/yieldCurvePlots'
+import { BenchmarkTable, LinearYieldCurve, FlatForwardCurve, CatmullRomCurve } from '../../../../src/components/learning_components/maths_finance/ir_modeling/yield_curve_construction/yieldCurvePlots'
 
 Fundamentally, the goal of an **interest rate model** is to describe the random movement of a curve of discount bond prices (known as the **term structure of interest rates**) through time, starting from a known initial condition. In actuality, only a few **short-dated** discount bonds are quoted **directly** at any given time. This is far from the continuous curve of discount bond prices up to a maturity of 20 or 30 years required as input in most IR models. However, as we have seen, there are a number of liquid securities whose values, in a no-arbitrage environment, depend in a straightforward fashion upon discount bonds. This allows the backing out of theoretical values for these bonds for maturities far beyond those that are quoted directly. Even so, only a finite set of securities are quoted in the market, so constructing a **continuous** curve of discount bond prices requires some assumptions of how the curve should act between observed points, i.e. an **interpolation rule** is required. This interpolation procedure may be based on direct assumptions of the functional form of the curve, or on some regularity norm to be optimised over.
 
@@ -210,6 +210,238 @@ $$
 $$
 From this relationship, it should be clear that the yield curve will remain continuous under this scheme.
 
-<FlatForwardCurve tableNumber="2" tableCaption="Hello World"/>
+<FlatForwardCurve/>
 
-The graph above shows this scheme applied to the swap data in Table 1. Notice that under this scheme yields are not linear functions of maturity.
+The graph above shows this scheme applied to the swap data in Table 1. Notice that under this scheme yields are non-linear functions of maturity.
+
+### $C^1$ yield curves: Hermite splines
+In the previous section we saw that bootstrapping yields generally gives rise to **discontinuous forward curves**. Empirically, this is often unrealistic and can give rise to distorted derivative prices based off said curves. The simplest extension to bootstrapping is to produce a **once-differentiable** yield curve and a **continuous** forward curve by utilising **Hermite cubic splines**. Hermitian cubic splines interpolate our yield curve function via a **continuously-differentiable** ($C^1$) function. Specifically, we write
+$$
+    y(T) = a_{0,i} + a_{1,i}(T-T_i) + a_{2,i}(T-T_i)^2 + a_{3,i}(T-T_i)^3, \quad T \in [T_i, T_{i+1}], \tag{8}
+$$
+for a set of constants $\{(a_{0,i}, a_{1,i}, a_{2,i}, a_{3,i}) : i = 1,\ldots,N-1 \}$ to be determined from the values of $y(T_i)$, $y'(T_i)$, $y(T_{i+1})$ and $y '(T_{i+1})$ observed in the market.
+
+To derive the values of the constants $a_{0,i}, a_{1,i}, a_{2,i}, a_{3,i}$, it is easier to introduce the scaling constant $h_i := T_{i+1} -T_i$ and write
+$$
+    \begin{aligned}
+        d_i(T) & := \frac{T-T_i}{h_i}, \\
+        b_{j,i} & := a_{j, i} h_i^j, \quad j = 0,1,2,3.
+    \end{aligned}
+$$
+Then equation (8) becomes
+$$
+    \begin{aligned}
+        y(T) & = b_{0, i} + b_{1,i} d_i(T) + b_{2,i} d_i(T)^2 + b_{3,i}d_i(T)^3  \tag{9} \\
+             & = D_i(T)^\intercal B_i, \quad T \in [T_i, T_{i+1}],
+    \end{aligned}
+$$
+where
+$$
+    \begin{aligned}
+        D_i(T) & := (1, d_i(T), d_i(T)^2, d_i(T)^3)^\intercal, \\
+        B_i    & := (b_{0,i}, b_{1,i}, b_{2,i}, b_{3,i})^\intercal.
+    \end{aligned}
+$$
+The goal is thus to find the vector $B_i$ as a function of $y_i, y_i', y_{i+1}, y_{i+1}'$, the observed values of $y(T_i)$, $y'(T_i)$, $y(T_{i+1})$ and $y'(T_{i+1})$. As there are four unknowns to be found, we must provide four equations based on these values to uniquely determine the $b_{j,i}$. In this case, we can utilise the four conditions that we have imposed on our scheme a priori. These are the facts that $y(\cdot)$ and $y'(\cdot)$ are continuous, and that $y(T_{i}) \equiv y_{i}$, $y'(T_{i}) \equiv y_{i}'$. 
+
+Upon differentiating equation (8), we find that 
+$$
+    y'(T) = \frac{b_{1,i}}{h_i} + 2\frac{b_{2,i}}{h_i} d_i(T) + 3\frac{b_{3,i}}{h_i}d_i(T)^2, \quad T \in [T_i, T_{i+1}],
+$$
+or equivalently
+$$
+    h_i y'(T) = b_{1,i} + 2 b_{2,i} d_i(T) + 3 b_{3,i} d_i(T)^2, \quad T \in [T_i, T_{i+1}] \tag{10}.
+$$
+Now, utilising the four conditions stated above in equations (9) and (10) values to equations gives rise to the four equations
+$$
+    \begin{aligned}
+        b_{0,i} & = y_i, \\
+        b_{1,i} & = y_i' h_i, \\
+        b_{0,i} + b_{1,i} + b_{2,i} + b_{3,i} & = y_{i+1}, \\
+        b_{1,i} + 2 b_{2,i} + 3 b_{3,i} & = y_{i+1}' h_i.
+    \end{aligned}
+$$
+In matrix form, this set of linear equations can be written as
+$$
+    Y_i = M^{-1}_i B_i, \tag{11}
+$$
+where
+$$
+    Y_i := (y_i, y_i' h_i, y_{i+1}, y_{i+1}' h_i)^\intercal
+$$
+and
+$$
+    M_{i} :=
+    \left(
+        \begin{array}{cccc}
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 \\
+            1 & 1 & 1 & 1 \\
+            0 & 1 & 2 & 3
+        \end{array}
+    \right)^{-1}.
+$$
+It is simple to show that the inverse of the above matrix is given by
+$$
+    M_i :=
+    \left(
+        \begin{array}{cccc}
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 \\
+            -3 & -2 & 3 & -1 \\
+            2 & 1 & -2 & 1
+        \end{array}
+    \right).
+$$
+By rearranging equation (11) and substituting into equation (9), we thus find that an arbitrary point $y(T)$, $T \in [T_i, T_{i+1}]$ is given by
+$$
+    y(T) = D_i(T)^\intercal M_i Y_i. \tag{12}
+$$
+
+A clear drawback of the scheme given above is the need to directly specify the derivatives $y_{i}'$, values that are not directly observable. One popular approach to circumventing this issue is the **Catmull-Rom spline** scheme, where the derivative $y_i'$ is approximated through the finite-difference approximation
+$$
+    y_i' := \frac{y_{i+1} - y_{i-1}}{T_{i+1} - T_{i-1}}, \quad i = 1,\ldots,N-1.
+$$
+At the endpoints $y_1$ and $y_{N}$, forwards and backwards differences are utilised instead. Notice that 
+$$
+    \begin{aligned}
+        T_{i+1} - T_{i-1} &= (T_{i+1} - T_i) + (T_i - T_{i-1}) \\
+                          &= h_i + h_{i-1},
+    \end{aligned}
+$$
+so that
+$$
+    \begin{aligned}
+        y_i' & = \frac{y_{i+1} - y_{i-1}}{h_i + h_{i-1}}, \quad i = 1,\ldots,N-1, \tag{13} \\
+        y_0' & = \frac{y_1 - y_0}{h_0}, \\
+        y_N' & = \frac{y_N - y_{N-1}}{h_{N-1}},
+    \end{aligned}
+$$
+under the Catmull-Rom scheme. Next, introduce the constants
+$$
+    \begin{aligned}
+        \alpha_i & := \frac{h_i}{h_i + h_{i-1}}, \\
+        \beta_i & := \frac{h_i}{h_{i+1} + h_i}.
+    \end{aligned}
+$$
+By substituting the approximation (13) into equation (12) and bringing the terms into the matrix $M$ gives rise to a new, derivative-free form
+$$
+    \begin{aligned}
+    B_i & = M_i Y_i \\
+        & = \left(
+                \begin{array}{cccc}
+                    1 & 0 & 0 & 0 \\
+                    0 & 1 & 0 & 0 \\
+                    -3 & -2 & 3 & -1 \\
+                    2 & 1 & -2 & 1
+                \end{array}
+            \right)
+            \left(
+                \begin{array}{c}
+                    y_i \\
+                    (y_{i+1} - y_{i-1}) \alpha_i \\
+                    y_{i+1} \\
+                    (y_{i+2} - y_i) \beta_i
+                \end{array}
+            \right) \\
+        & = \left(
+                \begin{array}{cccc}
+                    0 & 1 & 0 & 0 \\
+                    -\alpha_i & 0 & \alpha_i & 0 \\
+                    2\alpha_i & (\beta_i - 3) & (3-2\alpha_i) & -\beta_i \\
+                    -\alpha_i & (2-\beta_i) & (\alpha_i - 2) & \beta_i
+                \end{array}
+            \right)
+            \left(
+                \begin{array}{c}
+                    y_{i-1} \\
+                    y_i \\
+                    y_{i+1} \\
+                    y_{i+2}
+                \end{array}
+            \right) \\
+            & = A_i \hat{Y}_i \quad i = 1,\ldots,N-2.
+    \end{aligned}
+$$
+where
+$$
+    \begin{aligned}
+        A_i := 
+            \left(
+                \begin{array}{cccc}
+                    0 & 1 & 0 & 0 \\
+                    -\alpha_i & 0 & \alpha_i & 0 \\
+                    2\alpha_i & (\beta_i - 3) & (3-2\alpha_i) & -\beta_i \\
+                    -\alpha_i & (2-\beta_i) & (\alpha_i - 2) & \beta_i
+                \end{array}
+            \right), \quad \hat{Y}_i := 
+            \left(
+                \begin{array}{c}
+                    y_{i-1} \\
+                    y_i \\
+                    y_{i+1} \\
+                    y_{i+2}
+                \end{array}
+            \right)
+    \end{aligned}
+$$
+At the boundaries ($i = 1, N-1$) we find that
+$$
+    \begin{aligned}
+        A_0 & = 
+        \left(
+            \begin{array}{cccc}
+                0 & 1 & 0 & 0 \\
+                0 & -1 & 1 & 0 \\
+                0 & (\beta_0 - 1) & 1 & -\beta_0 \\
+                0 & (1-\beta_0) & -1 & \beta_0
+            \end{array}
+        \right), \\
+        A_{N-1} & = 
+        \left(
+            \begin{array}{cccc}
+                0 & 1 & 0 & 0 \\
+                -\alpha_{N-1} & 0 & \alpha_{N-1} & 0 \\
+                2\alpha_{N-1} & -2 & (2-2\alpha_{N-1}) & 0 \\
+                -\alpha_{N-1} & 1 & (\alpha_{N-1} - 1) & 0
+            \end{array}
+        \right).
+    \end{aligned}
+$$
+The Catmull-Rom scheme appears to depend on the two *ghost* points $y_0$ and $y_{N+1}$, however the matrices $A_1$ and $A_{N-1}$ express no true dependence on these values. As in the previous schemes, the Catmull-Rom scheme specifies the curve between $y_1$ and $y_N$. To extend the curve to $[0, T_1)$, a further extrapolation condition must be provided. Common choices are $y(T) = y_1$ for $T \in [0, T_1)$ as before, or the slope condition
+$$
+    \frac{y_1 - y_0}{h_0} = \frac{y_2 - y_1}{h_1},
+$$
+i.e.
+$$
+    y_0 = y_1 - \frac{h_0}{h_1}(y_2 - y_1).
+$$
+
+To fit the yield curve to the market under the Catmull-Rom scheme, notice that the price of the security $V_i$ depends on $y_1,\ldots,y_{i+1}$, as all the intermediate cash-flows are given as some function of these yields. Hence, the pricing equations take the **diagonal** form
+$$
+    \begin{aligned}
+        V_1 & = F_1(y_1, y_2), \\
+        V_2 & = F_2(y_1, y_2, y_3), \\
+        & \vdots \\
+        V_{N-1} & = F_{N-1}(y_1,\ldots, y_N), \\
+        V_N & = F_N(y_1,\ldots,y_N).
+    \end{aligned}
+$$
+Unlike under the standard bootstrapping procedure, security $V_i$ has dependence on the yield $y_{i+1}$. This necessitates the use of a slight modification of the standard bootstrap solving algorithm. The steps are as follows:
+
+Let $y_i^{(0)}$ be given by some other scheme (such as a bootstrapping scheme as seen earlier) and let $y_i^{(k)}$ be the value for $y_i$ found in the $k$th iteration.
+
+1. Let $y_j^{(k)}$, $j=1,\ldots,i-1$ and $y_{i+1}^{(k-1)}$ be known.
+2. Make a guess for $y_i^{(k)}$ using some root-finding scheme.
+3. Compute $V_i = F_i(y_1^{(k)},\ldots,y_i^{(k)}, y_{i+1}^{(k-1)})$.
+4. If $V_i = V_{\text{mkt}}$ continue, otherwise repeat step 2.
+5. If $i < N$ set $i = i+1$ and repeat step 1.
+
+Upon a single iteration, the algorithm gives $y_1^{(k)}, \ldots, y_N^{(k)}$. Iterating over $k$, we repeat the above steps until the RMSE is sufficiently small, i.e. we set an error tolerance $\epsilon$ and stop once
+$$
+    \frac{1}{N}\sum_{i=1}^N (y_i^{(k)} - y_i^{(k-1)})^2 < \epsilon^2.
+$$
+
+<CatmullRomCurve/>
+
+The graph above shows the Catmull-Rom scheme applied to the swap data in Table 1. Notice that the forward curve is now continuous, though not differentiable.

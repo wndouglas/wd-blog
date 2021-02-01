@@ -13,6 +13,8 @@ const linearYield_yieldCurve = CreateDataFromArrays(yield_data.maturities, yield
 const linearYield_forwardCurve = CreateDataFromArrays(yield_data.maturities, yield_data.linear_yields.forward_grid.map(x => x*100))
 const flatForward_YieldCurve = CreateDataFromArrays(yield_data.maturities, yield_data.flat_forwards.yield_grid.map(x => x*100))
 const flatForward_forwardCurve = CreateDataFromArrays(yield_data.maturities, yield_data.flat_forwards.forward_grid.map(x => x*100))
+const catmullRom_yieldCurve = CreateDataFromArrays(yield_data.maturities, yield_data.catmull_rom.yield_grid.map(x => x*100))
+const catmullRom_forwardCurve = CreateDataFromArrays(yield_data.maturities, yield_data.catmull_rom.forward_grid.map(x => x*100))
 
 function convert_to_percentage(value) {
     value = value*100
@@ -112,6 +114,53 @@ const flatForwardCurvePlot = {
         }
     ]
 }
+
+const catmullRomCurvePlot = {
+    datasets: [
+        {
+            label: 'Yield curve',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(44, 130, 201, 0.4)',
+            borderColor: 'rgba(44, 130, 201, 1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(44, 130, 201, 1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(44, 130, 201, 1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 0,
+            pointHitRadius: 10,
+            data: catmullRom_yieldCurve
+        },
+        {
+            label: 'Forward curve',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(35, 203, 167, 0.4)',
+            borderColor: 'rgba(35, 203, 167, 1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(35, 203, 167, 1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(35, 203, 167, 1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 0,
+            pointHitRadius: 10,
+            data: catmullRom_forwardCurve
+        }
+    ]
+}
     
 export const LinearYieldCurve = () => (
     <Line data={linearYieldCurvePlot} options = {{
@@ -147,6 +196,35 @@ export const FlatForwardCurve = ({ tableNumber, tableCaption }) => (
         title: {
             display: true,
             text: 'Flat Forward Interpolation',
+        },
+        scales: {
+            yAxes: [{
+                type: 'linear',
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Yield (%)',
+                },
+            }],
+            xAxes: [{
+                type: 'linear',
+                scaleLabel: {
+                    display: true,
+                    labelString: 'T'
+                },
+                ticks: {
+                    precision: 0,
+                },
+            }],
+        },
+    }     
+    }/>
+)
+
+export const CatmullRomCurve = ({ tableNumber, tableCaption }) => (
+    <Line data={catmullRomCurvePlot} options = {{
+        title: {
+            display: true,
+            text: 'Catmull-Rom Interpolation',
         },
         scales: {
             yAxes: [{
