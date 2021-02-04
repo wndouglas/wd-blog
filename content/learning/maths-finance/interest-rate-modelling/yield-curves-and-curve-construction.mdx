@@ -9,9 +9,9 @@ date: 2020-06-05
 
 <props.TutorialContents props={props}/>
 
-import { BenchmarkTable, LinearYieldCurve, FlatForwardCurve, CatmullRomCurve } from '../../../../src/components/learning_components/maths_finance/ir_modeling/yield_curve_construction/yieldCurvePlots'
+import { BenchmarkTable, LinearYieldCurve, FlatForwardCurve, CatmullRomCurve, NaturalSplinesCurve, ForwardErrorsCurve } from '../../../../src/components/learning_components/maths_finance/ir_modeling/yield_curve_construction/yieldCurvePlots'
 
-Fundamentally, the goal of an **interest rate model** is to describe the random movement of a curve of discount bond prices (known as the **term structure of interest rates**) through time, starting from a known initial condition. In actuality, only a few **short-dated** discount bonds are quoted **directly** at any given time. This is far from the continuous curve of discount bond prices up to a maturity of 20 or 30 years required as input in most IR models. However, as we have seen, there are a number of liquid securities whose values, in a no-arbitrage environment, depend in a straightforward fashion upon discount bonds. This allows the backing out of theoretical values for these bonds for maturities far beyond those that are quoted directly. Even so, only a finite set of securities are quoted in the market, so constructing a **continuous** curve of discount bond prices requires some assumptions of how the curve should act between observed points, i.e. an **interpolation rule** is required. This interpolation procedure may be based on direct assumptions of the functional form of the curve, or on some regularity norm to be optimised over.
+Fundamentally, the goal of an **interest rate model** is to describe the random movement of a curve of discount bond prices (known as the **term structure of interest rates**) through time, starting from a known initial condition. In practice, only a few **short-dated** discount bonds are quoted **directly** at any given time. This is far from the continuous curve of discount bond prices up to a maturity of 20 or 30 years required as input in most IR models. However, as we have seen, there are a number of liquid securities whose values, in a no-arbitrage environment, depend in a straightforward fashion upon discount bonds. This allows the reverse engineering of theoretical values for these bonds for maturities far beyond those that are quoted directly. Even so, only a finite set of securities are quoted in the market, so constructing a **continuous** curve of discount bond prices requires assumptions on how the curve should act between observed points, i.e. an **interpolation rule**. This interpolation may be based on direct assumptions of the functional form of the curve, or on some regularity norm to be optimised over.
 
 This area is known as **discount curve construction**, and is a fundamental step in the modelling of fixed income products. Before the financial crisis of 07-08, it was standard to construct only a single discount curve based on **Libor rates**. However, since the crisis, it is no longer reasonable to assume that Libor rates are an accurate proxy for the OIS rates that underlie instruments such as vanilla swaps. It is hence necessary for a whole family of inter-related curves to be constructed in an unified manner. Nonetheless, it is crucial to understand single-curve construction before moving on to the construction of multiple curves. In this section, we explore the principles of single-curve construction, as used before the crisis.
 
@@ -113,7 +113,7 @@ so that $y(T)$ can be seen as the **continuous yield-to-maturity** on the zero-c
 $$
     P \equiv P(y) = \left(e^{-y(t_1) \cdot t_1},\ldots, e^{-y(t_M)\cdot t_M} \right)^\intercal.
 $$
-The mapping $T : y(T)$ is known as the **spot (zero) yield curve**. It is important to note that the yield curve is simply an **invertible transformation** of the discount curve, using the transformation (5). Hence, the yield curve is just a more convenient way of viewing the discount curve, but contains exactly the same information. Another curve formed as a simple transformation of the discount curve is the **instantaneous forward curve** $f(T)$ satisfying
+The mapping $T \mapsto y(T)$ is known as the **spot (zero) yield curve**. It is important to note that the yield curve is simply an **invertible transformation** of the discount curve, using the transformation (5). Hence, the yield curve is just a more convenient way of viewing the discount curve, but contains exactly the same information. Another curve formed as a simple transformation of the discount curve is the **instantaneous forward curve** $f(T)$ satisfying
 $$
     P(T) = \exp\left(-\int_0^T f(u)\; \text{d}u \right).
 $$
@@ -215,7 +215,7 @@ From this relationship, it should be clear that the yield curve will remain cont
 The graph above shows this scheme applied to the swap data in Table 1. Notice that under this scheme yields are non-linear functions of maturity.
 
 ### $C^1$ yield curves: Hermite splines
-In the previous section we saw that bootstrapping yields generally gives rise to **discontinuous forward curves**. Empirically, this is often unrealistic and can give rise to distorted derivative prices based off said curves. The simplest extension to bootstrapping is to produce a **once-differentiable** yield curve and a **continuous** forward curve by utilising **Hermite cubic splines**. Hermitian cubic splines interpolate our yield curve function via a **continuously-differentiable** ($C^1$) function. Specifically, we write
+In the previous section we saw that bootstrapping yields generally gives rise to **discontinuous forward curves**. Empirically, this is often unrealistic and can give rise to distorted derivative prices based off of said curves. The simplest extension to bootstrapping is to produce a **once-differentiable** yield curve and a **continuous** forward curve by utilising **Hermite cubic splines**. Hermitian cubic splines interpolate our yield curve function via a **continuously-differentiable** ($C^1$) function. Specifically, we write
 $$
     y(T) = a_{0,i} + a_{1,i}(T-T_i) + a_{2,i}(T-T_i)^2 + a_{3,i}(T-T_i)^3, \quad T \in [T_i, T_{i+1}], \tag{8}
 $$
@@ -444,4 +444,100 @@ $$
 
 <CatmullRomCurve/>
 
-The graph above shows the Catmull-Rom scheme applied to the swap data in Table 1. Notice that the forward curve is now continuous, though not differentiable.
+The graph above shows the Catmull-Rom scheme applied to the swap data in Table 1. Notice that the forward curve is now continuous, though not differentiable. This leads us to the next type of yield curve construction scheme - **twice differentiable cubic splines**.
+
+
+### $C^2$ yield curves: twice differentiable cubic splines
+Given the problematic forward curves produced by the previous method, one remedy is to stay within the realms of cubic splines but to insist upon twice differentiability on $[T_1, T_N]$. In the cubic spline setting, this is equivalent to assuming piecewise linear second derivatives on each interval $[T_i, T_{i+1}]$ satisfying
+$$
+    y''(T) = \left(\frac{T_{i+1} - T}{T_{i+1} - T_i}\right)y_i'' + \left(\frac{T - T_i}{T_{i+1} - T_i}\right)y_{i+1}'', \quad T \in [T_i, T_{i+1}],
+$$
+where $y_i'' := y''(T_i)$. By integrating this equation twice on the interval $[T_i, T_{i+1}]$, using the same notation for $h_i$ as before, and enforcing that $y(T_i) = y_i$ we find that
+$$
+    \begin{aligned}
+        y(T) & = \frac{(T_{i+1} - T)^3}{6 h_i} y_i'' + \frac{(T - T_{i})^3}{6 h_i} y_{i+1}'' + (T_{i+1} - T)\left(\frac{y_i}{h_i} - \frac{h_i}{6} y_i'' \right) \\
+        & \quad\quad + (T - T_i)\left(\frac{y_{i+1}}{h_i} - \frac{h_i}{6} y_{i+1}'' \right), \quad T \in [T_i, T_{i+1}]. \tag{14}
+    \end{aligned}
+$$
+Clearly, this equation depends on the knowledge of the derivatives $y_{i}''$ at each point $i = 0,\ldots,N$. To obtain these values, we can differentiate equation (14) and use the fact that $y'(T)$ must be continuous across each $T_i$. Doing so gives the **system of equations**
+$$
+    \frac{h_{i-1}}{6}y_{i-1}'' + \left(\frac{h_{i-1} + h_i}{3} \right)y_i'' + \frac{h_i}{6}y_{i+1}'' = \frac{y_{i+1} - y_i}{h_i} - \frac{y_i - y_{i-1}}{h_{i-1}}, \quad i = 2,\ldots, N-1. \tag{15}
+$$
+This system of equations is **tridiagonal**, so is amenable to $\mathcal{O}(N)$ solutions such as via LU-decomposition. A final nuance is that we must provide **boundary conditions** for the derivatives $y_1''$ and $y_N$. A popular choice is to set $y_1'' = y_N'' = 0$. This choice gives rise to an interpolation scheme known as **natural splines**.
+
+Continuing with natural splines, we write $Y := (y_2,\ldots, y_{N-1})$ and $Y'' := (y_2'', \ldots, y_{N-1}'')$. The system of equations (15) can then be written as
+$$
+ BY'' = CY + M, \tag{16}
+$$
+where $B$ and $C$ are $(N-2)\times(N-2)$ matrices with
+$$
+    \begin{aligned}
+        B_{i,i-1} & = \frac{h_i}{6}, \quad B_{i,i} = \frac{h_i + h_{i+1}}{3}, \quad B_{i, i+1} = \frac{h_{i+1}}{6}, \\
+        C_{i, i-1} & = \frac{1}{h_i}, \quad C_{i,i} = -\left(\frac{1}{h_i} +\frac{1}{h_{i+1}}\right), \quad C_{i, i+1} = \frac{1}{h_{i+1}}.
+    \end{aligned}
+$$
+$M$ is a vector of length $N-2$ whose purpose is to encapsulate the boundary conditions. In the natural splines setting, we have
+$$
+    M = \left(\frac{y_1}{h_1}, 0, \ldots, 0, \frac{y_N}{h_{N-1}} \right)^\intercal.
+$$
+Notice that, from our construction, we can calculate $y(T)$ for $T \in [0, T_1]$ via linear interpolation, by calculating the gradient $y'(T_1)$ through differentiating (14) and evaluating at $T_1$. Specifically, one we have calculated the $y_i''$, we can find $y_1'$ as
+$$
+    y_1' = \frac{1}{h_1}(y_{2} - y_1) - \frac{h_1}{6}(y_{2}'' + 2 y_1'').
+$$
+With the above in place, we have the ingredients to create a procedure to calculate the yield curve $y_i$, $i = 1,\ldots, N$. The steps are as follows.
+
+1. Estimate the initial yields $y_i^{(0)}$, $i = 1,\ldots, N$ using some simpler scheme such as bootstrapping and set $k=0$.
+2. Using equation (16), calculate the second derivatives $y_i''$, $i=1,\ldots,N$. Use these calculated values to calculate the yield curve at all required intermediary points via equation (14).
+3. Price all benchmark instruments $V_i$, $i = 1, \ldots, N$ using the calculated yield curve.
+4. Calculate the error function $L(y_1^{(k)},\ldots,y_N^{(k)}) := \sum_{i=1}^N (V_{i}^\text{mkt} - V_i)^2$. If the error is within some predetermined threshold, stop. Else, using some form of optimisation routine, pick a new set of yields $y_i^{(k+1)}$, $i = 1,\ldots, N$ and repeat step 2.
+
+<NaturalSplinesCurve/>
+
+The above graph shows the twice differentiable cubic splines scheme using natural splines applied to the data in Table 1 using Gauss-Newton iterations to minimise the error in the benchmark set pricing. Notice that forward curve is now a continuous function - a clear improvement on the previous schemes.
+
+While the natural splines scheme gives rise to a visually appealing forward curve, it still has clear drawbacks. Most notably, twice-differentiable cubic splines often give rise to oscillatory behaviour and can lead to non-local behaviour when benchmark prices are perturbed. This can be explained loosely by the fact that, while the previous schemes use only neighbouring yields when finding an interpolated yield from the constructed curve, twice-differentiable cubic splines require a full $(N-2)\times(N-2)$ matrix system to be solved, which leads to *all* yields in the constructed curve being incorporated into calculating interpolated yields off of the curve.
+
+To see this effect in practice, we perturb the 10 year benchmark swap rate in Table 1 by 1bp and plot the changes (deltas) in the constructed forward curves for the natural spline scheme vs the same bump in the piecewise flat forward curve scheme.
+
+<ForwardErrorsCurve/>
+
+Notice that in the flat forward scheme, the changes are localised to the 10 year point and the two neighbouring points (7 years and 12 years), whereas the changes in the natural spline scheme are propagated across the whole curve in an oscillatory manner.
+
+## Non-Parametric Yield Curve Fitting
+The above framework is satisfactory when working with a well structured set of benchmark securities, such as a liquid staggered-maturity deposits, futures, and swaps as assembled by most banks for Libor yield construction purposes. In some situations, however, such as when constructing a corporate yield curve for an individual corporation, benchmark securities may be far more illiquid and less regular in their cash-flow structures. In this case, different techniques based on non-parametric optimisation may be more suitable. In this section, we will say a few words on one such technique.
+
+### Norm specification and optimisation
+When the benchmark set is noisy, a direct solution to equation (4) may be unstable or may not even exist. To overcome this challenge, we may relax our requirement to solve equation (4) to just ensuring the error 
+$$
+    \mathcal{E} := V - CP,
+$$
+is minimised in a **penalised least-squares norm**. 
+
+Specifically, we define the function space $\mathcal{A} := C^2([t_1, t_M])$, i.e. $\mathcal{A}$ is the set of all twice continuously-differentiable functions $f : [t_1, t_M] \rightarrow \mathbb{R}$. Furthermore, we define the diagonal weighting vector $W \in \mathbb{R}^{N \times N}$. Our goal is then to find
+$$
+    \hat{y} := \text{argmin}_{y \in \mathcal{A}} \mathcal{I}(y), \tag{16}
+$$
+where
+$$
+    \mathcal{I}(y) := \frac{1}{N}\left(V - C P(y) \right)^\intercal W^2 \left( V - CP(y) \right) + \lambda \int_{t_1}^{t_M} \left( y''(t)^2 + \sigma^2 y'(t)^2 \right) \text{d} t, \tag{17}
+$$
+where $\lambda, \sigma > 0$ are constants.
+
+Clearly, equation (16) consists of three distinct terms. These terms are
+1. An outright **goodness-of-fit** term
+$$
+    \frac{1}{N}\left(V - C P(y) \right)^\intercal W^2 \left( V - CP(y) \right),
+$$
+with weightings $W_{i,i}$ allowing the user to apply more importance to particular securities in the benchmark set, or somehow transform the securities from raw, dollar amounts, to more comparable quantities such as security specific yields.
+2. A weighted smoothness term 
+$$
+    \lambda \int_{t_1}^{t_M} y''(t)^2 \text{d} t,
+$$
+which penalises kinks and discontinuities in the constructed curve $y(t)$.
+3. A weighted curve length term
+$$
+    \lambda \sigma^2 \int_{t_1}^{t_M} y'(t)^2 \text{d} t,
+$$
+which penalises oscillations and excess convexity/concavity.
+
+Theory dictates that the curve satisfying equation is a form of natural cubic spline with knots at the cash-flow dates $t_1,\ldots,t_M$. Hence, in practice, we can solve equation (16) by making an initial guess for the values $y(t_j)$, $j=1,\ldots,t_M$ and then use some optimisation routine to find the values $\hat{y}(t_j)$, $j =1,\ldots,M$ that minimise (17).

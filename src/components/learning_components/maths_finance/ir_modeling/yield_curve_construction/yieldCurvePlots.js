@@ -8,6 +8,7 @@ const data = {
 }
 
 const yield_data = require('./data_out.json')
+const error_data = require('./error_data_out.json')
 
 const linearYield_yieldCurve = CreateDataFromArrays(yield_data.maturities, yield_data.linear_yields.yield_grid.map(x => x*100))
 const linearYield_forwardCurve = CreateDataFromArrays(yield_data.maturities, yield_data.linear_yields.forward_grid.map(x => x*100))
@@ -15,6 +16,11 @@ const flatForward_YieldCurve = CreateDataFromArrays(yield_data.maturities, yield
 const flatForward_forwardCurve = CreateDataFromArrays(yield_data.maturities, yield_data.flat_forwards.forward_grid.map(x => x*100))
 const catmullRom_yieldCurve = CreateDataFromArrays(yield_data.maturities, yield_data.catmull_rom.yield_grid.map(x => x*100))
 const catmullRom_forwardCurve = CreateDataFromArrays(yield_data.maturities, yield_data.catmull_rom.forward_grid.map(x => x*100))
+const naturalSplines_yieldCurve = CreateDataFromArrays(yield_data.maturities, yield_data.natural_splines.yield_grid.map(x => x*100))
+const naturalSplines_forwardCurve = CreateDataFromArrays(yield_data.maturities, yield_data.natural_splines.forward_grid.map(x => x*100))
+
+const flatForward_forwardError = CreateDataFromArrays(error_data.maturities, error_data.flat_forwards.forward_grid_errors.map(x => x*100))
+const naturalSplines_forwardError = CreateDataFromArrays(error_data.maturities, error_data.natural_splines.forward_grid_errors.map(x => x*100))
 
 function convert_to_percentage(value) {
     value = value*100
@@ -161,6 +167,102 @@ const catmullRomCurvePlot = {
         }
     ]
 }
+
+const naturalSplinesCurvePlot = {
+    datasets: [
+        {
+            label: 'Yield curve',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(44, 130, 201, 0.4)',
+            borderColor: 'rgba(44, 130, 201, 1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(44, 130, 201, 1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(44, 130, 201, 1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 0,
+            pointHitRadius: 10,
+            data: naturalSplines_yieldCurve
+        },
+        {
+            label: 'Forward curve',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(35, 203, 167, 0.4)',
+            borderColor: 'rgba(35, 203, 167, 1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(35, 203, 167, 1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(35, 203, 167, 1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 0,
+            pointHitRadius: 10,
+            data: naturalSplines_forwardCurve
+        }
+    ]
+}
+
+const forwardErrorsPlot = {
+    datasets: [
+        {
+            label: 'Flat forward error',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(44, 130, 201, 0.4)',
+            borderColor: 'rgba(44, 130, 201, 1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(44, 130, 201, 1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(44, 130, 201, 1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 0,
+            pointHitRadius: 10,
+            data: flatForward_forwardError
+        },
+        {
+            label: 'Natural spline error',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(35, 203, 167, 0.4)',
+            borderColor: 'rgba(35, 203, 167, 1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(35, 203, 167, 1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(35, 203, 167, 1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 0,
+            pointHitRadius: 10,
+            data: naturalSplines_forwardError
+        }
+    ]
+}
+
+
     
 export const LinearYieldCurve = () => (
     <Line data={linearYieldCurvePlot} options = {{
@@ -232,6 +334,64 @@ export const CatmullRomCurve = ({ tableNumber, tableCaption }) => (
                 scaleLabel: {
                     display: true,
                     labelString: 'Yield (%)',
+                },
+            }],
+            xAxes: [{
+                type: 'linear',
+                scaleLabel: {
+                    display: true,
+                    labelString: 'T'
+                },
+                ticks: {
+                    precision: 0,
+                },
+            }],
+        },
+    }     
+    }/>
+)
+
+export const NaturalSplinesCurve = ({ tableNumber, tableCaption }) => (
+    <Line data={naturalSplinesCurvePlot} options = {{
+        title: {
+            display: true,
+            text: 'Natural Splines Interpolation',
+        },
+        scales: {
+            yAxes: [{
+                type: 'linear',
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Yield (%)',
+                },
+            }],
+            xAxes: [{
+                type: 'linear',
+                scaleLabel: {
+                    display: true,
+                    labelString: 'T'
+                },
+                ticks: {
+                    precision: 0,
+                },
+            }],
+        },
+    }     
+    }/>
+)
+
+export const ForwardErrorsCurve = ({ tableNumber, tableCaption }) => (
+    <Line data={forwardErrorsPlot} options = {{
+        title: {
+            display: true,
+            text: 'Bumped data forward curve deltas',
+        },
+        scales: {
+            yAxes: [{
+                type: 'linear',
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Yield delta (%)',
                 },
             }],
             xAxes: [{
