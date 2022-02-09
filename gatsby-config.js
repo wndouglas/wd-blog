@@ -72,5 +72,11 @@ module.exports = {
         remarkPlugins: [ require('remark-math'), require('remark-html-katex') ]
       },
     },
+    {
+      resolve: `gatsby-plugin-disqus`,
+      options: {
+        shortname: `alphabetarho`,
+      }
+    }
   ],
 }

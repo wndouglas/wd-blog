@@ -73,9 +73,9 @@ exports.createPages = async ({ graphql, actions }) => {
             node.frontmatter.path, pathEdges),
       component: learnPostPage,
       context: {
-      category: node.frontmatter.category,
-      sub_category: node.frontmatter.sub_category,
-      slug: node.frontmatter.path,
+        category: node.frontmatter.category,
+        sub_category: node.frontmatter.sub_category,
+        slug: node.frontmatter.path,
       },
     })    
   })
