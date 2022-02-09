@@ -31,7 +31,7 @@
     "gatsby-remark-katex": "^3.3.2",
     "gatsby-remark-mathjax": "^1.0.0",
     "gatsby-source-filesystem": "^2.2.2",
-    "gatsby-source-wordpress": "^3.2.3",
+    "gatsby-source-wordpress": "^4.0.8",
     "gatsby-transformer-remark": "^2.7.1",
     "gatsby-transformer-sharp": "^2.4.3",
     "katex": "^0.11.1",
