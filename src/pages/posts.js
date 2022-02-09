@@ -77,8 +77,19 @@ export const query = graphql`
       }
 
     allDates:
-      allMdx(filter: {frontmatter: {config: {ne: true}, 
-        post_type: {eq: "blog"}}}) {
+      allMdx(filter: {
+        frontmatter: {
+          config: {
+            ne: true
+          }, 
+          post_type: {
+            eq: "blog"
+          },
+          hide: {
+            ne: true
+          }
+        }
+      }) {
         distinct(field: frontmatter___date)
       }
   }

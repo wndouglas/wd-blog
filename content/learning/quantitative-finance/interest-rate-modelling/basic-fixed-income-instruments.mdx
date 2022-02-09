@@ -1,0 +1,247 @@
+---
+title: Basic Fixed Income Instruments
+path: /fixed-income-instruments
+category: Quantitative Finance
+sub_category: Interest Rate Modeling
+index: 5
+date: 2020-08-25
+---
+
+<props.TutorialContents props={props}/>
+
+In this section, we will introduce the various **fixed income markets** along with an overview of the most basic 
+products that **trade**. The simpler and more **liquid** of these products typically serve as targets to calibrate the 
+parameters or our models to. The more complex and more illiquid ones, where accurate pricing is not readily available, 
+are the contracts that our models are ultimately designed to **price and hedge**.
+
+The vast majority of securities we analyse are tied to the so-called **Libor rates** - the 
+**London Interbank Offered Rates** - forward looking interest rates set by a group of banks as an estimate of the rate 
+they would be charged were they to borrow from other banks. Traditionally, Libor rates form a benchmark for the 
+majority of exotic securities along with more basic instruments such as swaps, FRAs, caps and swaptions. The industry 
+is currently in the process of shifting away from Libor towards so called **risk free rates**. In the UK, the rate of 
+choice is known as **SONIA** -  **Sterling Overnight Index Average**. For the time being, Libor is still in full force 
+and will form the basis of our analysis.
+
+## Fixed Income Markets and Participants
+Fundamentally, an **interest rate** represents the cost of borrowing and lending - to the borrower it is the price they 
+must pay for borrowing - to the lender it represents the compensation they demand for tying up their capital and 
+sacrificing the ability to earn a return of their own.
+
+In general, the interest rate demanded for borrowing/lending for different lengths of time will **not** be equal. In 
+usual conditions, a **risk premium** is demanded by the market for lending for longer periods of time. A participant 
+tying up their money for a long period of time faces greater risk of an adverse move in economic events that they will 
+be unable to respond to timely, than a particpant lending overnight. This effect is known as the **liquidity spread**. 
+The dependence of interest rates versus time is described as the **term structure of interest rates**.
+
+When comparing interest rates across time to maturity, it is important that each rate belongs to an instrument with the 
+same **credit quality**. For example, it is valid to assume that a 2 year US Treasury Note has a similar 
+**credit risk** (or risk of default) to a 10 year US Treasury Bond, etc. On the other hand, a 10 year T-Bond has a very 
+different credit risk to a 10 year Bond issued by Greece. The difference in the **yields** or rates offered by these 
+instruments is primarily driven by the different probabilities of the two countries honouring their obligation to repay 
+these bonds. While this effect is important, when we analyse a particular term structure, we are trying to isolate the 
+effects entirely due to the varying lengths of time for which we borrow and eliminate any credit risk.
+
+The **vast** majority of fixed income instruments are traded **OTC** - **over-the-counter**. This market runs parallel 
+to the **exchange markets**. The OTC market can be visualised as a network of banks and institutions trading among each 
+other under terms governed by standardised agreements spelled out by **ISDA** - 
+**International Swaps and Derivatives Association**. Central to OTC markets are **interest rate dealers**, trading 
+desks within banks specialised in fixed income trading. These desks
+provide provide liquidity in various securities across the rates spectrum.
+
+**Institutions** include **mortgage companies**, **pension funds**, **insurance companies** and **hedge funds**. These 
+companies either seek to profit by engaging in trading activities (primarily hedge funds), or to hedge their exposures 
+to interest rate risks, and achieve superior returns on their investments (pension funds and insurance companies). The 
+**exotic** end of the fixed income markets is driven by **issuers**, companies that sell **structured notes**, 
+instruments delivering appealing returns to investors via embedded optionality retained by the issuers.
+
+**Corporates** form the remaining participants in the fixed income markets. These are the remainder (and majority) of 
+companies, whose primary activities are not directly linked to fixed income markets. These participants raise capital 
+by borrowing from banks or by issuing bonds - in doing so they expose themselves to interest rates and other market 
+risks, which they may hedge through swaps and other fixed income derivatives.
+
+## Certificates of Deposit and Libor Rates
+The most basic fixed income security is the **CD** - **certificate of deposit**. A CD is simply a contract returning a 
+notional amount $N$ after a prespecified term and at a prespecified interest rate. Terms range from a week up to a year 
+or more, with 3 and 6 months being the most popular terms. If 1 unit is invested at a date $T$ for a period of $\tau$ 
+years, then $N = 1$ and the holder receives
+$$
+    1 + \tau L
+$$
+at the time $T + \tau$, where $L$ is the interest rate quoted on the CD. The rate is quoted as a simple rate, i.e. with 
+a compounding frequency equal to $\tau$. By definition of Libor itself, the average value of $L$ will be equal to the 
+Libor rate for the tenor $\tau$. Spot Libor rates for various tenors are calculated daily and quoted on **Bloomberg**.
+
+If $P(T,T+\tau)$ is the discount factor to date $T + \tau$ on the date $T$, then the discounted value of the CD should 
+be equal to 1 at $T$ and is given by
+$$
+    1 = P(T, T + \tau)(1 + \tau L).
+$$
+In particular, if $P(T, T + \tau)$ is the Libor based discount factor, then, as we might expect, we find that
+$$
+    L = L(T,T,T+\tau) = \frac{1}{\tau}\left(\frac{1 - P(T,T,T+\tau)}{P(T, T, T+\tau)}\right).
+$$
+
+## Forward Rate Agreements (FRAs)
+**FRAs** - **Forward Rate Agreements** are similar to CDs in that they allow investors to lock in an interest rate for 
+a given period of time. However, with a FRA, the interest rate is locked in for a period of time that starts in the 
+future. Contracts providing such a guarantee in general are called **forward contracts**. A FRA for the period 
+$[T, T+\tau]$ is a contract to exchange a fixed rate payment (agreed on the initiation date of the contract) against a 
+payment based on the time $T$ spot Libor for tenor $\tau$. While all payments on a FRA are exchanged on date $T$, the 
+contract is structured so that payments are made in $T+\tau$ currency units.
+
+Formally, suppose today is date $t$, $t \le T$, and we enter a FRA on unit notional with a rate $K$. From the 
+perspective of the fixed rate payer, the net payment at $T$ is given by
+$$
+    V(T) = \tau \left( \frac{L(T, T, T+\tau) - K}{1 + \tau L(T,T,T+\tau)}\right) = \tau P(T,T+\tau) (L(T,T,T+\tau) - K)
+$$
+where the discount factor $\tfrac{1}{1 + \tau L(T,T,T+\tau)}$ is applied to roll the payment into $T+\tau$ currency 
+units. To discount this payment back to time $t$, it is most convenient price under the $T$ measure. Doing so, we find 
+that
+$$
+\begin{aligned}
+    V(t) & = \tau P(t,T) \mathbb{E}_t^{T}\left[P(T,T+\tau) (L(T,T,T+\tau) - K) \right] \\
+    & = P(t,T) \mathbb{E}_t^{T}\left[P(T,T+\tau) \left(\frac{1}{P(T, T+\tau)} - 1 - \tau K \right) \right] \\
+    & = P(t,T) \mathbb{E}_t^{T}\left[ 1 - P(T,T+\tau)( 1 + \tau K ) \right] \\
+    & = P(t, T) - P(t, T+\tau)(1 + \tau K).
+\end{aligned}
+$$
+A FRA is constructed so that there is zero upfront cost to either party. Hence, the fixed rate $K$ is set to satisfy 
+$V(t) = 0$. Rearranging for $K$ we see that
+$$
+    K = L(t, T, T+\tau) = \frac{1}{\tau}\left(\frac{1}{P(t, T, T+\tau)} - 1 \right).
+$$
+From this we can see that the forward Libor rate $L(t, T, T+\tau)$ can be interpreted as the **break-even** rate on a 
+FRA in the interbank market.
+
+## Eurodollar Futures
+We saw above that a FRA allows a market participant to lock in favourable rates for future periods (or to speculate on 
+the future direction of rates). However, FRAs trade only on the OTC market and are thus only open to institutions 
+participating in this market. An alternative way to achieve a similar goal is to purchase a **Eurodollars futures** 
+contract. These contracts trade on the **CME** - **Chicago Mercantile Exchange**. The **ED Futures** - Eurodollars 
+futures contract - settles at maturity $T$ at
+$$
+    100\cdot (1 - L(T,T,T+\tau)).
+$$
+The **futures rate** $F(t, T, T+\tau)$ at time $t$ is defined to be the rate such that the quoted **futures price** at 
+time $t$ is equal to
+$$
+    100\cdot (1 - F(t,T,T+\tau)).
+$$
+As with all futures contracts, ED futures are marked to market daily. Confusingly, the actual amount settled between 
+counterparties is determined by the daily change in the **actual futures price** defined by
+$$
+    N_{\text{ED}} \cdot \left(1 - \frac{1}{4}F(t,T,T+\tau) \right),
+$$
+where $N_{\text{ED}}$ is the notional principal of the contract. For ED futures on the CME, this value is set to 
+$\$1,000,000$. In particular, for a 1bp move in the rate $F(t, T, T+\tau)$, the CME holder exchanges $\$25$.
+
+ED futures are **standardised**. Available contracts expire on **four** dates - one each in **March**, **June**, 
+**September** and **December** over the next **10 years**. Due to this standardisation, ED futures are **liquid** and 
+trade regurlarly.
+
+## Fixed for Floating Swaps
+**Swaps** are OTC derivatives in which two counterparties exchange one stream of cash flows on a preset schedule 
+against another on a (potentially different) preset schedule. These two streams are called the **legs** of the swap. A 
+**vanilla IR swap** is a swap in which one leg is a stream of fixed payments and another a stream of floating rate 
+payments, often Libor based. The legs are denominated in the same currency, have the same notional and expire on the 
+same date. Payment streams are made on a pre-defined schedule of contiguous time intervals, called **periods**. 
+Typically, the floating rate is fixed at the start of each period, and both legs are paid out at the end of the period.
+
+Swaps of varying maturities are traded between banks and financial institutions both to hedge interest rates exposures, 
+and to make bets on future rates. Corporates also use swaps in conjunction with bond issuance to transform their bonds 
+into synthetic floating rate bond positions.
+
+To define a **fixed-floating** swap, one specifies a **tenor structure** (an increasing sequence of maturities), 
+typically spaced equidistantly:
+$$
+    0 \le T_0 < T_1 \cdots < T_N, \quad \tau_n = T_{n+1} - T_n.
+$$
+
+In a vanilla swap with fixed rate $K$, one party pays simple interest based on the rate $K$ in return for simple 
+interest payments based on the Libor rate on date $T_n$ for the period $[T_n, T_{n+1}]$, $n = 0,\ldots,N-1$. The 
+payments are exchanged at the end of each period, $T_{n+1}$. In practice, payments are netted and only their difference 
+changed hands. From the fixed rate payers perspective, the net cash flow of the swap at $T_{n+1}$ is thus
+$$
+    \tau_n (L_n(T_n) - K), \quad L_n(t) := L(t, T_n, T_{n+1}), n = 0,\ldots N-1.
+$$
+Dates at which Libor rates are observed are called **fixing dates** and dates where payments occur are called 
+**payment dates**. The time $t$, $0 \le t \le T_0$ value of the swap to the fixed rate payer is given by
+$$
+    \begin{aligned}
+        V(t) & = \sum_{n=0}^{N-1}\tau_n \beta(t) \mathbb{E}_t^{\mathbb{Q}}\left[\beta(T_{n+1})^{-1} (L_n(T_n) - K) \right] \\
+        & = \sum_{n=0}^{N-1}\tau_n P(t,T_{n+1}) \mathbb{E}_t^{T_{n+1}}\left[ L_n(T_n) - K \right] \\
+        & = \sum_{n=0}^{N-1} \tau_n P(t, T_{n+1}) \left(L_n(t) - K \right) \\
+        & = \left(\sum_{n=0}^{N-1} \tau_n P(t,T_{n+1}) \right) \left(\frac{\sum_{n=0}^{N-1}\tau_n P(t,T_{n+1})L_n(t)}{\sum_{n=0}^{N-1} \tau_n P(t,T_{n+1})} - K \right) \\
+        & = A(t)(S(t) - K),
+    \end{aligned}
+$$
+where the first equality follows from changing measure from the risk-neutral measure to the $T_{n+1}$ forward measure, 
+and $A(t)$ and $S(t)$ are the **annuity** and **swap rates** respectively, i.e.
+$$
+    \begin{aligned}
+        A(t) & := \sum_{n=0}^{N-1} \tau_n P(t,T_{n+1}), \\
+        S(t) & := \frac{\sum_{n=0}^{N-1}\tau_n P(t,T_{n+1})L_n(t)}{\sum_{n=0}^{N-1} \tau_n P(t,T_{n+1})}.
+    \end{aligned}
+$$
+
+## General Swaps
+In general, interest rate swaps are not required to pay a constant fixed rate, or for the notional to remain constant 
+throughout the lifetime of the swap. A **non-standard swap** with notional schedule $\{q_n\}_{n=0}^{N-1}$ and fixed 
+rate schedule
+$\{k_n\}_{n=0}^{N-1}$ has the value
+$$
+    \begin{aligned}
+        V(t) & = \beta(t)\sum_{n=0}^{N-1} \tau_n q_n \mathbb{E}_t^{\mathbb{Q}} \left[\beta(T_{n+1})^{-1} (L_n(T_n) - k_n) \right] \\
+        & = \sum_{n=0}^{N-1} \tau_n q_n P(t, T_{n+1})(L_n(t) - k_n).
+    \end{aligned}
+$$
+Increasingly, swaps linked to overnight rates (Fed funds/SONIA) are traded. One example is the 
+**OIS** - **overnight index swap**. The most liquid of all overnight rate based swaps, the OIS pays a **compounded** 
+overnight rate versus fixed rate payments. Assuming we have the same tenor structure as before, and denoting 
+$\{t_{n,i}\}_{i=1}^{K_n}$ the collection of business days in the period $[T_n,T_{n+1})$, so that 
+$T_n = t_{n,1} < \cdots < t_{n, K_n} < T_{n+1}$, the net payment of the OIS with fixed rate $K$ at time $T_{n+1}$ is 
+given by
+$$
+    \tau_n (\hat{L}_n - K),
+$$
+where the floating rate $\hat{L}_n$ for the $n$th period of the swap is given by
+$$
+    \hat{L}_n = \frac{1}{\tau_n} \left( \prod_{i=1}^{K_n - 1} (1+(t_{n,i+1} - t_{n,i})L(t_{n,i}, t_{n,i}, t_{n,i+1})) - 1 \right).
+$$
+Here, $L(t,t,s)$ represents the overnight rate from the day $t$ to the next business day $s$.
+
+## Libor-in-Arrears Swaps
+For a **Libor-in-arrears** swap, Libor rates are observed (fixed) at the **end** of each period rather than at the 
+start. Thus, the value of a Libor-in-arrears fixed-for-floating swap is equal to
+$$
+    V(t) = \beta(t)\sum_{n=0}^{N-1} \tau_n \mathbb{E}_t^{\mathbb{Q}}\left[\beta(T_{n+1})^{-1}(L_{n+1}(T_{n+1}) - K) \right].
+$$
+Whereas with the vanilla fixed-for-floating swap, discounting from $T_{n+1}$ to $T_n$ led to cancellation of discount 
+factors in the Libor rate and a simple expression for the value of the swap, here we cannot perform the same trick and 
+the value of the Libor-in-arrears swap is **model dependent**.
+
+Libor-in-arrears swaps are popular in upward-sloping rates environments. In such an environment, the break-even fixed 
+rate on the Libor-in-arrears swap looks more *attractive* than that of the equivalent vanilla swap, thus increasing the 
+desirability of the swap to those wishing to receive fixed.
+
+## Averaging Swaps
+Swaps are not restricted to observing Libor rates on either the start or end day of a pay period. Another popular IR 
+swap is the **averaging swap**, i.e. a swap where the floating rate is determined as an average of Libor rates observed 
+at regular intervals between each period. To see this precisely, let $\{t_{n,i}^f, t_{n,i}^s, t_{n,i}^e \}_{i=1}^{K_n}$ 
+be a collection of date triplets defining rates to be used in calculating the payment in period $n$ - the **fixing**, 
+**start** and **end** dates. Defining a set of weights $w_{n,i}$ summing to 1, $i=1,\ldots,K_n$, the floating rate 
+$\hat{L}_n$ for the period $[T_n, T_{n+1}]$ is defined by
+$$
+    \hat{L}_n := \sum_{i=1}^{K_n} w_{n,i} L(t_{n,i}^f, t_{n,i}^s, t_{n,i}^e).
+$$
+For the fixed rate payer, the time $t$ averaging swap value is thus given by
+$$
+    V(t) = \beta(t)\sum_{n=0}^{N-1} \tau_n \mathbb{E}_t \left[\beta(T_{n+1})^{-1}(\hat{L}_n - K) \right]. \tag{5.1}
+$$
+Calculating (5.1) is again a model dependent computation.
+
+Swaps linked to the average Fed fund rate are also common. Particularly noteworthy are **Fed funds/Libor basis swaps** 
+which pay the average of the Fed funds rate versus a Libor based payment for that period. This instrument is an example 
+of a **floating for floating single currency basis swap**. Another closely related contract is the 
+**Fed funds futures** traded on the **CBOT** - **Chicago Board of Trade**. These use the 30 day running average of the 
+Fed funds rate for settlement.

@@ -1,0 +1,174 @@
+---
+title: Caps, Floors and Swaptions
+path: /caps-floors-swaptions
+category: Quantitative Finance
+sub_category: Interest Rate Modeling
+index: 6
+date: 2020-08-28
+---
+
+<props.TutorialContents props={props}/>
+
+In the previous section we covered the most basic rates derivatives. In the world of fixed income, these products are 
+known as **linear** instruments in the sense that their payoff functions are generally linear in their respective 
+underlyings. A consequence of this linearity is that they are generally simple to price and do not require any 
+stochastic model to do so. In general, this ease of pricing and the liquidity of these products makes them ideal 
+candidates for **calibrating** the parameters used for models required to price more advanced products. For example, 
+swaps are used by major institutions to build their in-house **curves** for various different rates, including 
+**swap curves** and **zero curves**.
+
+In this section, we move on to the most basic **non-linear** products, specifically **swaptions**, **caps** and 
+**floors**. While these products still exhibit great **liquidity** and their prices are readily observed in the market, 
+technically speaking a model is required to arrive at these prices. This comes as a consequence of the non-linearity of 
+their payoffs in their underlying, otherwise known as 'convexity'. Another important way of separating non-linear 
+products from their linear cousins is by noting their **non-zero gamma** (or equivalently their varying **delta**). 
+This simply means that the rate at which the value of these products change as a function of their underlying is not 
+constant. In practice, a dealer holding one of these product who desires to hedge their exposure to movements in the
+underlying is required to update their position in the underlying whenever the market moves.
+
+## Caps and Floors
+A firm with liabilities funded at a floating rate (e.g. Libor) is naturally concerned by the possibility that rates may 
+rise in the future. Of course, the firm could hedge this risk by paying fixed in a vanilla IR swap on the same floating 
+rate. In doing so, they could turn their floating payments into fixed ones and guarantee a certain fixed rate on their 
+payments. However, you can't have your cake *and* eat it. By hedging this floating rate risk they forgo the possibilty 
+of benefitting from a possible **drop** in floating rates.
+
+An **interest rate cap** is a security that allows the holder to benefit from low floating rates yet still remain 
+protected from high rates. Similarly, an **interest rate floor** is suitable for an investor receiving a floating rate 
+on their assets. A floor allows the investor to benefit from high floating rates but puts a floor on how low the rate 
+they receive is able to fall.
+
+Formally, a cap consists of a **strip of caplets**, call options on successive Libor rates. Likewise a floor is a 
+**strip of floorlets**, put options on successive Libor rates. Each caplet is given mathematically by
+$$
+    \tau_n(L_n(T_n) - K)^+
+$$
+per unit notional at time $T_{n+1}$. Similarly, a floor is given by
+$$
+    \tau_n(K - L_n(T_n))^+.
+$$
+It should now be simple to see where the names of both products come from. For a liability holder owing Libor set at 
+time $T_n$ at time $T_{n+1}$, were they to purchase a cap, their payoff at each $T_n$ would become
+$$
+    \tau_n(L_n(T_n) - K)^+ - \tau_n L_n(T_n) = -\tau_n\text{min}(L_n(T_n), K),
+$$
+i.e. their payoff is **capped** by the fixed rate $K$. Likewise, a floor holder receives payoffs **floored** by the fixed rate $K$.
+
+Setting $\omega = \pm 1$, we can mathematically encode both an $N$ period cap and an $N$ period floor with strike $K$ via 
+$$
+    V(t; \omega) = \beta(t) \sum_{n=0}^{N-1} \tau_n \mathbb{E}_t^{\mathbb{Q}} \left[ \beta(T_{n+1})^{-1} \left(\omega (L_n(T_n) - K) \right)^+ \right],
+$$
+where $V_{\text{cap}}(t) = V(t; 1)$ and $V_{\text{floor}}(t) = V(t; -1)$.
+
+As when pricing swaps in the previous section, by switching to the $T_{n+1}$-forward measure for the $n$th cashflow, 
+the above valuation formulas can be more conveniently expressed as
+$$
+    V(t; \omega) = \sum_{n=0}^{N-1} \tau_n P(t,T_{n+1}) \mathbb{E}_t^{T_{n+1}} \left[ \left(\omega (L_n(T_n) - K) \right)^+ \right].
+$$
+Since $L_n(\cdot)$ is a martingale under $\mathbb{Q}^{T_{n+1}}$ (see section 2), caplets/floorlets can each be priced 
+via a **vanilla** model, such as the **log-normal Black model**, a modification
+of the classic Black-Scholes model.
+
+While the OTC market for caps/floors is liquid, individual caplets/floorlets are not themselves traded. By considering 
+caps/floors of various maturities it is possible to back out volatility curves (volatilities vs strike) for individual 
+forward Libor rates making up caps/floors. Once extracted, these volatilities combined with those from swaption quotes 
+can form calibration targets for more advanced IR models used for pricing exotic products.
+
+## European Swaptions
+While caps and floors give investors a way of hedging cashflow downsides on an individual level through the lifetime of 
+an asset/liability while benefitting from upswings, **European swaptions** give the holder a means of entering into a 
+swap on a future date if the strike swap rate at the time of exercise is more favourable than the current spot swap 
+rate. Put differently, they allow the holder to enter into a swap with a positive PV. European swaptions give the 
+holder the right, but not the obligation, to enter into a swap at a future date at a given fixed rate. A **payer** 
+swaption is an option to **pay** the fixed leg on a fixed-floating swap, while a **receiver** swaption is an option to 
+**receive** the fixed leg.
+
+Assuming the underlying swap begins at the expiry date $T_0$ (this is typical), the payoff for a payer swaption at 
+$T_0$ is given by
+$$
+    V(T_0) = (V_{\text{swap}}(T_0))^+ = \left(\sum_{n=0}^{N-1}\tau_n P(T_0, T_{n+1})(L_n(T_0) - K) \right)^+.
+$$
+By exploiting the representation of swaps in terms of annuitities and swap rates developed in the previous section, we 
+find that
+$$
+    V(T_0) = A(T_0)(S(T_0) - K)^+.
+$$
+Hence, the time $t \le T_0$ European payer swaption value is given by
+$$
+    V(t) = \beta(t) \mathbb{E}_t^{\mathbb{Q}}\left[\beta(T_0)^{-1} A(T_0)(S(T_0) - K)^+ \right].
+$$
+At this point, naively pricing under the risk-neutral measure requires joint dynamics of the bank account, swap rate 
+and the annuity to be prescribed. Instead, by switching to the **annuity measure** $\mathbb{Q}^A$ of section 2,
+the swaption value collapses nicely to the expression
+$$
+    V(t) = A(t)\mathbb{E}_t^A\left[(S(T_0) - K)^+ \right],
+$$
+with the forward swap rate $S(\cdot)$ being a martingale under $\mathbb{Q}^A$.
+
+This observation reduces European payer/receiver swaption pricing back to pricing of a simple European call/put option, 
+for which we can utilise the Black model once again. Conversely, and more typically, market swaption prices can
+be mapped to market implied distributional characteristics of forward swap rates. In particular, it is universal 
+practice across the industry to quote swaption prices in terms of **implied Black** or **Normal volatilities**.
+
+The swaptions market is **very** liquid with many different maturities and swap underlyings traded actively. We proceed 
+to fully characterise the set of all traded swaptions. Given a tenor structure
+$$
+    0 \le T_0 < T_1 \cdots < T_N, \quad \tau_n = T_{n+1} - T_n,
+$$
+consider swaptions of expiries $\{T_n\}_{n=0}^{N-1}$ that can be exercised into swaps beginning at $T_n$ and covering 
+$m$ periods, i.e. with last payment dates $T_{n+m}$. We denote the corresponding underlying swap rates and annuity 
+factors
+by
+$$
+    \begin{aligned}
+        A_{n,m}(t) & = \sum_{i=n}^{n+m-1} \tau_i P(t, T_{i+1}), \\
+        S_{n,m}(t) & = \frac{\sum_{i=n}^{n+m-1}\tau_i P(t,T_{i+1})L_i(t)}{\sum_{i=n}^{n+m-1}\tau_i P(t,T_{i+1})},
+    \end{aligned}
+$$
+for $n=0,\ldots,N-1, m=1,\ldots, N-n$. Then the value of the $(n, m)$-swaption is equal to
+$$
+    A_{n,m}(t) \mathbb{E}_t^{n,m}\left[(S_{n,m}(T_n) - K)^+ \right],
+$$
+where $\mathbb{E}_t^{n,m}[\cdot] \equiv \mathbb{E}_t^{\mathbb{Q}^{n,m}}[\cdot]$ and $\mathbb{Q}^{n,m}$ represents the 
+$A_{n,m}(\cdot)$ annuity measure. In market language, a $T_n$-maturity European swaption on a swap running from $T_n$ 
+to $T_{m+n}$ is called a $T_n$y($T_{m+n}-T_n$)y swaption. For instance, a 1 year swaption on a 3 year swap is called 
+the 1y3y swaption.
+
+Evidently, if $m = 1$, we just have an option to enter into a caplet or floorlet. Hence, any general discussion on 
+swaptions implicitly includes caplets/floorlets. Together, the set of $(n,m)$-swaptions constitutes the 
+**swaption grid**. Due to the broad range of swaptions observable in the market, market quotes on swaptions in the form 
+of implied volatilities provide the most readily-available information on the volatility structure of interest rates. 
+However, since different swaptions in the grid cover overlapping sections of the interest rate term structure, 
+extracting clean volatility information from the market is not a simple feat.
+
+Options on vanilla swaps comprise the bulk of the liquid IR non-linear derivatives market, but there are also traded 
+options on general swaps. It is often the case that general swaps can be decomposed (mathematically) into a basket of 
+standard swaps. In this case, options on these swaps become **basket options** which require information on the joint 
+distribution of the constituent underlyings.
+
+## Cash-Settled Swaptions
+The above swaption contracts assume **physical settlement**. This means, upon exercise, an actual swap contract is 
+entered into. An economically equivalent swaption contract is one where the parties agree to make a cash payment equal 
+to the PV of the swap observed at exercise. Indeed, both types give a payoff of
+$$
+    A(T_0)(S(T_0) - K)^+, \tag{6.1}
+$$
+at time $T_0$. The final variety of swaption is known as a **cash-settled** swaption. This type of swaption is also 
+very common. Here, rather than entering into a swap at exercise, the option holder again receives a cash payout. The settlement amount is calculated in
+a manner similar to (6.1), except the annuity factor $A(\cdot)$$ is calculated by discounting fixed rate payments at 
+the swap rate $S(T_0)$. Specifically, we find that
+$$
+    V_{\text{css}}(T_0) = a(S(T_0))(S(T_0) - K)^+,
+$$
+where
+$$
+    a(x) := \sum_{n = 0}^{N-1} \frac{\tau_n}{\prod_{i=0}^n (1+\tau_i x)}.
+$$
+The benefit of this method is that, while physically settled swaptions require knowledge of a strip of discount factors 
+(which may be estimated differently by different dealers due to differences in their curve building methodologies), 
+cash settlement only requires that
+the swap rate $S(T_0)$ is observable in the market, an unambiguous quantity for all market participants.
+
+From a technical perspective, cash settlement introduces difficulties in valuation of these contracts, since under the 
+measure associated with the numeraire $X(t) := a(S(t))$, the swap rate $S(\cdot)$ is **not** a martingale, so certain 
+drift assumptions are required.

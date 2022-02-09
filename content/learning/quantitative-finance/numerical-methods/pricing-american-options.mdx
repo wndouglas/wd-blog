@@ -1,0 +1,273 @@
+---
+title: Pricing American Options I – Finite Difference Methods
+path: /pricing-american-options-fd-methods
+category: Quantitative Finance
+sub_category: Numerical Methods
+date: 2020-10-07
+---
+
+import { EuropeanOptionPrice, EuropeanOptionJointConvergence, AmericanOptionPrice, AmericanEuropeanOptionDiff, AmericanOptionJointConvergence } from '../../../../src/components/post_components/american_options/europeanOptionPlots'
+
+In it's simplest form, an **option** is a financial derivative that gives the holder the right, but not the obligation, to either purchase (known as a call option) or to sell (known as a put option) an underlying security for a predetermined price, known as the **strike price** on a predetermined date, known as the **exercise date**. This kind of option, with a single exercise date at the end of the options life, is known as a **European option**. While this version of an option is the most simple, both conceptually and in terms of ease of modelling its value/risks, nearly all options traded on futures exchanges and nearly all stock options (options written on equity) are **American**. An American option differs from it's European counterpart in one important way. American options give the holder exercise rights at any moment in time during the contracts lifetime.
+
+The widespread use of American options clearly gives rise to the need for accurate and reliable pricing and risk tools. In the following, we will derive the **Black-Scholes equation** for a European option on a simple stock option with continuous dividend yield, before generalising the result to American options. With the equation in place, we will propose and implement a general purpose solver for American options, and test the results on a few simple test cases.
+
+## The Black-Scholes Equation
+In the Black-Scholes model, it is assumed that we operate within in a **frictionless** market **without transaction costs**, where prices can be observed **continuously**, and the market itself is **efficient**, in the sense that asset prices incorporate all available information and **no arbitrage opportunities** exist.
+
+Consider an underlying asset $(S(t))_{t\ge 0}$ emitting dividends continuously at a yield of $y$ over each infinitesimal time interval $\text{d}t$. While this assumption may seem unreasonable for a single stock, it becomes closer to reality in the case where our asset tracks an index, like the S&P 500. Likewise, consider a bank-account process $(B(t))_{t\ge 0}$, where investors can place their money to earn a risk-free return $r$ over any infinitesimal time increment $\text{d}t$. We assume that $S$ follows a geometric Brownian motion, with constant mean return $\mu$ and volatility $\sigma$. Specifically, we have the system
+$$
+    \begin{aligned}
+        \text{d}S(t) & = S(t)\left( (\mu - y) \text{d}t + \sigma \text{d}W(t) \right), \\
+        \text{d}B(t) & = B(t) r \text{d} t,
+    \end{aligned}
+$$
+where $(W(t))_{t\ge 0}$ is a Brownian motion. Clearly, the $-yS(t)\text{d}t$ term arises from the fact that as dividends are paid out, the price of the underlying adjusts downwards to preclude any arbitrage opportunities.
+
+The key insight of Black, Scholes and Merton that led to the famous Black Scholes PDE is that, in a **complete** market it is possible to **dynamically hedge** a position in an option using a varying (but known) quantity in the underlying asset. By buying and selling the asset in the correct quantity at each moment in time, it is theoretically possible to completely counteract any unexpected moves in the overall portfolio. Furthermore, if a portfolio grows at a predictable rate, it must grow at the risk-free rate - if not, one could finance their position using the bank-account and earn a guaranteed profit, an arbitrage opportunity we have assumed cannot exist.
+
+Let our option have expiry date $T > 0$ and let it's value at time $t \in [0,T]$ be denoted by $V \equiv V(t, S(t))$. Clearly, $V$ is a function of both $t$ and of $S(t)$. Consider a portfolio consisting of $\Delta(t)$ units of the stock at each time $t$ along with a short position in the option. We will denote the portfolio's value at time $t$ by $P(t)$, so that
+$$
+    P(t) = \Delta(t) S(t) - V. \tag{1}
+$$
+By using a result of stochastic calculus known as **Ito's Lemma** on $V$, we find that $V$ satisfies the stochastic differential equation
+$$
+    \text{d}V = \frac{\partial V}{\partial S} \text{d} S(t) + \left(\frac{1}{2}\sigma^2 S(t)^2 \frac{\partial^2 V}{\partial S^2} + \frac{\partial V}{\partial t} \right) \text{d}t.
+$$
+Next, by noting that in each time interval $\text{d} t$ we receive $\Delta(t)S(t)y \text{d}t$ units of dividend, the right-hand side of equation (1) satisfies
+$$
+    \text{d} \left( \Delta(t) S(t) - V \right) = \Delta(t) \text{d} S(t) + y\Delta(t)S(t) \text{d}t - \text{d} V.
+$$
+Hence, we find that
+$$
+    \text{d}P(t) = \left( \Delta(t) - \frac{\partial V}{\partial S} \right) \text{d} S(t) + \left( y\Delta(t)S(t) - \frac{1}{2}\sigma^2 S(t)^2 \frac{\partial^2 V}{\partial S^2} - \frac{\partial V}{\partial t} \right) \text{d}t.
+$$
+As noted earlier, by prudent choice of our quantity of underlying asset, we can remove the uncertainty associated with the above portfolio in any infinitesimal interval $\text{d}t$. By observing the first bracketed term in the above, we see that the choice
+$$
+    \Delta(t) = \frac{\partial V}{\partial S}
+$$
+achieves this goal. Substituting in this value for $\Delta(t)$ yields
+$$
+    \text{d}P(t) = \left( y S(t) \frac{\partial V}{\partial S} - \frac{1}{2}\sigma^2 S(t)^2 \frac{\partial^2 V}{\partial S^2} - \frac{\partial V}{\partial t} \right) \text{d}t. \tag{2}
+$$
+As this change contains no randomness, we find that $\text{d}P(t) = r P(t)\text{d}t$ or after substituting in equation (1), 
+$$
+    \text{d}P(t) = r \left(S(t) \frac{\partial V}{\partial S} - V\right)\text{d}t.
+$$
+Substituting this expression into equation (2) and rearranging yields
+$$
+    \left(\frac{\partial V}{\partial t} + \frac{1}{2}\sigma^2 S(t)^2 \frac{\partial^2 V}{\partial S^2} + (r-y) S(t)\frac{\partial V}{\partial S} - rV \right) \text{d}t = 0.
+$$
+In turn, this gives us the celebrated Black-Scholes PDE
+$$
+    \frac{\partial V}{\partial t} + \frac{1}{2}\sigma^2 S(t)^2 \frac{\partial^2 V}{\partial S^2} + (r-y) S(t)\frac{\partial V}{\partial S} - r V = 0. \tag{3}
+$$
+Along with a terminal payoff $V(T, S(T)) := P(S)$, the above gives us a well-defined PDE to solve for $V(t,S)$ at all points $t \in [0,T]$ and $S \in [0,\infty)$. Note that technically we need boundary conditions for $S=0$ and $S \rightarrow \infty$. A condition when $S=0$ drops directly out of the PDE itself - we find that at $S=0$,
+$$
+    \frac{\partial V(t,0)}{\partial t} - rV(t,0) = 0,
+$$
+which implies that
+$$
+    V(t,0) = P(S) \exp(-r (T-t)).
+$$
+Likewise, when $S \rightarrow \infty$ we find that the PDE is dominated by the second-order term and hence that
+$$
+    \frac{\partial^2 V(t, S)}{\partial S^2} \rightarrow 0.
+$$
+Empirically, particularly for vanilla options, it suffices to consider an upper pound anywhere larger than 3 standard deviations above the asset price, supposing that the initial value of the asset was such that the option was initially **at-the-money**, i.e. $S(0) = K$. Solving the SDE for $S(t)$ and setting $W(T) = \sqrt{T}\cdot Z = 5\sqrt{T}$, where $Z \sim \mathcal{N}(0,1)$ is a standard normal that we have set equal to 5 standard deviations, we find that $S(T)$ satisfying
+$$
+    \bar{S} = K \exp\left( \left(r - \tfrac{1}{2}\sigma^2 \right)T + 5\sigma\sqrt{T} \right),
+$$
+is a sufficient upper bound for which to set $\frac{\partial^2 V(t, \bar{S})}{\partial S^2} = 0$.
+
+## The Finite-Difference Method
+Without diving too deep into the body of theory, finite difference methods treat partial derivatives in PDEs such as equation (3) above as difference equations in their respective variables. For example, for a function $f(x)$, the finite difference approximation to the derivative $f'(x)$ could be given by
+$$
+    D_h f(x) = \frac{f(x+h) - f(x-h)}{2h}.
+$$
+Assuming $f$ is sufficiently regular, a Taylor series expansion on the above shows that $D_h f(x) - f'(x) \sim \mathcal{O}(h^2)$, i.e. this approximation is second-order in $h$ as $h \rightarrow 0$.
+
+The second key insight of finite difference methods is to **discretise** our dimensions on a discrete grid of points. By introducing natural numbers $N,M$, representing the number of grid points in space and time respectively, we can divide our spatial dimension and time dimensions up uniformly via
+$$
+    \begin{aligned}
+        S_n & = n \Delta S, \; & \Delta S = \frac{\bar{S}}{N-1}, \; n & = 0,\ldots,N-1, \\
+        t_m & = m \Delta t, \; & \Delta t = \frac{T}{M-1}, \; m & = 0,\ldots,M-1.
+    \end{aligned}
+$$
+We first perform this discretisation in $S$, setting $V_n(t) := V(t, S_n)$ and using the finite-difference approximations
+$$
+    \begin{aligned}
+        \frac{\partial V_n}{\partial S} & \approx \frac{V_{n+1} - V_{n-1}}{2 \Delta S} =: D_1 V_n(t), \\
+        \frac{\partial^2 V_n}{\partial S^2} & \approx \frac{V_{n+1} - 2V_n + V_{n-1}}{\Delta S^2} =: D_2 V_n(t). \\
+    \end{aligned}
+$$
+Isolating the terms in the Black-Scholes PDE that do not contain time derivatives, performing the spatial discretisations and substituting the above approximations gives
+$$
+    \begin{aligned}
+        L V_n(t) 
+            & = \frac{1}{2}\sigma^2 S_n^2 D_2 V_n(t) + (r-y) S_n D_1 V_n(t) - r V_n(t) \\
+            & = \frac{1}{2}\sigma^2 n^2 \left(V_{n+1} - 2V_n + V_{n-1}\right) + \frac{1}{2} (r-y) n \left( V_{n+1} - V_{n-1} \right) - r V_n(t), \\
+            & = \frac{1}{2} n \left( \sigma^2 n - (r-y) \right)V_{n-1}(t) + \left(-\sigma^2 n^2 - r\right)V_n(t) + \frac{1}{2} n \left(\sigma^2 n + (r-y) \right) V_{n+1}(t). \tag{4}
+    \end{aligned}
+$$
+By discretising the boundary condition $\frac{\partial^2 V(t, \bar{S})}{\partial S^2} = 0$ and considering the **ghost point** $V_N(t)$ we see that
+$$
+    V_N(t) = 2V_{N-1}(t) - V_{N-2}(t).
+$$
+Substituting this condition into equation (4) shows that
+$$
+    \begin{aligned}
+        L V_{N-1}(t) 
+        & = \frac{1}{2} (N-1) \left( \sigma^2 (N-1) - (r-y) \right)V_{N-2}(t) + \left(-\sigma^2 (N-1)^2 - r\right)V_{N-1}(t)  \\
+        & \quad\quad\quad + \frac{1}{2} (N-1) \left(\sigma^2 (N-1) + (r-y) \right) (2V_{N-1}(t) - V_{N-2}(t)) \\
+        & = -(N-1)\left(r-y\right)V_{N-2}(t) + \left(-r + (N-1)(r-y) \right)V_{N-1}(t).
+    \end{aligned}
+$$
+With the above, we have a set of $N$ equations, one for each spatial grid point $S_n$, $n=0\ldots,N-1$. Denoting by $a_n$, $b_n$ and $c_n$ the terms relating the point $V_n$ to $V_{n-1}$, $V_n$ and $V_{n+1}$ respectively in equation (4), we may write equation (4) more succinctly as
+$$
+    L V_n(t) = a_n V_{n-1}(t) + b_n V_n(t) + c_n V_{n+1}(t), \quad n = 0,\ldots,N-1,
+$$
+where $a_0 = 0$ and $c_{N-1} = 0$. Specifically, we find that
+$$
+    \begin{aligned}
+        a_n & = 
+        \begin{cases}
+            \frac{1}{2} n \left( \sigma^2 n - (r-y) \right), & n < N-1, \\
+            -(N-1)\left(r-y\right), & n = N-1,
+        \end{cases} \\
+        b_n & = 
+        \begin{cases}
+            -\sigma^2 n^2 - r, & n < N-1, \\
+            -r + (N-1)(r-y), & n = N-1,
+        \end{cases} \\
+        c_n & =
+        \begin{cases}
+            \frac{1}{2} n \left(\sigma^2 n + (r-y) \right), & n < N-1, \\
+            0, & n = N-1.
+        \end{cases}
+    \end{aligned}
+$$
+Denoting the vector of points $V_0(t),\ldots,V_{N-1}(t)$ by
+$$
+    V(t) = (V_0(t),\ldots, V_{N-1}(t))^\intercal,
+$$
+we find that the above yields matrix-vector system
+$$
+    \frac{\partial V(t)}{\partial t} = -A V(t),
+$$
+where
+$$
+    A =
+    \left( 
+        \begin{array}{cccccc}
+            b_0 & c_0 & 0 & \cdots & \cdots & 0 \\
+            a_1 & b_1 & c_1 & \ddots & \cdots & 0 \\
+            0 & \ddots & \ddots & \ddots & \ddots & \vdots \\
+            \vdots & \ddots & \ddots & \ddots & \ddots & 0 \\
+            0 & \cdots & \ddots & a_{N-2} & b_{N-2} & c_{N-2} \\
+            0 & \cdots & \cdots & 0 & a_{N-1} & b_{N-1}
+        \end{array} 
+    \right).
+$$
+With this system in place, we proceed to discretise in the $t$ dimension. To that end, we set $V^m := V(t_m)$ and $V^m_n := V_n(t_m)$. Finally, we use a **theta** rule with $\theta \in [0,1]$ to write
+$$
+    \frac{V^{m-1} - V^m}{\Delta t} = \theta A V^{m-1} + (1-\theta) A V^m, \quad m = 1,\ldots,M.
+$$
+This setup encompasses both the **implicit** and **explicit** time-stepping schemes. Rewriting yields
+$$
+    (I - \Delta t \theta A) V^{m-1} = (I + \Delta t (1-\theta) A) V^m, \quad m = 1,\ldots,M.
+$$
+With $K_1^\theta := I - \Delta t \theta A$ and $K_2^\theta := I + \Delta t (1-\theta) A$ the above can be rewritten as the system of equations
+$$
+    \begin{aligned}
+        V^M & = (P(S_0),\ldots,P(S_{N-1}))^\intercal, \\
+        K_1^\theta V^{m-1} & = K_2^\theta V^m, \quad m = 1,\ldots,M. \tag{5}
+    \end{aligned}
+$$
+
+With $\theta = 0$ we arrive at the explicit scheme, which is the easiest to implement but exhibits **instability** when too few timesteps $M$ are used relative to spatial steps $N$. In general, we require a relationship of the form $M \ge \lambda N^2$ for some $\lambda > 0$, where $\lambda$ depends on the specific parameters of the problem, to ensure stability of the system. The explicit scheme generally exhibits first-order convergence in time and second-order convergence in space. 
+
+Setting $\theta = 1$ brings us to the implicit scheme, where the solution $V^{m-1}$ must be found as the implicit solution of an equation of the form $K V^{m-1} = V^m$ at each step $m = 1,\ldots,N-1$. Fortunately, the matrix $K$ is **sparse** and efficient algorithms exist to solve problems of this form in linear time. Unlike the explicit scheme, the implicit scheme is **unconditionally stable**. Similarly to the explicit scheme, the implicit scheme also exhibits first-order convergence in time and second-order convergence in space. 
+
+Another scheme, known as the **Crank-Nicolson** scheme, where $\theta = \tfrac{1}{2}$ is a popular choice for the finite-difference scheme (5). This scheme offers unconditional stability as in the implicit case, but in this case also offers second-order convergence in **both space and time**. Like the implicit scheme, an implicit system must be solved at each step in time. Generally speaking, when using the Crank-Nicolson scheme, users will select $N = M$ so that the solution converges to the true solution at second-order in $N$. Heuristically, Denoting the error by $\epsilon$, we find that
+$$
+    \epsilon \sim \mathcal{O}(N^{-2}).
+$$
+Similarly, the computational **cost** of the calculation is linear in the spatial steps at each time step, and linear in time, so that
+$$
+    C(\epsilon) \sim \mathcal{O}(N^2) \sim \mathcal{O}(\epsilon^{-1}).
+$$
+**Roughly speaking**, this says that decreasing the error by a factor of $\alpha$ will require a corresponding increase in computational effort of $\alpha$, which can be thought of roughly as the amount of real-world time the calculation will take on a computer.
+
+## Solving the American Option Problem
+In the framework we have developed above, time flows in discrete steps of size $\Delta t$. Hence, for our purposes it will be more convenient to consider options known as **Bermudan options**, which are similar to American options, except that they offer exercise rights only on certain dates instead of on all dates. It should be clear that a Bermudan option with exercise rights on the dates $t_0,\ldots,t_{M-1}$ will converge in price to the equivalent American option when $M \rightarrow \infty$ and $\Delta t \rightarrow 0$.
+
+To preclude arbitrage, at each timestep $t_m$, the holder of the Bermudan option considered above will make a judgement as to whether there is more value in holding their option for a further timestep, or whether they are better off exercising at that moment in time. Specifically, if we let the solution to system (5) at time $m$ be denoted by $H^m$, the Bermudan option has price at time $m$ given by $V^m$ satisfying
+$$
+    V^m = \max(H^m, P(S)),
+$$
+where $\max(X,Y)$ denotes the element-wise maximum of the two vectors $X$ and $Y$. Hence, the updated algorithm
+$$
+    \begin{aligned}
+        V^M & = (P(S_0),\ldots,P(S_{N-1}))^\intercal, \\
+        K_1^\theta H^{m-1} & = K_2^\theta V^m, \\
+        V^{m-1} & = \max(H^{m-1}, P(S)), \quad m = 1,\ldots,M,
+    \end{aligned}
+$$
+converges to the solution of the American option problem as $N,M \rightarrow \infty$.
+
+## Results
+With the finite difference scheme developed above, we are in a position to test our method in terms of its rate of convergence in its discretisation parameters $N$ and $M$ as well as its *hyperparameter* $theta$ which determines the type of finite difference scheme we are using. In the following, we will consider the price of a call option on underlying with continuous dividends as presented above. We will use the parameters
+$$
+    \begin{aligned}
+        r & = 0.05, \\
+        y & = 0.1, \\
+        \sigma & = 0.2, \\
+        K & = 150, \\
+        T & = 2.
+    \end{aligned}
+$$
+##### European straddle option
+In the case of European options, there is an analytic formula available for the price of call/put options under the Black-Scholes model. The formula, with the notation above, is given by
+$$
+    \begin{aligned}
+        C(t, S) & = e^{-r(T-t)}\left(F N(d_1) - K N(d_2) \right), \\
+        P(t, S) & = e^{-r(T-t)}\left(K N(-d_2) - F N(-d_1) \right), \\
+        F & := S e^{(r-y)(T-t)}, \\ 
+        d_1 & := \frac{1}{\sigma\sqrt{T-t}}\left[\log\left(\frac{S}{K}\right) + \left(r-y +\tfrac{1}{2}\sigma^2\right)(T-t) \right] \\
+        d_2 & := d_1 - \sigma\sqrt{T-t},
+    \end{aligned}
+$$
+where $N(\cdot)$ is the standard cumulative normal distribution function. A straddle option consists of a combination of a put and a call option with the same strike and maturity. Below is a plot of the above at time $t = 0$ for various values of $S$ along with the payoff function $P(S)$.
+
+<EuropeanOptionPrice/>
+
+As noted previously, the explicit finite difference scheme, with $\theta = 0$, is unstable when we use too few time steps per space step, so we will not consider the explicit scheme. By comparing the $L_2$ error in the results of the finite difference method developed above for the implicit scheme and the Crank-Nicolson scheme as we increase $N = M$, we can deduce the rate of convergence for different finite difference schemes. These results can be seen below.
+
+<EuropeanOptionJointConvergence/>
+
+We observe linear plots in log-log space for both schemes, with a slope of -1 for the implicit scheme and a slope of 02 for the Crank-Nicolson scheme, corresponding to first and second order convergence respectively. Due to its favourable convergence characteristics, we will only consider the Crank-Nicolson scheme when moving on to the American option problem.
+
+##### American straddle option
+Using the same option parameters as above, we now turn to the American option problem. Below is a plot of the American straddle price versus the underlying, with the European option price included for reference.
+<AmericanOptionPrice/>
+
+Unlike the European option, the value of the American option never drops below the payoff value. This is to be expected in a no-arbitrage environment. Likewise, since the American option gives the holder the same benefits as the European option holder plus more, it is also to be expected that the American option price should be just as great as its European equivalent - this is also reflected in the graph. To see this difference in more detail, we consider the spread in the American option versus its European equivalent and plot this against the underlying.
+
+<AmericanEuropeanOptionDiff/>
+
+The above plot confirms that the American option is always worth at least as much as its European equivalent. It also shows that *near the money*, their prices are broadly similar, but looking at the wings we see that their prices start to diverge at an increasing rate. This observation does not always hold. For example, in the case of a European call with no dividends, the in-the-money European and American option both have exactly the same value - the payoff value. The above observation on the straddle on a dividend paying underlying shows that a sensible investor holding the in-the-money straddle on the call side would exercise early, lock in their profits and earn dividends on the underlying that they now hold.
+
+With an American option pricing scheme in place, we can run a similar error analysis to that of the European option. However, in this case there is no analytic value to compare our approximations to. To sidestep this issue, there are a few proxies we could consider. Here, we consider the $L_2$ error in successive approximations on a finer grid. Observing the slope of a log-log plot of these differences versus the number of steps used gives us a proxy for the order of convergence of the error of our approximation compared to the true value. To see this, set $N=M$ and assume that our error $\epsilon(N) = \left\vert\left\vert V(N) - V\right\vert\right\vert$ satisfies $\epsilon(N) \sim \mathcal{O}(N^{-\alpha})$. Roughly, we find that $\epsilon(N) = C N^{-\alpha}$ for some constant $C$. Furthermore, by the triangle inequality, the difference in successive error terms satisfies
+$$
+    \epsilon(N_1) - \epsilon(N_2) \le \left\vert\left\vert (V(N_1) - V) - (V(N_2) - V)\right\vert\right\vert = \left\vert\left\vert V(N_1) - V(N_2) \right\vert\right\vert \le \epsilon(N_1) + \epsilon(N_2).
+$$
+The left-hand-side of this inequality can be simplified to $C(N_1^{-\alpha} + N_2^{-\alpha})$. If we assume that $N_2 = a N^1$ for some base $a > 1$ then we find that this simplifies further to $C(1 + a^{-\alpha})N_1^{-\alpha} \equiv C_0 N_1^{-\alpha}$ for some constant $C_0 > 0$. Similarly, we find that the right-hand-side of the inequality simplifies to $C_1 N_1^{-\alpha}$ for some $C_1 > 0$. If we observe that the middle term, the difference that we calculate, satisfies $C_2 N_1^{-\beta}$ for some $C_2 > 0$, then we are forced to conclude that $\alpha = \beta$. Below is a log-log plot of the $L_2$ norm of successive differences in our approximation.
+
+<AmericanOptionJointConvergence/>
+
+In contrast to the European case, it appears that the Crank-Nicolson scheme has dropped to first-order convergence. This is a downside of the naive American scheme developed above. More complex iterative schemes for solving the problem have been proposed and explored, such as the use of **successive over-relaxation** schemes, or schemes based on **Jacobi's method**. While these schemes can offer improved performance, for 1D problems such as the option pricing problem above, our scheme performs sufficiently fast for most purposes and has the added benefit of easy interpretability.
+
+## Extensions
+
+While finite-difference methods perform excellently for low-dimensional problems and are perfectly suited for backward moving American option problems, if we introduce extra-dimensionality or path-dependence, finite-difference methods quickly run into issues. The other major paradigm for option pricing are **Monte Carlo methods**. Monte Carlo methods run stochastic simulations forwards through time, then average over all these simulations to calculate the option's price as an expectation. In contrast to finite-difference methods, Monte Carlo methods are inherently forward moving, so handle path-dependence with ease. They also scale excellently to high-dimensional problems. While the forward moving nature of Monte Carlo methods is a plus for path-dependence, it is a major downside when it comes to pricing options with embedded optionality like American or Bermudan options. In these cases, a naive application of iterated expectations leads to an exponential explosion in the computational complexity of the problem. A breakthrough in the pricing of American options by Monte Carlo methods came in 2001, in the form of the **Longstaff-Schwartz method**. In a following post, we will explore the pricing of American Options in the Monte Carlo framework by utilising the work of Longstaff and Schwartz.

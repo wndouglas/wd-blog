@@ -1,0 +1,143 @@
+---
+title: Callable Libor Exotics and TARNs
+path: /cles-and-tarns
+category: Quantitative Finance
+sub_category: Interest Rate Modeling
+index: 10
+date: 2020-06-05
+---
+
+<props.TutorialContents props={props}/>
+
+While standard Bermudan swaptions are Bermudan-style options giving the holder the right to enter into a regular 
+fixed-for-floating swap, if the underlying swap is altered to an **exotic swap** then a **callable Libor Exotic** 
+(**CLE**) is created. CLEs most often emerge as part of **callable structured notes** where the issuer receives 
+principal from an investor and pays a **structured coupon** in return. As a **callable** structure, the issuer holds 
+the right to to **call** the note on a schedule of dates - typically the call schedule coincides with the 
+**coupon fixing dates** after some initial **lock-out** period. Should such a note be called by the issuer, the 
+principal is returned to the investor and the contract is cancelled.
+
+## Risk Managing CLEs
+Typically, once a CLE has been issued, it is passed through to an IR exotics trading desk to deal with its risk 
+management. Meanwhile, the principal is **invested** and pays a Libor rate, plus or minus a spread (dependent on the 
+cost of financing). From the perspective of the trading desk, what is left is an exotic swap paying structure coupons, 
+while receiving Libor, plus a Bermudn-style right to call.
+
+Another way of conceptualising a CLE is to consider it a straight exotic swap, plus a Bermudan-style option to enter a 
+reverse swap. This makes valuation easier, while emphasising the fact that the cancelability of a CLE benefits the 
+owner of the right (the structured note issuer). This benefit allows the issuer to offer a more attractive coupon 
+structure to the investor.
+
+Consider a CLE on an exotic swap with structured coupons $\{C_n\}_{n=0}^{N-1}$. To the trading desk holding the 
+optionality, they may exercise on date $T_n$ and enter into the exotic swap receiving the structured coupons and paying 
+Libor. This Bermudan option thus has exercise value
+$$
+    U_n(T_n) = \beta(T_n) \sum_{i=n}^{N-1} \tau_i \mathbb{E}_{T_n}^{\mathbb{Q}}\left[\beta(T_{i+1})^{-1} (C_i - L_i(T_i)) \right].
+$$
+The underlying exotic swap has value
+$$
+    V_e(T_n) = \beta(T_n) \sum_{i=n}^{N-1} \tau_i \mathbb{E}_{T_n}^{\mathbb{Q}}\left[\beta(T_{i+1})^{-1} (C_i - L_i(T_i)) \right]
+$$
+Labelling the Bermudan exotic swap value at time $t$ by $V_b(t)$, the CLE has value to the trading desk given by
+$$
+    V(t) = V_b(t) - V_e(t). \tag{1}
+$$
+Since $V_b(t) > 0$, we find that the desk is able to issue the CLE such that $V_e(t) = V_b(t) > 0$ and still maintain 
+an contract with zero upfront fee to the client. This allows the desk to issue the exotic swap with artificially large 
+coupons $C_i$ relative to their non-CLE equivalents.
+## Pricing CLEs
+Clearly, the embedded optionality found in CLEs points to the use of **PDE methods** for valuation. However, since a 
+CLE often exhibits path dependence, this makes the PDE approach impractical from a computational perspective. Hence, 
+CLEs must generally utilise **Monte Carlo methods**.
+
+## Types of CLEs
+Any exotic swap can be used as the underlying of a CLE. Observing equation (1) above, it is natural that most CLEs are 
+issued such that the optionality has a large value to the desk. This allows the desk to issue a CLE with an underlying 
+exotic swap with larger value and hence more favourable coupons for the client. Some of the most popular CLEs are given 
+below.
+
+### Callable snowballs
+Callable snowballs are CLEs with a snowball underlying. Notably, they are one of the first widely popular instruments 
+that include both strong path-dependence and optionality. It is possible to incorporate path dependence into a PDE 
+framework for snowball type products by introducing **auxiliary variables**. Alternatively, it is possible to introduce 
+optionality into a Monte Carlo framework by using methods such as the **Longstaff-Schwartz** approach.
+
+### CLEs accreting at coupon rate
+Usually, the notional on the underlying exotic swap in a CLE is fixed throughout the life of the deal, but this does 
+not have to be the case. It is possible to have **accreting** or **amortising** notionals. If the rate of accretion/
+amortisation is deterministic, this does not provide much of a modelling challenge. However, some contracts specify 
+that the notional accretes at the **structured coupon rate**, in which case the accretion rate also contains 
+randomness. Specifically, if $q_i$ is the notional value for the period $[T_i, T_{i+1}]$, then $q_i$ is obtained from 
+the previous by multiplication with the structured coupon over the previous period. Specifically, we have
+$$
+    \begin{aligned}
+        U_n(T_n) 
+        & = \beta(T_n) \sum_{i=n}^{N-1} \tau_i \mathbb{E}_{T_n}^{\mathbb{Q}}\left[\beta(T_{i+1})^{-1} q_i (C_i - L_i(T_i)) \right], \\
+        q_i & = q_{i-1} (1 + \tau_{i-1}C_{i-1}), \quad i = n, \ldots, N-1, \\
+        q_0 & = N.
+    \end{aligned}
+$$
+
+### Multi-tranches
+**Multi-tranches** give the issuer the right to increase the size of the note on a set of predetermined dates if they 
+see fit. The times when the issuer has the right to increase the notional typically come before the times when the note 
+can be cancelled by the issuer and callability generally applies to all tranches of the note.
+
+Generally speaking, the more optionality the issuer can retain, the better a coupon they are able to offer to the 
+investor.
+
+## TARNs and Other Trade-Level Features
+It is often helpful to view a Libor exotic as a definition of a coupon (i.e. a formula converting rates into a payment 
+to the investor), along with a collection of trade-level features (features that don't act upon the coupons but upon 
+the trade as a whole).
+
+### Knock-out swaps
+a **knock-out** swap is an exotic swap that cancels on the first fixing date upon which the specified reference rate is 
+above/below a specified barrier. Denoting the reference rate for the period $n$ at time $t$ by $X_n(t)$, the coupon by 
+$C_n$, the Libor rate $L_n$, the knock-out barrier by $R$, the value of a **down-and-out** knock-out swap from the 
+perspective of a desk paying the structured coupon is given by
+$$
+    V(t) = \beta(t)\mathbb{E}_t^{\mathbb{Q}}\left[\sum_{n=0}^{N-1}\tau_n \beta(T_{n+1})^{-1}(L_n(T_n) - C_n) \prod_{i=0}^n 1(X_i(T_i) > R) \right].
+$$
+
+### TARNs
+While Libor exotics have proven popular among investors, it is clear that investors require complex modelling tools to 
+deduce when an issuer will call the note. One way to reduce this issue is through the **Target Redemption Note** 
+(**TARN**). TARNs track the total investor return, defined as the sum of all structured coupons paid to the current 
+date. When this total return exceeds a pre-specified target, the note is **terminated** and the principal returned to 
+the investor.
+
+As with callable notes, issuers do not typically keep TARNs on their books, but pass them through to a trading desk 
+while investing the principal. The trading desk then receives Libor payments from the issuer in exchange for paying the 
+structured leg back to the issuer, who passes this on to the investor. Again, from the perspective of the trading desk, 
+we can decompose the TARN into an exotic swap with an offsetting callable swap that cancels the position once the 
+threshold return has been reached.
+
+Formally, let the structured coupon for the period $[T_n, T_{n+1}]$ be $C_n$. The coupon over the period 
+$[T_n, T_{n+1}]$ is only paid if the sum of structured coupons up to time $T_n$ is below a **total return** $R$. Thus, 
+the value of the TARN at time $0$ from the desk's point of view is given by
+$$
+    \begin{aligned}
+        V(0) 
+        & = \beta(0)\mathbb{E}^{\mathbb{Q}}\left[ \sum_{n=1}^{N-1} \tau_n \beta(T_{n+1})^{-1} (L_n(T_n) - C_n) 1_{\{Q_n < R \}} \right], \\
+        Q_n & := \sum_{i=1}^{n-1} \tau_i C_i, \\
+        Q_1 & = 0.
+    \end{aligned}
+$$
+
+##### Note:
+TARNs will typically pay some **fixed coupons** to the investor before the knock-out features start - these payments 
+can be valued statically off of an interest rate curve separately.
+
+### Global caps
+One form of TARN has the feature that the total return is restricted to be exactly $R$. It achieves this by ensuring 
+that if a coupon that will be paid crosses the total return threshold, it pays exactly $R - Q_n$ so that the total 
+return at the end of the TARN is $R$. This feature is called a **global cap**. This feature can be decoupled from the 
+TARN and applied to generic exotic swaps. Note that a swap typically will not terminate at this point - the trading 
+desk will continue to receive Libor until the maturity of the trade or, from the investors perspective, their principal 
+remains invested with the issuer until the trades maturity, while they receive no coupons.
+
+### Global floors
+Analogously to the global cap, a **global floor** ensures that the investors cumulative return reaches a minimum level 
+of $F$ by the maturity of the note. If the total return is less than $F$ by the final coupon, the final coupon will pay 
+$F - Q_n$ to ensure that this level is met.

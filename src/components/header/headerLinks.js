@@ -9,7 +9,7 @@ import { ContactPageName } from "../../pages/contact"
 import { PostsPageName } from "../../pages/posts"
 
 const NavItem = styled(Link)`
-  dispay: inline-block; 
+  display: inline-block; 
   color: #111;
   text-decoration: none;
   box-shadow: none;

@@ -1,0 +1,167 @@
+---
+title: Structured Notes and Exotic Swaps
+path: /structured-notes-and-exotic-swaps
+category: Quantitative Finance
+sub_category: Interest Rate Modeling
+index: 9
+date: 2020-06-05
+---
+
+<props.TutorialContents props={props}/>
+
+Investors have grown familiar with the swap or bond format of payout on fixed income securities. Sophisticated market 
+participants seeking complex payoffs to express their market views fueled the growth of so called **exotic swaps** and 
+**structured notes**. It should be noted that, post-crisis, demand for these kind of products has fallen significantly 
+on pre-crisis levels. That said, these products do still exists and proper modelling still remains an important task.
+
+## Exotic swaps
+
+An exotic swap consists of a regular floating Libor leg versus a **structured** leg that pays a coupon based on an 
+observed interest rate. This coupon may be any arbitrary function of the underlying rate. A standard fixed-floating 
+vanilla swap is a trivial example where the structured coupon is simply a fixed rate. Likewise, a cap/floor can be seen 
+as another example, by noting that
+$$
+    (L - K)^+ = L - \left[L - (L-K)^+\right] = L - \text{min}(K, L).
+$$
+Exotic swaps often start their lives as bonds sold by banks to investors. In a structured note, the investor pays an 
+up-front **principal** to the issuer of the note (the bank), who in turn pays the investor a structured coupon, and 
+repays the principal at the maturity of the note. The principal is invested by the issuing bank, and pays the Libor 
+rate plus or minus a spread. From the perspective of the bank, then, the net cash flows on the note are equivalent to 
+those of an exotic swap.
+
+In terms of valuation, if $C_n$ is the structured coupon for the $n$th period, the value of the exotic swap is equal to
+$$
+    V_{\text{exotic}}(t) = \beta(t) N \sum_{n=0}^{N-1} \tau_n \mathbb{E}_t^\mathbb{Q}\left[\beta(T_{n-1})^{-1} (C_n - L_n(T_n)) \right],
+$$ 
+where $N$ is the notional of the swap. From now on, we will normalise our swap so that $N=1$. For simplicity, we have 
+assumed that the two legs of the swap pay out on the same payment schedule. As mentioned, the coupon $C_n$ can be an 
+arbitrary function of interest rates, structured to reflect investors views on the market.
+
+In the following, we distinguish between exotic swaps based on different features, such as **Libor rates**, 
+**CMS rates**, **multi-rates**, **range accruals** and **general path dependence**.
+
+### Libor-based exotic swaps
+In a Libor-based exotic swap, the structured coupon is a function of a Libor rate, i.e.
+$$
+    C_n \equiv C_n(L_n(T_n)).
+$$
+A large variety of structured coupons $C_n(\cdot)$ can be used. Examples include:
+
+* Standard swaps:
+$$
+    C_n = K.
+$$
+* Capped and floored **floaters**. For a given **strike** $K$, **gearing** $G$, **cap** $C$ and **floor** $F$,
+$$
+    \text{max}(\text{min}(G \cdot x - K, C), F).
+$$
+* Capped and floored **inverse floaters**. For a given **strike** $K$, **gearing** $G$, **cap** $C$ and **floor** $F$,
+$$
+    C_n(x) = \text{max}(\text{min}(K - G \cdot x, C), F).
+$$
+* **Digitals**. For a given **strike** $K$ and **coupon** $C$,
+$$
+    C_n(x) = C \cdot 1_{\{x > K\}}
+$$
+* **Flip-flops**. For a given **strike** $K$ and two **coupons**, $C_1$ and $C_2$,
+$$
+    C_n(x) = 
+    \begin{cases}
+        C_1, & x \le K, \\
+        C_2, & x > K.
+    \end{cases}
+$$
+A libor-based exotic swap can usually be decomposed further into a sum of simpler instruments, such as ordinary swap 
+floating legs, fixed legs, caps/floors and digital caps/floors. Hence, if the prices of these simpler contracts are 
+observable in the market, Libor-based exotics can be perfectly replicated via the **static hedging** strategy of 
+purchasing the constituent underlying instruments.
+
+### CMS-based exotic swaps
+By setting $x = S_{n,m}(\cdot)$ in $C_n(x)$, all of the above payoffs can be applied to CMS rates, rather than Libor 
+rates. If an $m$-period rate is used, a structured coupon for the period $n$ can be defined by
+$$
+    C_n = C_n(S_{n,m}(T_n)).
+$$
+CMS-based exotics can be decomposed into linear combinations of CMS swaps and CMS caps/floors. Hence, CMS-based exotics 
+rarely present any significant modelling challenges beyond those present for pricing CMS swaps/caps/floors.
+
+### Multi-rate exotic swaps
+Unlike the previous two types of exotic swaps, multi-rate exotic swaps reference multiple market rates for their coupon 
+calculations. The *most common* form of multi-rate exotic swap is the **CMS spread coupon**, which references two CMS 
+swap rates for differing periods, $a$ and $b$. For example, let both rates start at the time $T_n$, $n=0,\ldots,N-1$ 
+and cover $a$ and $b$ periods, respectively. The CMS spread is given by 
+$X_{n,a,b}(T_n) := S_{n,a}(T_n) - S_{n,b}(T_n)$. A CMS spread coupon with **gearing** $G$, **spread** $S$, **cap** $C$, 
+and **floor** $F$ is then given by
+$$
+    C_{n} := \text{max}(\text{min}(G \cdot X_{n,a,b}(T_n) + S, C), F).
+$$
+A typical example would be the 10 year - 2 year (10y2y) CMS call spread option, where $a = 40$ and $b = 8$ (where $a$ 
+and $b$ are measured in quarters), with quarterly coupon given by
+$$
+    C_n = X_{n,40,8}(T_n)^+.
+$$
+By setting $x := X_{n,a,b}(T_n)$ in the examples for Libor/CMS rate exotic swaps above, more general examples of 
+multi-rate swaps can be obtained.
+
+While multi-rate exotic swaps cannot typically be decomposed into standard swaps and a valuation model is generally 
+required, such a model does not always need to be a fully fledged term structure model - some spread-linked payoffs can 
+be valued by vanilla models.
+
+### Range accruals
+**Range accruals** have coupons defined as a given rate that only *accrues* while a **reference rate** is within a 
+given range. Let $R_n(t)$ denote the payment rate, $X_n(t)$ denote the reference rate and let $L$ and $U$ be the 
+**lower** and **upper** bounds respectively. A range accrual coupon then pays
+$$
+    C_n := R_n(T_n) \left(\frac{d(t \in [T_n, T_{n+1}] : X_n(t) \in [L,U])}{d(t \in [T_n, T_{n+1}])} \right),
+$$
+where $d$ counts the number of days that the given criteria is met for. Hence, here, the coupon $C_n$ clearly 
+represents the payment rate multiplied by the proportion of dates where the reference rate lies within the given lower 
+and upper bounds.
+
+The most common choice of payment rate $R_n(t)$ is either a Libor rate or simply a constant rate. The reference rate 
+$X_n(t)$ is free to be any observable rate, such as the Libor rate fixed at $t$, a CMS rate fixing at $t$, or even a 
+CMS spread rate.
+
+Note that range accruals can **always** be decomposed into simple digital payoffs, because
+$$
+    d(t \in [T_n, T_{n+1}] : X_n(t) \in [L,U]) = \sum_{t \in [T_n, T_{n+1}]} 1_{\{X_n(t) \in [L,U] \}}.
+$$
+This decomposition is particularly useful when $R_n \equiv K$, a fixed rate, because simple digital options can be 
+priced directly from the market. For floating rates, the above decomposition requires further work to be converted into 
+a valuation formula.
+
+More advanced extensions of range accruals can depend on two or more different reference rates, where each of the two 
+rates must lie within their own specified ranges. Another generalisation is a **product-of-ranges** range accrual, 
+where the range accrual multiplies up all the previous range accrual factors to define the multiplier used for the 
+current coupon - for example
+$$
+    C_n = R_n(T_n) \cdot Y_n,
+$$
+where
+$$
+    \begin{aligned}
+        Y_n & = Y_{n-1} \cdot \left(\frac{d(t \in [T_n, T_{n+1}] : X_n(t) \in [L,U])}{d(t \in [T_n, T_{n+1}])} \right), \\
+        Y_{-1} & = 1.
+    \end{aligned}
+$$
+
+Notice that the dependence of $Y_n$ on $Y_{n-1}$ implies that $C_n$ depends on all previous factors 
+$Y_0, \ldots, Y_{n-1}$ which in turn depend on $X_0,\ldots,X_{n-1}$. Hence, **product-of-ranges** range accruals are 
+**path-dependent**.
+
+### Path-dependent swaps
+The **product-of-ranges** swap is one example of a path-dependent swap - a swap where one coupon depends on rate 
+observations from previous coupons. Most commonly, path-dependence in exotic swaps is introduced by linking the 
+structured coupon to both current rates but also to previous coupons themselves. This is often known as a **snowball** 
+feature. The archetypal **snowball** structure involves a coupon of inverse floater type, with the $n$th coupon given by
+$$
+    C_n = (C_{n-1} + S_n - G_n \cdot L_n(T_n))^+,
+$$
+where $\{S_n\}_{n=0}^{N}$, $\{G_n\}_{n=0}^N$ are deterministic sequences of **spreads** and **gearings** specified in 
+the contract.
+
+The term *snowball* comes from the analogy of a rolling snowball quickly picking up size/momentum. Clearly, if $C_0$ 
+begins as a very large payment, this is likely to continue into subsequent coupons. It is clear to see that if all 
+terms other than the previous coupon term $C_{n-1}$ remain equal, a positive coupon implies a linearly increasing 
+sequence of subsequent coupons. This highly leveraged exposure to previous coupons makes snowballs attractive to some 
+investors, while simultaneously makes them difficult to risk manage.

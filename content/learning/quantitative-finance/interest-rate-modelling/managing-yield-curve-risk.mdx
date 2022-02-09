@@ -1,0 +1,285 @@
+---
+title: Managing Yield Curve Risk
+path: /managing-yield-curve-risk
+category: Quantitative Finance
+sub_category: Interest Rate Modeling
+index: 13
+date: 2020-06-05
+---
+
+<props.TutorialContents props={props}/>
+
+In the previous section, we explored different methodologies of constructing yield curves, in particular, through the 
+use of different interpolation rules. In this section, we consider how movements in the yield curve lead to price 
+changes in a portfolio consisting of underlying instruments that depend upon our constructed yield curve.
+
+Consider a portfolio of securities with value $X$, where $X \equiv X(y(t))$ is a function of the yield curve $y$. The 
+securities in $X$ are typically **not in the benchmark set** and could contain **IR options**, **swaps** that are no 
+longer at par, etc. Since the yield curve, $y$, is itself a function of the benchmark set
+$$
+    V = (V_1,\ldots, V_N)^\intercal,
+$$
+our portfolio, $X$ is **implicitly** a function of the $V_i$ and **explicitly** a function of a vector 
+$\theta \in \mathbb{R}^J$, containing model parameters used to price the underlying instruments within the portfolio 
+(for example, **volatilities**). Hence, we may write
+$$
+    X = X(V_1, \ldots, V; \theta).
+$$
+Clearly, $X$ is dependent on the benchmark securities via a curve-construction algorithm, so this dependence will 
+change if we were to use say **natual-cubic splines** as opposed to **piecewise flat forward-rate bootstrapping**.
+
+Taking the **differential** of $X$ and employing the **chain-rule**, we find that
+$$
+    \text{d} X = \sum_{i=1}^N \frac{\partial X}{\partial V_i} \text{d} V_i + \sum_{j =1}^J \frac{\partial X}{\partial \theta_j} \text{d} \theta_j. \tag{1}
+$$
+Clearly, this is a mathematical construct that has no practical use in a live risk-management system. However, for 
+**non-infinitesimal** moves in each parameter, equation (1) holds to **second-order accuracy**, i.e. for **small** moves
+$\Delta V_i$, $i = 1,\ldots,N$, $\Delta \theta_j$, $j = 1,\ldots,J$, we have
+$$
+    \Delta X \approx \sum_{i=1}^N \frac{\partial X}{\partial V_i} \Delta V_i + \sum_{j =1}^J \frac{\partial X}{\partial \theta_j} \Delta \theta_j. \tag{2}
+$$
+This equation **is** useful, and allows the attribution of moves in a portfolio to moves in the underlying parameters, 
+or **risk-factors**, in a process known as **PnL attribution**. At most institutions managing portfolios of fixed 
+income securities, this process is run **overnight** and generates a report known as a **PnL explain** report. This 
+report allows the managers of said portfolio to understand exactly where moves in their positions came from. In 
+particularly volatile market conditions, the first order moves captured in equation (2) above may not be enough to 
+adequately capture all of the PnL moves in a book. In this case, **higher-order** terms including **second** and 
+**cross-derivative** terms may need to be included to properly understand where all movements in PnL came from.
+
+For the purpose of managing **first-order risks** in the **yield curve**, equation (2) suggests that the collection of 
+derivatives $\frac{\partial X}{\partial V_i}$, $i = 1,\ldots, N$ - often referred to as 
+**bucketed interest-rate deltas** - constitute a natural metric for calculating portfolio risk. If all these 
+derivatives were **zero**, then our portfolio, to **first-order**, would be immune to any moves in the yield curve 
+**consistent with the chosen curve construction algorithm**. More explicitly, our portfolio would be immune to small 
+moves in the underlying benchmark instruments utilised to construct said yield curve.
+
+On the other hand, if we were to construct a portfolio of positions and find that some of these derivatives were 
+**non-zero**, we could manage our risk by constructing a **hedge portfolio** of benchmark securities with exposures 
+$-\frac{\partial X}{\partial V_i}$ for $i=1,\ldots,N$. This hedge portfolio could be constructed out of the 
+**benchmark securities** themselves, or out of another set of liquid instruments providing exposure to these factors. 
+The key idea is simply that we can hedge our original portfolio without having to use the original portfolio's 
+securities and by utilising a set of liquid securities with low-transaction costs. It is important to emphasise that 
+the hedge resulting from using such a hedging portfolio would **not** be **model-consistent** - most interest rate 
+models assume that yield curve risk arises from a few **stochastic yield curve factors** that move the curve 
+**smoothly**, in a generally **parallel fashion**. Hence, in theory, a **bucketed** immunisation against each term 
+$\Delta V_i$ is **overkill** in the sense that our resulting portfolio would be hedged against too many risk factors, 
+as each factor is theoretically driven by a common, smaller set of fundamental factors. However, this approach is still 
+the industry standard and works well in practice.
+
+## The Par-Point Approach
+Perhaps the simplest approach to computation of the **delta** $\frac{\partial X}{\partial V_i}$ involves a manual 
+**bump** to $V_i$ by a fixed amount $\epsilon_i > 0$ followed by a reconstruction of the yield curve and a subsequent 
+repricing of the portfolio $X$. Then, the delta can be approximated by the **finite-difference**
+$$
+    \frac{X(V_1,\ldots,V_{i-1}, V_i + \epsilon_i, V_{i+1}, \ldots, V_N) - X(V_1,\ldots,V_N)}{\epsilon_i} \approx \frac{\partial X}{\partial V_i}.
+$$
+This procedure is known as the **par-point approach** and the resulting derivatives are known as the 
+**par-point deltas**. This approach is attractive in that it fits into an existing 
+**yield curve construction and portfolio valuation framework** with no extra work on behalf of the implementor. 
+However, for it to work effectively, it is important that whatever yield curve construction algorithm is in place is 
+fast and produces **local** perturbations of the yield curve when the benchmark prices are shifted. For example, 
+suppose our benchmark set contains a short-dated FRA. Perturbing the price of this FRA should not cause noticeable 
+shifts in **long-term** yields. Doing so could lead us to the conclusion that, for example, a 30 year swap could be 
+perfectly hedged using a 1 month FRA, a clearly erroneous assumption. As we alluded to in the previous post, simple 
+**bootstrapping methods** and **Hermite splines** exhibit good perturbation locality due to the dependence of the yield 
+curve on benchmark prices only directly adjacent to the point in question. Cubic $C^2$ splines, on the other hand, 
+involve the inversion of a system of linear equations that consequently leads to the bleeding of a shift in any 
+benchmark price across the whole yield curve (see the final figure of the previous post).
+
+## The Forward Rate Approach
+An alternative approach to perturbing the benchmark security prices directly is to apply perturbations 
+**directly to the discount curve**, hence eliminating idiosyncrasies arising from the yield curve construction 
+algorithm itself. In practice, this technique involves applying bumps to the **forward curve** $f(t)$, to which we 
+apply **functional shifts** $\mu_k(t)$, $k = 1,\ldots,K$. Expressing the direct dependence of the portfolio $X$ on the 
+yield (or forward curve) by writing $X \equiv X(f(t))$, we then compute the **functional derivatives** for $X$ as
+$$
+    \partial_k X := \left. \frac{\text{d} X(f(t) + \epsilon \mu_k(t))}{\text{d} \epsilon} \right\vert_{\epsilon = 0}, \quad k = 1,\ldots, K. \tag{3}
+$$
+Some **standard choices** for $\mu_k(t)$ are:
+
+1. **Piecewise triangular**:
+$$
+    \mu_k(t) = \left(\frac{t - t_{k-1}}{t_k - t_{k-1}}\right) 1(t \in [t_{k-1}, t_k)) + \left(\frac{t_{k+1} - t_k}{t_{k+1} - t_k}\right) 1(t \in [t_k, t_{k+1})).
+$$ 
+2. **Piecewise flat**:
+$$
+    \mu_k(t) = 1(t \in [t_k, t_{k+1})).
+$$
+where $\{t_k\}_{k=1}^K$ is a user-specified **discretisation grid**. The resulting deltas are often called 
+**forward rate deltas**.
+
+A common choice is to set the $t_k$ three months apart, with dates corresponding to Eurodollar futures maturities. This 
+clearly gives rise to a large number of deltas, $K$, and the derivatives $\partial_k X$ thus give a fairly detailed 
+description of where the portfolio risk is concentrated on the forward curve.
+
+Since FRAs and Eurodollar futures are liquid only up to around the 4 year maturity, the forward rate deltas do not 
+directly reflect hedging instruments for the longer end of the yield curve. However, by considering the dependence of 
+the benchmark instrument $V_i$ on the discretised forward curve points $f_k \equiv f(t_k)$, via the chain-rule we see 
+that
+$$
+    \begin{aligned}
+        \frac{\partial X}{\partial V_i} & = \sum_{k = 1}^K \frac{\partial f_k}{\partial V_i} \frac{\partial X}{\partial f_k} \approx \sum_{k = 1}^K \frac{\partial f_k}{\partial V_i} \partial_k X,
+    \end{aligned}
+$$
+so that forward rate deltas can be translated to hedging notionals through the knowledge of the values 
+$\left(\frac{\partial f_k}{\partial V_i}\right)_{k = 1, \ldots, K, i = 1,\ldots,N}$. These sensitivities form the 
+**Jacobian** describing how changes in the forward rates relate to changes in the underlying benchmark instruments. 
+This idea shall be explored further in the next section.
+
+## The Jacobian Approach
+As described in the previous section, a collection of forward rate deltas is useful only in its ability to be 
+translated into actual hedge transactions. To do so requires some basic linear algebra as we shall now see.
+
+Suppose we have available a set of $L$ hedging instruments with values
+$$
+    H = (H_1, \ldots, H_L)^\intercal.
+$$
+This set may or may not correspond with the benchmark set used for curve construction. Using equation (3), we denote 
+the sensitivities of the hedging instruments to the shifts $\mu_k(t)$ by $\partial_k H_l$, $l=1,\ldots,L$, 
+$k=1,\ldots,K$. If the $l$th hedging instrument is held in our hedging portfolio with **notional weight** $p_l$, and we 
+define the vector of weights $p$ as
+$$
+    p = (p_1,\ldots, p_L)^\intercal,
+$$
+then our hedge portfolio $H_0$ has value given by
+$$
+    H_0(p) := p^\intercal H.
+$$
+Hence, the $k$th perturbation to the hedge portfolio is given by
+$$
+    \partial_k H_0(p) = p^\intercal \partial_k H,
+$$
+where
+$$
+    \partial_k H = (\partial_k H_1, \ldots, \partial_k H_L)^\intercal.
+$$
+In general, we would like to choose the weights $p$ in such a way as to offset as much of $\partial_k X$ as possible 
+through our hedge portfolio sensitivity $\partial_k H_0(p)$, for $k=1,\ldots,K$. Let $W_k$ be the relative importance 
+of the $k$th sensitivity and let $U_l$ represent the **relative reluctance** to use the $l$th hedging instrument (a 
+function of the instruments liquidity, for example). Then, the optimal hedging weights $\hat{p}$ satisfy the condition
+$$
+    \hat{p} = \text{argmin}_p \left[\sum_{k=1}^K W_k^2 (\partial_k H_0(p) - \partial_k X)^2 + \sum_{l=1}^L U_l^2 p_l^2 \right]. \tag{4}
+$$
+By defining the **Jacobian matrix** $J_H := \partial H$ to have columns $\partial_1 H, \ldots, \partial_K H$, the
+vector $\partial X$ by
+$$
+    \partial X = (\partial_1 X, \ldots, \partial_K X)^\intercal,
+$$
+the matrix $W$ to be a $K \times K$ diagonal matrix with $W_{k, k} := W_k$, and the matrix $U$ to be the $L \times L$ 
+diagonal matrix with $U_{l,l} := U_l$, we find that equation (4) can be recast in matrix-vector form as
+$$
+    \hat{p} = \text{argmin}_p \left[ (J_H^\intercal p - \partial X)^\intercal W^2 (J_H^\intercal p - \partial X) + p^\intercal U^2 p \right].
+$$
+This problem can be solved analytically, with solution given as the solution to the linear system
+$$
+    (J_H W^2 J_H^\intercal + U^2)\hat{p} = J_H W^2 \partial X. \tag{5}
+$$
+When solving equation (5), it is important to consider the relative dimensions of the matrices involved. 
+
+Firstly, if we use fewer hedging instruments than shifts, i.e. $L < K$, then it is generally not possible to offset all 
+risks. In this case, the weights $W$ gain importance because they allow the user to focus hedging towards risk buckets 
+deemed to be more important to immunise. On the other hand, the weights $U$ become less important, because we have less 
+instruments in which to transact. 
+
+Conversely, if there are more hedging instruments than risk buckets, i.e. $L > K$, then there are **infinitely many** 
+hedging portfolios that perfectly offset all the risks. In this case, the weights $W_k$ can generally be ignored (set 
+to 1), whereas the weights matrix $U$ becomes critical because it allows the user to decide which of the possible hedge 
+portfolios is most desirable from a *cost* perspective. 
+
+Finally, if $L = K$ then there normally exists a single portfolio that hedges all risks. Both $W$ and $U$ are 
+relatively unimportant in this case, though one may still wish to use non-zero values for $U$ to *dampen* or reduce 
+*oscillations* in the computed solutions as yields vary. In the case that $L = K$, $W = I$ and $U = 0$, the solution to 
+the optimisation problem reduces to the analytic solution
+$$
+    \hat{p} = (J_H^\intercal)^{-1} \partial X.
+$$
+
+The above methodology for producing hedge portfolios from arbitrary shocks to the forward curve via the matrix problem 
+(5) is known as the **Jacobian method**. Combined with forward rate deltas, the Jacobian method allows the aggregation 
+of fine-grained risks with respect to forward buckets $k$ into hedges in a set of hedging instruments.
+
+Note that the par-point method can be seen as a special case of the Jacobian method. In this case, the hedging set is 
+chosen to correspond with the benchmark set and the $\mu_k$s are set to exactly represent shifts of the forward curve 
+that bump the benchmark securities by a fixed bump size. In this instance, the Jacobian matrix $J_H \equiv I_N$ and the 
+original par-point deltas are recovered.
+
+The Jacobian approach has two primary benefits over the other two methods. The first is that it decouples the risk/
+sensitivity calculations from the particular curve construction algorithm used. This allows for combining of smooth 
+curves with localised risks. It is also a useful approach when the underlying yield curve must be reconstructed very 
+quickly - this is particularly apt when using a Libor or Treasury curve, since the underlying instruments trade very 
+liquidly and their prices hence change very frequently. In this case, the Jacobian approach allows changed in benchmark 
+prices to be translated into changes of the forward curve via a simple matrix multiplication, rather than through a 
+full curve reconstruction upon every benchmark price update, i.e. since
+$$
+    H(p) \approx X,
+$$
+we find that
+$$
+    \Delta X = \Delta H(p) = p^\intercal \Delta H = p^\intercal J_H \Delta f,
+$$
+where
+$$
+    \Delta f := (\Delta f_1, \ldots, \Delta f_K)^\intercal.
+$$
+
+## Cumulative Shifts
+Roughly speaking, swap rates represent a weighted average of forward Libor rates across the tenor structure of the 
+swap. For example, an $n$ year swap with annual tenor structure can be written as
+$$
+    S_n \approx \sum_{i=1}^n w_{i,n} L_i,
+$$
+where $L_i \equiv L(0, T_{i-1}, T_i)$. The weightings will be roughly of size $w_{i,n} = \frac{1}{n}$, so that we find 
+that
+$$
+    S_n \approx \frac{1}{n} \sum_{i = 1}^n L_i.
+$$
+Inverting this relationship for $L_n$ shows that
+$$
+    L_n \approx n S_n - \sum_{i = 1}^{n-1} L_i = n S_n - (n-1)S_{n-1} = n \left[ S_n - \left(\frac{n-1}{n}\right) S_{n-1} \right].
+$$
+Hence, a naive bump to the forward rate $S_n$ by an amount $\epsilon$ while leaving $S_{n-1}$ and $S_{n+1}$ unchanged 
+propagates into the Libor forward rate $L_n$ as a shift of size $n \epsilon$ and into the forward rate $L_{n+1}$ as a 
+shift of size $-n \epsilon$. As a concrete example, if we were to shift the 10 year swap rate by 1bp while keeping the 
+9 and 11 year points flat, then the forward Libor rate $L_{10}$ would move by 10bp and the forward rate $L_{11}$ would 
+move by -10bp. Now suppose that our portfolio contained a spread option on the difference $L_{10} - L_{11}$. We see 
+that the underlying of this option just moved by 20bp despite the swap rate $S_{10}$ moving just 1bp!
+
+This situation helps highlight the importance of applying shifts to the forward curve that reflect realistic moves in 
+interest rates. It is highly unlikely that the forward curve would move in a way that caused the 10 year swap rate to 
+move by a basis point while the 9 and 11 year swap rates stayed constant.
+
+A tweak to the par-point approach that leads to more realistic shifts in the forward curve is the 
+**cumulative par-point approach**. The idea here is simple. The shift to the $i$th benchmark security is retained while 
+calculating the derivative with respect to the $(i+1)$th security, i.e. the $(i+1)$th derivative $C_{i+1}$ is 
+calculated as
+$$
+    C_{i+1} := X(V_1 + \Delta V_1, \ldots, V_{i} + \Delta V_i, V_{i+1} + \Delta V_{i+1}, V_{i+2}, \ldots, V_N) - X(V_1 + \Delta V_1, \ldots, V_i + \Delta V_i, V_{i+1}, \ldots, V_N).
+$$
+Notice that, by Taylor expansion about the point $(V_1 + \Delta V_1, \ldots, V_i + \Delta V_i, V_{i+1}, \ldots, V_N)$, 
+we find that
+$$
+    C_{i+1} = \frac{\partial X}{\partial V_{i+1}} (V_1 + \Delta V_1, \ldots, V_i + \Delta V_i, V_{i+1}, \ldots V_N) \Delta V_{i+1},
+$$
+which clearly converges to the standard par-point delta
+$$
+    \Delta_{i+1} X := X(V_1, \ldots, V_{i}, V_{i+1} + \Delta V_{i+1}, V_{i+2}, \ldots, V_N) - X(V_1, \ldots, V_N),  
+$$
+in the limit as $\Delta V_j \rightarrow 0$ for $j = 1, \ldots, i$. The forward curve moves implied by the cumulative 
+par-point approach are less extreme than those implied by the ordinary par-point approach, making te cumulative method 
+attractive in practice. Another advantage of the cumulative approach is the fact that the sum of the deltas $C_i$ 
+calculated by the method are always **exactly equal** to the **parallel delta**, by construction. Due to second-order 
+effects, the same is only true of the ordinary method in the limit as the shifts tend to zero.
+
+It is easy to enact the cumulative approach in the Jacobian framework laid out above. Clearly, the $i$th cumulative 
+shift roughly corresponds to a **piecewise flat move** in the forward curve between the maturities of the $(i+1)$th and 
+$i$th benchmark. Hence, we define
+$$
+    \mu_i(t) = 1(t \in [T_{i-1}, T_i)), \quad i = 1, \ldots, N.
+$$
+In fact, performing the cumulative shifts in forward space is often a more attractive approach than doing so in price 
+space. By shifting in forward space, forward curve shocks are similarly scaled, in contrast to the basic cumulative 
+method where the size of the forward curve shocks grow linearly with maturity.
+
+A final point to note is that most yield curve risk-management systems compute deltas as the average of a delta first 
+computed using a positive bump and then computed using a negative bump. This approach helps to improve accuracy and 
+stability of the computed deltas and applies to all of the delta calculation methods explored above.

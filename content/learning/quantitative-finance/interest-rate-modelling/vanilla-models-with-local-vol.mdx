@@ -1,0 +1,162 @@
+---
+title: Vanilla Models With Local Volatility
+path: /van-models-with-lv
+category: Quantitative Finance
+sub_category: Interest Rate Modeling
+index: 14
+date: 2020-06-05
+---
+
+<props.TutorialContents props={props}/>
+
+import { CEVBlackVolCurve } from '../../../../src/components/learning_components/maths_finance/ir_modeling/vanilla_pricing_with_local_vol/vanillaModelPlots.js'
+
+As we saw in post 6 of this series, European swaptions can be valued as European options on a forward swap rate. 
+Consequently, a full **term structure model** specifying the dynamics of the yield curve as a whole is unnecessary for 
+European swaption valuation. Instead, we simply need a **terminal distribution** for a single swap rate (or a model for 
+said rate's evolution). Models of this nature are known as **vanilla models**, to distinguish them from full term 
+structure models. If multiple rates are involved in the pricing of a European option, a vanilla model can be extended 
+by copula methods to price such an option through the joint distribution of each rate involved.
+
+In this post, we review **one-factor diffusion models**, where our ability to alter the terminal distribution of the 
+underlying swap rate stems from a single place: a swap rate dependent diffusion term. Models of this nature are known 
+as **local volatility function** (**LVF**) models. Particularly tractable examples of such models include: the 
+**constant elasticity of variance** (**CEV**) model, the **displaced diffusion** model and **quadratic** models. At 
+first, we will review these types of models, before reviewing efficient numerical methods for European options within 
+the more general LVF model class.
+
+## The General Framework
+### Model dynamics
+Denote the swap rate by $S(t)$ (note that the forward Libor rate $L(t, S, T)$ is simply a special case of a swap rate 
+with underlying swap paying on just one date, namely the maturity date $T$). Let $W(t)$ be a one-dimensional 
+**Brownian motion** under the measure $\mathbb{S}$ such that $S(\cdot)$ is a martingale. From now on, we will write 
+$\mathbb{E}_t[\cdot] := \mathbb{E}^\mathbb{S}_t\left[ \cdot \right]$ to denote the expectation under the measure 
+$\mathbb{S}$. We assume that $S(t)$ follows the one-dimensional SDE
+$$
+    \text{d} S(t) = \lambda \varphi(S(t)) \text{d} W(t), \tag{1}
+$$
+where $\lambda > 0$ is constant and $\varphi(\cdot)$ is a real-valued function of the swap rate $S(t)$ satisfying some 
+*regularity conditions*. In most cases, we would want $S(t) \ge 0$, which is easily seen to impose the condition
+$$
+    \varphi(0) = 0. \tag{2}
+$$
+If this were not the case, there would always be a non-zero probability that $S(t)$ would *go negative* on the interval 
+where $\varphi$ was non-zero. In some cases, however, we will knowingly violate condition (2) if it makes the model 
+more tractable.
+
+### Volatility smile and implied density
+The function $\varphi$ exists in order to match the distribution of $S(\cdot)$ to that observed through options 
+observed in the market. Specifically, let $c \equiv c(t, S; T, K)$ represent the time-$t$ price of a $T$-maturity 
+**European call option** (payer swaption) with strike $K$, where $S \equiv S(t)$. $c$ has time-$t$ price given by the 
+expectation
+$$
+    c(t, S(t); T, K) = \mathbb{E}_t \left[(S(T) - K)^+ \right].
+$$
+The time-$t$ probability density function of $S(T)$ can be derived from the time-$t$ observed values of $c$ via
+$$
+    \begin{aligned}
+        f_t(K) & = \frac{\mathbb{S}_t(S(T) \in [K, K+ \text{d}K))}{\text{d} K} \\
+        & = \mathbb{E}_t \left[\delta (S(T) - K) \right] \\
+        & = \mathbb{E}_t \left[ \frac{\partial^2 c(T, S(T); T, K)}{\partial K^2} \right] \\
+        & = \frac{\partial^2 c(T, S(T); T, K)}{\partial K^2}.
+    \end{aligned}
+$$
+This result allows us to construct the time-$t$ marginal density of $S(T)$ from prices of $T$-maturity call options for 
+a continuum of strikes $K$. In options markets, it is more common to express the strike dependency of option prices in 
+terms of the **implied volatility** of the option. Specifically, for a given option price $c$ observed in the market, 
+with strike $K$ and maturity $T$, we define the time-$t$ **Black implied volatility** function $\sigma_B(t,S;T,K)$ as 
+the solution to
+$$ 
+    \begin{aligned}
+        c(t, S; T, K) & = S \Phi(d_+) - K \Phi(d_-), \\
+        d_{\pm} & = \frac{\log\left(\frac{S}{K}\right) \pm \frac{1}{2} \sigma_B(t, S; T, K)^2(T-t)}{\sigma_B(t, S; T, K) \sqrt{T - t}}.
+    \end{aligned}
+$$
+Notice that the above formula is the price of an option under the Black model, with constant volatility given by 
+$\sigma_B(t, S; K, T)$. 
+
+At any given snapshot in time, both $t$ and $S(t)$ are fixed and we observe option prices on a strike-maturity grid. 
+Hence, we consider $\sigma_B(t,S;K,T)$ a mapping from $K \mapsto \sigma_B(t, S; T, K)$ for fixed maturity $T$ and refer 
+to this function as the $T$-maturity **volatility smile**. In most fixed income markets, this **smile** is a downwards 
+sloping function of $K$, although it is not common for $\sigma_B$ to eventually increase for sufficiently large values 
+of $K$.
+
+##### Choosing $\varphi$
+If we were to allow $\varphi$ to depend on time, a key result by Dupire shows that any arbitrage-free terminal 
+distribution of $S(T)$ can be realised through a suitable choice of $\varphi \equiv \varphi(t, S)$, $t \in [0, T]$. 
+Indeed, we do so by finding $\phi(S, K)$ through the observed volatility surface $\sigma_B(0, S(0); S, K)$, 
+$(S, K) \in [0, T] \times [0, \infty)$. 
+
+Indeed, writing 
+$$
+    \begin{aligned}
+        w(T, K) & := T \cdot \sigma_B(0, S(0); T, K)^2, \\
+        y & := \log\left(\frac{K}{S(T)}\right), \\
+    \end{aligned}
+$$
+we find that
+$$
+    \varphi(T, K)^2 = \frac{\frac{\partial w}{\partial T}}{1 - \frac{y}{w}\frac{\partial w}{\partial y} + \frac{1}{4}\left(-\frac{1}{4} - \frac{1}{w} + \frac{y^2}{w^2}\right)\left(\frac{\partial w}{\partial y} \right)^2 + \frac{1}{2}\frac{\partial^2 w}{\partial y^2}}.
+$$
+However, unless the resulting $\varphi$ is monotonic in $S$, the resulting model will imply **non-stationary** 
+volatility smile behaviour, contrary to empirical results. Consequently, non-monotonic specifications of $\varphi$ 
+should be approached with caution. 
+
+Hence, the basic model (1) is best used in markets where the volatility smile is close to a montonic function of $K$. A 
+classic choice for $\varphi$ that satisfies this condition is the **constant elasticity of variance** (**CEV**) 
+specification
+$$
+    \varphi(S) = S^p,
+$$
+for some constant $p$.
+
+### The CEV model
+The CEV model is given by the SDE
+$$
+    \text{d} S(t) = \lambda S(t)^p \text{d}W(t), \tag{3}
+$$
+where $p > 0$ is a constant. There are a few key points regarding the CEV specification (3):
+
+1. All solutions to (3) are non-explosive,
+2. For $p \ge \frac{1}{2}$, (3) has a unique solution,
+3. For $0 < p < 1$, $S = 0$ is an **attainable boundary** for (3), in the sense that $S(t)$ will reach this boundary with non-zero probability in finite time. For $p \ge 1$, $S=0$ is an **unattainable boundary** for (3),
+4. For $0 < p \le 1$, $S(t)$ is a **martingale**. For $p > 1$, $S(t)$ is a **supermartingale**.
+
+Through point 2, we know that solutions to (3) are unique for $p \ge \frac{1}{2}$. Hence, for $\frac{1}{2} \le p < 1$, 
+if the solution ever reaches $S = 0$, then it will stay there, i.e. it will be **absorbed**. However, for 
+$0 < p < \frac{1}{2}$, solutions are **not unique**, and there will be solutions that stay at 0 if they reach the 
+origin, and others that *jump* out of it. Hence, it is important to supply a **boundary condition** at $S = 0$. In 
+practice, we set $S = 0$ to be an **absorbing barrier**, in the sense that if $S(\tau) = 0$, then $S(u) = 0$ for all 
+$u \ge \tau$, where $\tau$ is the first time at which $S(t) = 0$. This is the **only** arbitrage-free boundary 
+condition.
+
+##### Call option pricing
+Pricing European call options under the CEV model requires evaluation of the expectation
+$$
+    c_{\text{CEV}}(t, S(t); T, K) \equiv \mathbb{E}_t\left[(S(T) - K)^+ \right],
+$$
+for $S(\cdot)$ following (3). As a tedious exercise in integration, after applying a suitable transform to $S(\cdot)$ 
+and inverting said transform, we find that, with $\mathcal{X}_\nu^2(\gamma)$ representing a 
+**non-central chi-squared distributed** variable with $\nu$ degrees of freedom and non-centrality parameter $\gamma$, 
+and defining the following variables:
+$$
+    \begin{aligned}
+        \Upsilon(x, \eta, \gamma) & := \mathbb{P}(\mathcal{X}_\nu^2(\gamma) \le x), \\
+        a & := \frac{K^{2(1-p)}}{(1-p)^2 \lambda^2 (T-t)}, \\
+        b & := \left\vert 1 - p \right\vert^{-1}, \\
+        c & := \frac{S^{2(1-p)}}{(1-p)^2\lambda^2(T-t)},
+    \end{aligned}
+$$
+for $0 < p < 1$, $K > 0$ and the absorbing boundary condition, we find that
+$$
+    c_{\text{CEV}}(t, S(t); T, K) = S(1 - \Upsilon(a, b + 2, c)) - K\Upsilon(c, b, a).
+$$
+
+To see this model in action, we set $S(0) = 6\%$ and $\lambda = 10\%$, fix $T = 10$ years and plot the Black implied 
+volatilities implied volatilities generated by different values of $p$ as a function of **moneyness** $K/S(0)$.
+
+<CEVBlackVolCurve/>
+
+Notice that, in the plot above, as $p$ approaches $1$, i.e. the CEV model approaches the Black model, the implied 
+volatility approaches the flat implied volatility curve produced by the Black model with Black volatility equal to 
+$\lambda$.
