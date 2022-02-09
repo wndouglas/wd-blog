@@ -4,12 +4,13 @@ import { graphql } from "gatsby"
 import SEO from "../components/seo"
 import { MDXRenderer } from "gatsby-plugin-mdx"
 import MetaData from "../components/postMetadata"
-import { Disqus } from 'gatsby-plugin-disqus';
+  import { Disqus } from 'gatsby-plugin-disqus';
 
 export default ({ data }) => {
   const post = data.markdown
+  const url = data.site.siteMetadata.siteURL + "/posts" + post.frontmatter.path
   const disqusConfig = {
-    url: post.frontmatter.path,
+    url: url,
     identifier: post.id,
     title: post.frontmatter.title,
   }
@@ -40,6 +41,11 @@ export const query = graphql`
         }
         body
         timeToRead
+    }
+    site: site {
+      siteMetadata {
+        siteURL
+      }
+    }
   }
-}
 `

@@ -70,35 +70,35 @@ export default ({ data }) => {
 
 export const query = graphql`
   query($category: String!) {
-  allPosts: allMdx(filter: {frontmatter: {config: {ne: true}, 
-    post_type: {nin: ["header_page", "blog"]},
-    category: {eq: $category}}}) {
-    edges {
-      node {
-        frontmatter {
-            path
-            title
-            category
-            sub_category
-            date
-            index
-          }
-          timeToRead
-          excerpt
-      }
-    }
-  }
-  allConfig: allMdx(filter: {frontmatter: {config: {eq: true}, post_type: {nin: ["header_page", "blog"]}}}) {
-    edges {
-      node {
-        frontmatter {
-          sub_category
-          category
-          path
+    allPosts: allMdx(filter: {frontmatter: {config: {ne: true}, 
+      post_type: {nin: ["header_page", "blog"]},
+      category: {eq: $category}}}) {
+      edges {
+        node {
+          frontmatter {
+              path
+              title
+              category
+              sub_category
+              date
+              index
+            }
+            timeToRead
+            excerpt
         }
-        body
+      }
+    }
+    allConfig: allMdx(filter: {frontmatter: {config: {eq: true}, post_type: {nin: ["header_page", "blog"]}}}) {
+      edges {
+        node {
+          frontmatter {
+            sub_category
+            category
+            path
+          }
+          body
+        }
       }
     }
   }
-}
 `

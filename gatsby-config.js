@@ -3,6 +3,7 @@ module.exports = {
     title: `Alpha Beta Rho`,
     description: `Thoughts and Ideas from a Quantitative Professional.`,
     author: `Will Douglas`,
+    siteURL: 'https://alphabetarho.com',
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
